@@ -70,13 +70,19 @@ class Order extends Component
         $get_end_array = [];
         $the_order = $this->order_menu;
 
-        $sql = "SELECT
-        `cms_menu`.`id`,
-        `cms_menu`.`title` from `cms_menu`";
-        $sql .= " UNION ";
-        $sql .= "SELECT
-        `cms_menu_category`.`id`,
-        `cms_menu_category`.`title` from `cms_menu_category`";
+        $sql = "
+        SELECT
+            cms_menu.id,
+            cms_menu.title
+        FROM cms_menu
+
+        UNION
+
+        SELECT
+            cms_menu_category.id,
+            cms_menu_category.title
+        FROM cms_menu_category
+        ";
 
         $result = DB::select($sql);
 
@@ -111,7 +117,7 @@ class Order extends Component
                 }
             }
         }
-        
+
 
         $dkk = [];
 

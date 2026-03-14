@@ -104,9 +104,9 @@
                                                         <div class="row">
                                                             <div class="col-md-10">
                                                                 <?php
-                                                                
+
                                                                 echo get_needed($value2)[0]->title;
-                                                                
+
                                                                 ?>
                                                             </div>
 

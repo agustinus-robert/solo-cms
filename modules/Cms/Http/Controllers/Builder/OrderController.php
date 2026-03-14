@@ -24,7 +24,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
 //        $this->authorize('access', CmsMenuOrder::class);
-        
+
         return view('cms::builder.order.index');
     }
 }

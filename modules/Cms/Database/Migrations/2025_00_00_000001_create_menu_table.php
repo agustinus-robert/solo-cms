@@ -27,6 +27,7 @@ return new class extends Migration
             $table->longText('taxonomy_code');
             $table->longText('image_code');
             $table->longText('woocomerce_code');
+            $table->longText('meta_keyword');
             $table->tinyInteger('add')->nullable();
             $table->tinyInteger('edit')->nullable();
             $table->tinyInteger('delete')->nullable();

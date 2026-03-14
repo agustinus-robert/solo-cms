@@ -306,22 +306,27 @@ function category_by_post_id($post, $menu_id_category = '')
 
 function get_needed($id)
 {
-    $sql = "SELECT
-        `cms_menu`.`id`,
-        `cms_menu`.`title`,
-        `cms_menu`.`type`,
-        `cms_menu`.`icon`
-         from `cms_menu`
-        WHERE `cms_menu`.`id` = '" . $id . "'";
-    $sql .= " UNION ";
-    $sql .= "SELECT
-        `cms_menu_category`.`id`,
-        `cms_menu_category`.`title`,
-        `cms_menu_category`.`type`,
-        `cms_menu_category`.`icon` from `cms_menu_category`
-        WHERE `cms_menu_category`.`id` = '" . $id . "'";
+    $sql = "
+        SELECT
+            cms_menu.id,
+            cms_menu.title,
+            cms_menu.type,
+            cms_menu.icon
+        FROM cms_menu
+        WHERE cms_menu.id = ?
 
-    return DB::select($sql);
+        UNION
+
+        SELECT
+            cms_menu_category.id,
+            cms_menu_category.title,
+            cms_menu_category.type,
+            cms_menu_category.icon
+        FROM cms_menu_category
+        WHERE cms_menu_category.id = ?
+    ";
+
+    return DB::select($sql, [$id, $id]);
 }
 
 function get_menu_order()
