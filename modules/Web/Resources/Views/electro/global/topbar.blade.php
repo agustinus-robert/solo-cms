@@ -82,13 +82,35 @@
             </div>
             <div class="col-md-4 col-lg-3 text-center text-lg-end">
                 <div class="d-inline-flex align-items-center">
-                    <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span
-                            class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></i></a>
-                    <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span
-                            class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></a>
-                    <a href="#" class="text-muted d-flex align-items-center justify-content-center"><span
-                            class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                        <span class="text-dark ms-2">$0.00</span></a>
+                    @auth
+                        @php
+                            $isLiveEditorActive = request()->query('live_editor') === 'true';
+                            $toggleUrl = Request::fullUrlWithQuery(['live_editor' => $isLiveEditorActive ? null : 'true']);
+
+                            $canEditMode = $canEdit ?? false;
+                        @endphp
+
+                        <a href="{{ $toggleUrl }}"
+                        class="{{ $isLiveEditorActive ? 'text-danger' : 'text-primary' }} d-flex align-items-center justify-content-center me-3"
+                        title="{{ $isLiveEditorActive ? 'Matikan Live Editor' : 'Aktifkan Live Editor' }}">
+                            <span class="rounded-circle btn-md-square border {{ $isLiveEditorActive ? 'border-danger' : 'border-primary' }}">
+                                <i class="fas {{ $isLiveEditorActive ? 'fa-times' : 'fa-edit' }}"></i>
+                            </span>
+                        </a>
+                    @endauth
+
+                    <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3">
+                        <span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span>
+                    </a>
+
+                    <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3">
+                        <span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span>
+                    </a>
+
+                    <a href="#" class="text-muted d-flex align-items-center justify-content-center">
+                        <span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
+                        <span class="text-dark ms-2">$0.00</span>
+                    </a>
                 </div>
             </div>
         </div>
