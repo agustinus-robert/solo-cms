@@ -12,5 +12,5 @@ class CmsPostSchedule extends Model
 {
     use HasFactory, Metable;
 
-    public $table = "cms_post_schedule";
+    public $table = "cms_schedule_post";
 }

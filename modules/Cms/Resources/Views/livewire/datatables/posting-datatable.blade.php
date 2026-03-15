@@ -16,7 +16,7 @@
                     "serverSide": true,
                     "processing": true,
                     "ajax": {
-                        "url": "datatable?class=Modules\\Admin\\DataTables\\PostingDatatables",
+                        "url": "datatable?class=Modules\\Cms\\DataTables\\PostingDatatables",
                         "type": "GET",
                         "data": function(data) {
 
@@ -32,13 +32,13 @@
                     },
                     columnDefs: [
                         {
-                            targets: -1, 
+                            targets: -1,
                             createdCell: function(td, cellData, rowData, row, col) {
                                 td.setAttribute('nowrap', 'nowrap');
                             }
                         },
                         {
-                            targets: 4, 
+                            targets: 4,
                             visible: false
                         },
                     ],

@@ -100,7 +100,7 @@
                             <input wire:change="helperlanguage($event.target.value)" class="form-control" type="text" wire:model.lazy="content.title" />
                         </div>
                         <?php
-                        
+
                             if($data->post_code){
                                 $i = 0;
                                 foreach(json_decode($data->post_code, true) as $index_pc => $value_pc){
@@ -132,7 +132,7 @@
 
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">Media 
+                        <h5 class="mb-0">Media
                             @if($postId == 30 || $postId == 31 || $postId == 34)
                                <p style="font-size:13px;">gambar 1280 x 500 (Landscape)</p>
                             @elseif($postId == 32)

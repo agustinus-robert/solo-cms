@@ -1,123 +1,94 @@
 @extends('cms::layouts.default')
 
-@extends('cms::layouts.components.navbar-admin')
-
 @section('title', 'Posting')
-
 @section('navtitle', 'Posting')
 
 @section('content')
 
     @if (str_contains(url()->full(), 'create') || str_contains(url()->full(), 'edit'))
-        @livewire('cms::builder.posting')
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body p-0">
+                @livewire('cms::builder.posting')
+            </div>
+        </div>
     @else
-        <div class="toolbar mb-lg-7 mb-5" id="kt_toolbar">
-            <!--begin::Page title-->
-            <div class="page-title d-flex flex-column me-3">
-                <!--begin::Title-->
-                <h1 class="d-flex fw-bold fs-3 my-1 text-gray-900">Posting {{ $type == 7 ? 'Form' : 'Data' }}</h1>
-                <!--end::Title-->
-                <!--begin::Breadcrumb-->
-                <ul class="breadcrumb breadcrumb-dot fw-semibold fs-7 my-1 text-gray-600">
-                    <!--begin::Item-->
-                    <li class="breadcrumb-item text-gray-600">
-                        <a href="index.html" class="text-hover-primary text-gray-600">Dashboard</a>
-                    </li>
-
-                    <li class="breadcrumb-item text-gray-600">Posting {{ $type == 7 ? 'Form' : 'Data' }}</li>
-                </ul>
-                <!--end::Breadcrumb-->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-8">
+            <div>
+                <h1 class="fw-bolder text-dark fs-2 mb-1">
+                    {{ $type == 7 ? 'Form Management' : 'Posting Data' }}
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-dot fw-semibold fs-7 p-0 m-0">
+                        <li class="breadcrumb-item text-muted">Dashboard</li>
+                        <li class="breadcrumb-item text-primary active">Posting</li>
+                    </ol>
+                </nav>
             </div>
-            <!--end::Page title-->
+
+            <div class="mt-4 mt-md-0">
+                @if ($type == 7 || $create_status->add == 1)
+                    <a href="{{ $type == 7 ? route('cms::builder.posting_form.create') : route('cms::builder.posting.create') }}?id_menu={{ $id_menu }}"
+                       class="btn btn-dark btn-sm px-6 shadow-sm"
+                       style="border-radius: 8px; transition: all 0.2s;">
+                        <i class="ki-duotone ki-plus fs-4 me-1"></i>
+                        Add New {{ $type == 7 ? 'Form' : 'Post' }}
+                    </a>
+                @endif
+            </div>
         </div>
 
-        <div class="content flex-column-fluid" id="kt_content">
-            @if (Session::has('msg'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-                    <div class="alert alert-success">
-                        {{ Session::get('msg') }}
+        @foreach (['msg' => 'success', 'msg-gagal' => 'danger', 'msg-server' => 'danger'] as $key => $type_alert)
+            @if (Session::has($key))
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
+                     x-transition.duration.500ms
+                     class="alert alert-dismissible bg-light-{{ $type_alert }} border-{{ $type_alert }} border-dashed d-flex flex-column flex-sm-row p-4 mb-6">
+                    <div class="d-flex flex-column pe-0 pe-sm-10 text-{{ $type_alert }}">
+                        <span class="fw-bold text-dark fs-6">{{ Session::get($key) }}</span>
                     </div>
                 </div>
             @endif
+        @endforeach
 
-            @if (Session::has('msg-gagal'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-                    <div class="alert-danger alert">
-                        {{ Session::get('msg-gagal') }}
-                    </div>
+        <div class="card border-0 shadow-sm mb-5 mt-4" style="border-radius: 16px; overflow: hidden;">
+            <div class="card-header border-0 pt-8 bg-transparent">
+                <div class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold fs-4 text-gray-800">All Records</span>
+                    <span class="text-muted mt-1 fw-semibold fs-7">Manage and organize your content efficiently</span>
                 </div>
-            @endif
+            </div>
 
-            @if (Session::has('msg-server'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-                    <div class="alert-danger alert">
-                        {{ Session::get('msg') }}
-                    </div>
-                </div>
-            @endif
-
-            {{-- <div class="row">
-	    <div class="px-3 mb-5">
-	        <div class="row justify-content-between">
-	          <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-xxl-0 border-bottom-xxl-0 border-end border-bottom pb-4 pb-xxl-0 "><span class="uil fs-5 lh-1 uil-envelope text-primary"></span>
-	            <h1 class="fs-5 pt-3">0</h1>
-	            <p class="fs-9 mb-0">Total Post</p>
-	          </div>
-	          <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-xxl-0 border-bottom-xxl-0 border-end-md border-bottom pb-4 pb-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-upload text-info"></span>
-	            <h1 class="fs-5 pt-3">0</h1>
-	            <p class="fs-9 mb-0">Total Post On day</p>
-	          </div>
-	          <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-bottom-xxl-0 border-bottom border-end border-end-md-0 pb-4 pb-xxl-0 pt-4 pt-md-0"><span class="uil fs-5 lh-1 uil-envelopes text-primary"></span>
-	            <h1 class="fs-5 pt-3">0</h1>
-	            <p class="fs-9 mb-0">Total Post every 3 month</p>
-	          </div>
-	          <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end-md border-end-xxl-0 border-bottom border-bottom-md-0 pb-4 pb-xxl-0 pt-4 pt-xxl-0"><span class="uil fs-5 lh-1 uil-envelope-open text-info"></span>
-	            <h1 class="fs-5 pt-3">0</h1>
-	            <p class="fs-9 mb-0">Total Post On year</p>
-	          </div>
-	        </div>
-	    </div>
-	</div> --}}
-
-            <div class="card-flush card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <div class="card-title mb-0">
-                        <div class="d-flex align-items-center position-relative my-1">
-                            List Of Post Data
-                        </div>
-                    </div>
-
-                    <div class="card-toolbar">
-                        @if ($type == 7)
-                            <a class="btn btn-primary" href="{{ route('cms::builder.posting_form.create') }}?id_menu={{ $id_menu }}">
-                                Create Form
-                            </a>
-                        @else
-                            @if ($create_status->add == 1)
-                                <a class="btn btn-primary" href="{{ route('cms::builder.posting.create') }}?id_menu={{ $id_menu }}">
-                                    Create Post
-                                </a>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-
-
-                <div class="card-body">
-                    @if ($type != 7)
-                        @livewire('cms::datatables.posting-datatable')
-                    @else
-                        @livewire('cms::datatables.posting-form-datatable')
-                    @endif
+            <div class="card-body pt-2 pb-8">
+                <div class="table-responsive custom-datatable">
+                    @livewire($type != 7 ? 'cms::datatables.posting-datatable' : 'cms::datatables.posting-form-datatable')
                 </div>
             </div>
         </div>
 
-        <script type="text/javascript">
-            $('#datatablesSimple table').addClass('mt-5');
-            $('#datatablesSimple tr th').addClass('fw-bold fs-6 text-gray-800');
-        </script>
+        <style>
+            /* Custom Subtle Styling */
+            .card {
+                background-color: #ffffff;
+                box-shadow: 0 0.1rem 1rem 0.25rem rgba(0, 0, 0, 0.03) !important;
+            }
+            .breadcrumb-item.active { color: #0095E8 !important; }
+            .btn-dark { background-color: #181c32 !important; border: none; }
+            .btn-dark:hover { background-color: #000 !important; transform: translateY(-1px); }
+
+            /* Make Datatable Clean */
+            .custom-datatable .table thead th {
+                background-color: #f9fafb;
+                text-transform: uppercase;
+                font-size: 0.75rem !important;
+                letter-spacing: 0.05em;
+                font-weight: 700;
+                border-bottom: 1px solid #f1f1f4 !important;
+                padding: 1rem !important;
+            }
+            .custom-datatable .table tbody td {
+                padding: 1.25rem 1rem !important;
+                vertical-align: middle;
+            }
+        </style>
     @endif
-
 
 @endsection

@@ -7,9 +7,7 @@ use Laravel\Passport\Passport;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Yajra\DataTables\Services\DataTable;
-use Modules\Admin\Http\Controllers\Builder\DataTableBuilderController;
-use Modules\Admin\Http\Controllers\Configure\DataTableConfigureController;
-use Modules\Admin\Http\Controllers\CustomFeature\DataTableCustomController;
+use Modules\Cms\Http\Controllers\Builder\DataTableBuilderController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -23,12 +21,11 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+        public function register()
     {
-        // Passport configuration
-        if (env('BUG') == 0) {
+        if (!app()->runningInConsole()) {
             $this->app->when(DataTableBuilderController::class)->needs(DataTable::class)->give(function () {
-                $className = request()->query('class', \App\DataTables\DefaultDataTables::class);
+                $className = request()->query('class');
 
                 if (class_exists($className)) {
                     return (new $className);
@@ -36,30 +33,8 @@ class AppServiceProvider extends ServiceProvider
 
                 return abort(403);
             });
-
-            $this->app->when(DataTableConfigureController::class)->needs(DataTable::class)->give(function () {
-                $className = request()->query('class', \App\DataTables\DefaultDataTables::class);
-
-                if (class_exists($className)) {
-                    return (new $className);
-                }
-
-                return abort(403);
-            });
-
-            $this->app->when(DataTableCustomController::class)->needs(DataTable::class)->give(
-                function () {
-                    $className = request()->query('class', \App\DataTables\DefaultDataTables::class);
-
-                    if (class_exists($className)) {
-                        return (new $className);
-                    }
-
-                    return abort(403);
-                }
-            );
         }
-        // Passport::ignoreMigrations();
+
     }
 
     /**

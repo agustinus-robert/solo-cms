@@ -20,4 +20,14 @@ class CmsPost extends Model
         return $this->belongsToMany(CmsCategory::class, 'cms_post_has_category', 'post_id', 'tags_id');
     }
 
+    public function menu()
+    {
+        return $this->belongsTo(CmsMenu::class, 'menu_id');
+    }
+
+    public function schedule()
+    {
+        return $this->hasOne(CmsPostSchedule::class, 'cms_post_id')
+            ->latestOfMany();
+    }
 }

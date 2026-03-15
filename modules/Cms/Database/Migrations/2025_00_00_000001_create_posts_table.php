@@ -25,6 +25,10 @@ return new class extends Migration
             $table->integer('status');
             $table->longText('alt_image')->nullable();
 
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('menu_id')->references('id')->on('cms_menu')->onUpdate('cascade')->onDelete('cascade');
@@ -32,23 +36,23 @@ return new class extends Migration
 
         Schema::create('cms_post_meta', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('post_id');
+            $table->unsignedBigInteger('cms_post_id');
             $table->string('type', 50);
             $table->string('key', 255);
             $table->longText('value');
 
-            $table->foreign('post_id')->references('id')->on('cms_post')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('cms_post_id')->references('id')->on('cms_post')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cms_schedule_post', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('post_id');
+            $table->unsignedBigInteger('cms_post_id');
             $table->date('schedule_on');
             $table->time('timepicker');
 
             $table->softDeletes();
             $table->timestamps();
-            $table->foreign('post_id')->references('id')->on('cms_post')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('cms_post_id')->references('id')->on('cms_post')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cms_post_image', function (Blueprint $table) {
@@ -70,12 +74,15 @@ return new class extends Migration
 
         Schema::create('cms_post_has_category', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('menu_id');
             $table->unsignedBigInteger('tags_id');
             $table->string('parameter', 255);
 
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('post_id')->references('id')->on('cms_post')->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('cms_post_image_has_category', function (Blueprint $table) {
