@@ -18,7 +18,8 @@ class HomeController extends Controller{
                 'order' => 1,
                 'data'  => [
                    'carousel' => get_data_by_menu('1859690265115931', null, false),
-                   'offers' => get_data_by_menu('1859690530369920', null, false)
+                   'offers' => get_data_by_menu('1859690530369920', null, false),
+                   'canEdit' => $this->canEdit
                 ]
             ],
             'web::electro.home.section2-services' => [

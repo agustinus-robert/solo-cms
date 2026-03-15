@@ -11,26 +11,25 @@ use Illuminate\Support\Facades\View;
 
 class Controller extends AppController {
     use HasSectionsTraits;
+    public $canEdit = false;
 
     public function __construct()
     {
-        $theme = Setting::where('key', 'theme')->first();
+        if (Auth::check()) {
+            $access = CmsLiveEditorsAccess::where('user_id', Auth::id())
+                        ->where('status', 1)
+                        ->first();
 
-        view()->composer('web::'.$theme->value.'.index', function ($view) {
-            $canEdit = false;
-
-            if (Auth::check()) {
-                $access = CmsLiveEditorsAccess::where('user_id', Auth::id())
-                            ->where('status', 1)
-                            ->first();
-
-
-                if ($access && request()->query('live_editor') === 'true') {
-                    $canEdit = true;
-                }
+            if ($access && request()->query('live_editor') === 'true') {
+                $this->canEdit = true;
             }
+        }
 
-            $view->with('canEdit', $canEdit);
+        $theme = Setting::where('key', 'theme')->first();
+        $themeName = $theme ? $theme->value : 'electro';
+
+        view()->composer('web::' . $themeName . '.*', function ($view) {
+            $view->with('canEdit', $this->canEdit);
             $view->with('pages', request()->path());
         });
     }

@@ -1,17 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Modules\Admin\Models\Post;
+use Modules\Web\Http\Controllers\EditorController; // Pastikan path-nya bener
+use Modules\Web\Http\Controllers\MainController;
 
 Route::group(['middleware' => ['web']], function () {
-    Route::any('{controller?}/{method?}/{param?}',
-        [\Modules\Web\Http\Controllers\MainController::class, 'call']
-    )->name('web.page');
-});
-//pemanggilan
 
-//route('web.page', [
-//     'controller' => 'product',
-//     'method' => 'detail'
-// ]);
+    Route::resource('editor-sidebar', EditorController::class)->only([
+        'edit', 'update'
+    ]);
+
+    Route::any('{controller?}/{method?}/{param?}', [MainController::class, 'call'])
+        ->name('web.page');
+});
