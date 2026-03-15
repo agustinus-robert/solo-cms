@@ -21,7 +21,7 @@
         <form wire:submit="save" enctype="multipart/form-data">
             <div class="card-body p-4">
                 <div class="row g-4">
-                    
+
                     @if ($action == 'direction')
                         <div class="col-md-7 border-end">
                             <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Informasi Dasar</h6>
@@ -62,6 +62,9 @@
                                         <option value="1">PCS</option>
                                     </select>
                                 </div>
+                                {{-- Hidden Type untuk validasi --}}
+                                <input type="hidden" wire:model="form.type" value="standard">
+                                <input type="hidden" wire:model="form.barcode" value="1">
                             </div>
                         </div>
 
@@ -94,6 +97,7 @@
                         </div>
 
                     @else
+                        {{-- VIEW TAMBAH PRODUK BIASA --}}
                         <div class="col-md-8">
                             <div class="row g-3">
                                 <div class="col-md-4">
@@ -103,6 +107,14 @@
                                 <div class="col-md-8">
                                     <label class="form-label small fw-bold">Nama Produk</label>
                                     <input type="text" class="form-control @error('form.name') is-invalid @enderror" wire:model="form.name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Tipe Produk</label>
+                                    <select class="form-select @error('form.type') is-invalid @enderror" wire:model="form.type">
+                                        <option value="">Pilih Tipe</option>
+                                        <option value="1">Standard</option>
+                                        <option value="2">Service</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Brand</label>
@@ -119,10 +131,24 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-primary text-decoration-underline">Harga Awal (Modal)</label>
+                                    <label class="form-label small fw-bold">Sub Kategori</label>
+                                    <select class="form-select" wire:model="form.sub_category_id" {{ $categoryHasSub != 1 ? 'disabled' : '' }}>
+                                        <option value="">Pilih Sub</option>
+                                        @foreach ($subCategory as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Unit</label>
+                                    <select class="form-select @error('form.unit_id') is-invalid @enderror" wire:model="form.unit_id">
+                                        <option value="">Pilih Unit</option>
+                                        <option value="1">PCS</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-primary">Harga Modal</label>
                                     <input type="number" wire:model="form.wholesale" class="form-control">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label small fw-bold">Harga Jual</label>
                                     <input type="number" wire:model="form.price" class="form-control">
                                 </div>
@@ -131,25 +157,21 @@
 
                         <div class="col-md-4">
                             <div class="p-3 bg-light rounded-3 h-100">
-                                <div class="mb-3 text-center">
-                                    <label class="form-label small fw-bold d-block text-start">File / Gambar Produk</label>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Gambar Produk</label>
                                     <input type="file" class="form-control form-control-sm" wire:model="form.document">
-                                    @if (!empty($form['document']) && isset($form['id']))
-                                        <a href="{{ asset($form['document']) }}" class="btn btn-sm btn-outline-primary mt-2 w-100">
-                                            <i class="bi bi-download"></i> Lihat File
-                                        </a>
-                                    @endif
                                 </div>
                                 <hr>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Barcode Tipe</label>
-                                    <select class="form-select form-select-sm" wire:model="form.barcode">
-                                        <option value="1">Barcode 1</option>
+                                    <select class="form-select form-select-sm @error('form.barcode') is-invalid @enderror" wire:model="form.barcode">
+                                        <option value="0">Pilih Barcode</option>
+                                        <option value="1">CODE128</option>
                                     </select>
                                 </div>
                                 <div class="mb-0">
                                     <label class="form-label small fw-bold">Pajak</label>
-                                    <select class="form-select form-select-sm" wire:model="form.tax_rate_id">
+                                    <select class="form-select form-select-sm @error('form.tax_rate_id') is-invalid @enderror" wire:model="form.tax_rate_id">
                                         <option value="">Tanpa Pajak</option>
                                         @foreach ($tax as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
                                     </select>

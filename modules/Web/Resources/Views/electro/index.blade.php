@@ -19,93 +19,40 @@
     <link href="{{ asset('themes/electro/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('themes/electro/css/style.css') }}" rel="stylesheet">
 
-    <style>
-        body {
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-        }
+    @if($canEdit)
+        <style>
+            body { overflow: hidden; margin: 0; padding: 0; width: 100vw; height: 100vh; }
+            .builder-layout { display: flex; width: 100%; height: 100vh; overflow: hidden; background-color: #e2e8f0; }
+            #customizer-sidebar { width: 450px; min-width: 450px; flex-shrink: 0; background-color: white; z-index: 1030; position: relative; overflow-y: auto; }
+            .sidebar-closed { margin-left: -450px !important; opacity: 0; visibility: hidden; }
+            .main-content-area { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; transition: all 0.3s ease; height: 100vh; }
+            .builder-topbar { height: 65px; background: white; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #dee2e6; flex-shrink: 0; }
 
-        /* WRAPPER UTAMA */
-        .builder-layout {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #e2e8f0;
-        }
+            /* FIX SCROLL & VISIBILITY */
+            #preview-container {
+                flex: 1;
+                padding: 20px;
+                overflow-y: auto !important;
+                overflow-x: hidden;
+                background-color: #e2e8f0;
+                display: block;
+            }
+            #preview-frame {
+                width: 100%;
+                min-height: 100%;
+                height: auto !important;
+                background: white;
+                border-radius: 16px;
+            }
 
-        /* SIDEBAR */
-        #customizer-sidebar {
-            width: 450px;
-            min-width: 450px;
-            flex-shrink: 0; /* Jaga lebar sidebar tetap saat transisi */
-            background-color: white;
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease !important;
-            z-index: 1030;
-            position: relative;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        /* STATE TUTUP */
-        .sidebar-closed {
-            margin-left: -450px !important;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        /* AREA KANAN (PREVIEW) */
-        .main-content-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0; /* CRITICAL: Mencegah konten lebar nembus layout ke kanan */
-            transition: all 0.3s ease;
-        }
-
-        .builder-topbar {
-            height: 65px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid #dee2e6;
-            position: relative;
-            z-index: 1025;
-            width: 100%;
-            flex-shrink: 0;
-        }
-
-        #preview-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            overflow-x: hidden; /* Pastikan tidak ada scroll horizontal di container luar */
-            display: flex;
-            justify-content: center;
-            background-color: #e2e8f0;
-        }
-
-        #preview-frame {
-            width: 100%;
-            max-width: 100%;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            min-height: 100%;
-            height: fit-content;
-            overflow-x: hidden; /* Kunci konten website di dalam frame ini */
-        }
-
-        /* CUSTOM SCROLLBAR */
-        #customizer-sidebar::-webkit-scrollbar { width: 5px; }
-        #customizer-sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-
-        .border-dashed { border: 2px dashed #dee2e6 !important; }
-    </style>
+            /* PAKSA SEMUA SECTION MUNCUL (Matikan efek WOW.js di mode edit) */
+            .wow {
+                visibility: visible !important;
+                animation-name: none !important;
+                opacity: 1 !important;
+            }
+        </style>
+    @endif
 </head>
 
 <body>
