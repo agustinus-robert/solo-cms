@@ -177,8 +177,6 @@ function get_menu_id($id)
 function get_data_by_menu($menu_id, $limit = null, $first = false)
 {
     $query = DB::table('cms_post')
-        // JANGAN panggil .* dari tabel join di akhir
-        // Taruh cms_post.* di paling akhir select supaya dia yang menang (overwrite)
         ->select('cms_post_has_category.id as category_id', 'cms_post.*')
         ->leftJoin('cms_post_has_category', 'cms_post_has_category.post_id', '=', 'cms_post.id')
         ->where([

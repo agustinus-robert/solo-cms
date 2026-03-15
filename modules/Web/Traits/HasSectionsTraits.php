@@ -13,9 +13,8 @@ trait HasSectionsTraits
     public function setSections(array $sections): self
     {
         foreach ($sections as $view => $config) {
-            // Cek apakah ada key 'order', jika tidak default ke 99
             $order = $config['order'] ?? 99;
-            $data = $config['data'] ?? $config; // Jika tidak ada nested 'data', ambil semua sebagai data
+            $data = $config['data'] ?? $config;
 
             $this->addSection($view, $data, $order);
         }

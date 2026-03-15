@@ -41,8 +41,9 @@
             @if (Session::has($key))
                 <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
                      x-transition.duration.500ms
-                     class="alert alert-dismissible bg-light-{{ $type_alert }} border-{{ $type_alert }} border-dashed d-flex flex-column flex-sm-row p-4 mb-6">
-                    <div class="d-flex flex-column pe-0 pe-sm-10 text-{{ $type_alert }}">
+                     class="alert alert-dismissible alert-{{ $type_alert }} border-{{ $type_alert }} border-dashed d-flex flex-column flex-sm-row p-4 mb-6
+                     mt-4">
+                    <div class="d-flex flex-column pe-0 pe-sm-10 text-secondary">
                         <span class="fw-bold text-dark fs-6">{{ Session::get($key) }}</span>
                     </div>
                 </div>

@@ -6,12 +6,20 @@ use Illuminate\Http\Request;
 use Modules\Web\Http\Controllers\Controller;
 
 class HomeController extends Controller{
+
+    public function __construct() {
+        parent::__construct();
+    }
+
     public function index(){
 
         $allSections = [
             'web::electro.home.section1-carousel' => [
                 'order' => 1,
-                'data'  => []
+                'data'  => [
+                   'carousel' => get_data_by_menu('1859690265115931', null, false),
+                   'offers' => get_data_by_menu('1859690530369920', null, false)
+                ]
             ],
             'web::electro.home.section2-services' => [
                 'order' => 2,
