@@ -12,7 +12,7 @@
                 </div>
 
                 @include('web::electro.contact.partials.left-form')
-                @include('web::electro.contact.partials.right-form')
+                @include('web::electro.contact.partials.right-map')
                 @include('web::electro.contact.partials.bottom-form')
             </div>
         </div>

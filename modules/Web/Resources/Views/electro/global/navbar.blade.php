@@ -57,9 +57,9 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <div class="navbar-nav ms-auto py-0">
-                            <a href="{{ url('/') }}" class="nav-item nav-link active">Home</a>
-                            <a href="{{ route('web::web.shop') }}" class="nav-item nav-link">Shop</a>
-                            <a href="contact.html" class="nav-item nav-link me-2">Contact</a>
+                            <a href="{{ url('/') }}" class="nav-item nav-link {{ (Request::is('/') || Request::is('home*')) ? 'active' : '' }}">Home</a>
+                            <a href="{{ route('web::web.shop') }}" class="nav-item nav-link {{ Route::is('web::web.shop*') ? 'active' : '' }}">Shop</a>
+                            <a href="{{ route('web::web.contact') }}" class="nav-item nav-link {{ Route::is('web::web.contact') ? 'active' : '' }}">Contact</a>
                             <div class="nav-item dropdown d-block d-lg-none mb-3">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">All Category</a>
                                 <div class="dropdown-menu m-0">
