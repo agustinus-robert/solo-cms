@@ -15,6 +15,7 @@
 
         <div class="col-lg-4 text-center text-lg-end">
             <div class="d-inline-flex align-items-center" style="height: 45px;">
+                <a href="{{ url('/login') }}" class="text-muted me-4"> Login</a>
                 <div class="dropdown">
                     <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small>
                             USD</small></a>
