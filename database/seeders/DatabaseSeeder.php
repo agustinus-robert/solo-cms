@@ -18,11 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            AppDatabaseSeeder::class,
-            \Modules\Account\Database\Seeders\AccountDatabaseSeeder::class,
-            \Modules\Account\Database\Seeders\UserDatabaseSeeder::class,
-            \Modules\Poz\Database\Seeders\ProductDatabaseSeeder::class,
-            \Modules\Poz\Database\Seeders\SupplierDatabaseSeeder::class
+            OnlyDataSeeder::class
         ]);
     }
 }

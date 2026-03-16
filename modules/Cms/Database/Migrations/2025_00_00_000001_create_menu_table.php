@@ -18,7 +18,7 @@ return new class extends Migration
         Schema::create('cms_menu', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title', 255);
-            $table->string('icon', 50);
+            $table->string('icon', 50)->nullable();
             $table->string('slug', 255);
             $table->integer('type');
             $table->longText('meta');
