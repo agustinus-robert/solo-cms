@@ -56,7 +56,7 @@
         color: #556ee6;
         font-weight: 600;
     }
-    
+
     /* Mempercantik Table Header */
     #dataTableBuilder thead th {
         background-color: #f8f9fa;
@@ -142,6 +142,7 @@
                                         'sale' => 'transaction.sale.create', 'purchase' => 'transaction.purchase.create',
                                         'retur' => 'transaction.return.create', 'adjustment' => 'transaction.adjustment.create',
                                         'adjustment-supplier' => 'supplierz.adjustment.create', 'quotation' => 'supplierz.quotation.create',
+                                        'tier' => 'master.tier.create'
                                     ];
                                     $labels = ['quotation' => 'Penawaran', 'retur' => 'Return'];
                                     $currentRoute = $routes[$menu] ?? null;
@@ -150,7 +151,7 @@
                                 @endphp
 
                                 @if($currentRoute)
-                                    <a class="btn btn-primary btn-create waves-effect waves-light shadow-sm" 
+                                    <a class="btn btn-primary btn-create waves-effect waves-light shadow-sm"
                                        href="{{ route('poz::' . $currentRoute, $isSupplierModule ? [] : ['outlet' => $outlet]) }}">
                                         <i class="bx bx-plus-circle me-1"></i> Tambah {{ $btnLabel }}
                                     </a>

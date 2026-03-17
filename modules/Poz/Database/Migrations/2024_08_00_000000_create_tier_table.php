@@ -17,14 +17,8 @@ return new class extends Migration
     {
         Schema::create('ref_tiers', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10);
+            $table->integer('type');
             $table->string('name', 100);
-            $table->string('email', 100);
-            $table->string('phone', 20);
-            $table->text('address')->nullable();
-            $table->string('location')->nullable();
-            $table->string('image_name')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -32,6 +26,24 @@ return new class extends Migration
 
             $table->softDeletesTz();
             $table->timestampsTz();
+        });
+
+        Schema::create('tiers_transaction', function(Blueprint $table){
+            $table->id();
+            $table->string('name', 100);
+            $table->foreignId('ref_tier_id')
+                ->constrained('ref_tiers')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletesTz();
+            $table->timestampsTz();
+
         });
     }
 

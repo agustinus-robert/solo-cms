@@ -2,12 +2,31 @@
 
 namespace Modules\Poz\Models;
 
-use App\Traits\HasAuditLog; // Import Trait-nya
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
 {
-    use HasAuditLog; // Pakai di sini
+    protected $table = 'audit_logs';
 
-    protected $fillable = ['name', 'start_date', 'end_date', 'is_active'];
+    protected $fillable = [
+        'auditable_id',
+        'auditable_type',
+        'event',
+        'description',
+        'old_values',
+        'new_values',
+        'user_id',
+        'url',
+        'ip_address',
+    ];
+
+    protected $casts = [
+        'old_values' => 'array',
+        'new_values' => 'array',
+    ];
+
+    public function auditable()
+    {
+        return $this->morphTo();
+    }
 }

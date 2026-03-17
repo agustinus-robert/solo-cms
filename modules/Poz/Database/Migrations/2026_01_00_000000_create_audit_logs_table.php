@@ -20,7 +20,11 @@ return new class extends Migration
 
             $table->morphs('auditable');
             $table->string('event');
+            $table->text('description')->nullable(); // Keterangan aktivitas
+            $table->json('old_values')->nullable();
+            $table->json('new_values')->nullable();
 
+            $table->text('url')->nullable();
             $table->ipAddress('ip_address')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 

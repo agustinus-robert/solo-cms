@@ -38,6 +38,11 @@
                     <span class="nav-main-link-name">Supplier</span>
                 </a>
             </li>
+            <li>
+                <a href="{{ route('poz::master.tier.index', request()->query()) }}" class="nav-main-link">
+                    <span class="nav-main-link-name">Tier</span>
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -50,7 +55,7 @@
     </li>
 
     <li class="menu-title" key="t-menu">Transaksi</li>
-    
+
     <li class="nav-main-item">
         <a class="nav-main-link active" href="{{ route('poz::transaction.qutation.index', request()->query()) }}">
             <i class="nav-main-link-icon mdi mdi-quora"></i>

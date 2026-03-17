@@ -50,6 +50,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::get('datatable_warehouse', 'WarehouseController@unitTable')->name('warehouse.datatables');
         Route::get('datatable_outlet', 'OutletController@outletTable')->name('outlet.datatables');
         Route::get('datatable_casier', 'CasierController@casierTable')->name('casier.datatables');
+        Route::get('datatable_tier', 'TierController@tierTable')->name('tier.datatables');
     });
 
     Route::prefix('reporting')->namespace('Reporting')->name('reporting.')->group(function () {
@@ -80,6 +81,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::resource('outlet', 'OutletController')->parameters(['outlets' => 'outlet']);
         Route::resource('casier', 'CasierController')->parameters(['casiers' => 'casier']);
         Route::resource('supplier', 'SupplierController')->parameters(['suppliers' => 'supplier']);
+        Route::resource('tier', 'TierController')->parameters(['tiers' => 'tier']);
     });
 
     Route::prefix('schedule')->namespace('Schedule')->name('schedule.')->group(function(){
@@ -91,8 +93,8 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::resource('sale', 'SaleController')->parameters(['sales' => 'sale']);
         Route::resource('qutation', 'QutationController')
             ->only(['index', 'show', 'update'])
-            ->parameters(['qutations' => 'qutation']);        
-            
+            ->parameters(['qutations' => 'qutation']);
+
         Route::resource('purchase', 'PurchaseController')->parameters(['purchases' => 'purchase']);
         Route::resource('return', 'ReturnController')->parameters(['returns' => 'return']);
         Route::resource('adjustment', 'AdjustmentController')->parameters(['adjustments' => 'adjustment']);
