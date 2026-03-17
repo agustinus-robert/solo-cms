@@ -15,10 +15,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('purchase', function (Blueprint $table) {
+        Schema::create('purchases', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
-            $table->foreignId('supplier_id')->constrained('supplier')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->constrained('ref_suppliers')->cascadeOnUpdate()->cascadeOnDelete();
            // $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete(); // Ditambahkan outlet
             $table->integer('is_pos')->nullable();
             $table->integer('purchase_status');
@@ -38,8 +38,8 @@ return new class extends Migration
 
         Schema::create('purchase_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_id')->constrained('purchase')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
            // $table->foreignId('warehouse_id')->constrained('warehouse')->cascadeOnUpdate()->cascadeOnDelete();
             // $table->foreignId('transfer_id')->nullable()->constrained('transfer')->nullOnDelete();
           //  $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete(); // Ditambahkan outlet

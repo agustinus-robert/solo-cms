@@ -15,10 +15,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('ref_units', function (Blueprint $table) {
+        Schema::create('ref_tiers', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10);
             $table->string('name', 100);
+            $table->string('email', 100);
+            $table->string('phone', 20);
+            $table->text('address')->nullable();
+            $table->string('location')->nullable();
+            $table->string('image_name')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -36,6 +42,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('unit');
+        Schema::dropIfExists('supplier');
     }
 };

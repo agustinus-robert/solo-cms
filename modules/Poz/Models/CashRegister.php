@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,9 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CashRegister extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasAuditLog, SoftDeletes;
 
-    public $table = "cash_register";
+    public $table = "cash_registers";
 
     protected $fillable = [
         'casier_id',

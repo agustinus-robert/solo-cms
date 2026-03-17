@@ -8,12 +8,12 @@ class CreateSupplierScheduleTable extends Migration
 {
     public function up()
     {
-        Schema::create('supplier_schedule', function (Blueprint $table) {
+        Schema::create('supplier_schedules', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('supplier_id');
             $table->unsignedBigInteger('product_id');
-          //  $table->string('day'); 
-            $table->string('time'); 
+          //  $table->string('day');
+            $table->string('time');
 
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
@@ -22,8 +22,8 @@ class CreateSupplierScheduleTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('supplier_id')->references('id')->on('supplier')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');
+            $table->foreign('supplier_id')->references('id')->on('ref_suppliers')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 

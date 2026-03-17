@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\BaseModel;
@@ -14,9 +15,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, Restorable, SoftDeletes, Userstamps;
+    use HasFactory, HasAuditLog, Restorable, SoftDeletes, Userstamps;
 
-    public $table = "product";
+    public $table = "products";
 
     protected $fillable = [
         'type',

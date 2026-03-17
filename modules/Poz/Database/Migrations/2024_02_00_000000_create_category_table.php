@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('category', function (Blueprint $table) {
+        Schema::create('ref_categories', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10);
             $table->string('name', 100);
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('image_name')->nullable();
 
-            $table->foreignId('parent_id')->nullable()->constrained('category')->nullOnDelete();
+            $table->foreignId('parent_id')->nullable()->constrained('ref_categories')->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

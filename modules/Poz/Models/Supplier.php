@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Supplier extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps;
+    use HasFactory, HasAuditLog, SoftDeletes, Userstamps;
 
-    public $table = "supplier";
+    public $table = "ref_suppliers";
 
     protected $fillable = [
         'code',

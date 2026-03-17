@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,15 +12,15 @@ use Modules\Core\Enums\SupplierWorkEnum;
 
 class SupplierSchedule extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps, Restorable;
+    use HasFactory, HasAuditLog, SoftDeletes, Userstamps, Restorable;
 
-    protected $table = 'supplier_schedule';
+    protected $table = 'supplier_schedules';
 
     protected $fillable = [
         'supplier_id',
         'product_id',
-        // 'day',    
-        'time'     
+        // 'day',
+        'time'
     ];
 
     /**

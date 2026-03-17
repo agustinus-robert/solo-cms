@@ -15,18 +15,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('product', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->integer('type');
             $table->integer('alert_qty')->nullable();
             $table->string('code', 30)->nullable();
             $table->string('name', 100);
             $table->string('barcode', 50)->nullable();
-            $table->foreignId('brand_id')->nullable()->constrained('brand')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained('category')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('sub_category_id')->nullable()->constrained('category')->nullOnDelete();
-            $table->foreignId('unit_id')->nullable()->constrained('unit')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('tax_rate_id')->nullable()->constrained('tax_rate')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('brand_id')->nullable()->constrained('ref_brands')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('ref_categories')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sub_category_id')->nullable()->constrained('ref_categories')->nullOnDelete();
+            $table->foreignId('unit_id')->nullable()->constrained('ref_units')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('tax_rate_id')->nullable()->constrained('ref_tax_rates')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('price', 20, 2);
             $table->text('description')->nullable();
             $table->text('location')->nullable();
@@ -40,10 +40,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('product_meta', function (Blueprint $table) {
+        Schema::create('product_metas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')
-                ->constrained('product')
+                ->constrained('products')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
@@ -55,6 +55,11 @@ return new class extends Migration
 
         Schema::create('product_promotions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
             $table->string('name');
             $table->tinyInteger('type');
             $table->json('config');
@@ -64,9 +69,9 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('product_label_variant', function (Blueprint $table) {
+        Schema::create('product_label_variants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->jsonb('attributes');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -75,9 +80,9 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('product_master_variant', function (Blueprint $table) {
+        Schema::create('product_master_variants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->jsonb('attributes');
             $table->string('code', 10);
             $table->string('name', 100);
@@ -90,10 +95,10 @@ return new class extends Migration
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
         });
 
-        Schema::create('product_gallery', function (Blueprint $table) {
+        Schema::create('product_galleries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_variant_id')->constrained('product_label_variant')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_variant_id')->constrained('product_label_variants')->cascadeOnUpdate()->cascadeOnDelete();
             $table->text('location')->nullable();
             $table->text('image_name')->nullable();
             $table->softDeletesTz();
@@ -101,12 +106,12 @@ return new class extends Migration
         });
 
 
-        Schema::create('product_cart', function (Blueprint $table) {
+        Schema::create('product_carts', function (Blueprint $table) {
             $table->id();
             $table->text('session_id')->nullable();
             $table->text('num')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->nullable()->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->nullable()->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('qty');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -121,9 +126,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product');
-        Schema::dropIfExists('product_label_variant');
-        Schema::dropIfExists('product_master_variant');
-        Schema::dropIfExists('product_gallery');
+        Schema::dropIfExists('products');
+        Schema::dropIfExists('product_label_variants');
+        Schema::dropIfExists('product_master_variants');
+        Schema::dropIfExists('product_galleries');
     }
 };

@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('warehouse', function (Blueprint $table) {
+        Schema::create('ref_warehouses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('code', 10);

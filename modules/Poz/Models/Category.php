@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\Userstamps\Userstamps;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog;
 
-    public $table = "category";
+    public $table = "ref_categories";
 
     protected $fillable = [
         'code',

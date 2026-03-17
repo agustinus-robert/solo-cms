@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cash_register', function (Blueprint $table) {
+        Schema::create('cash_registers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('casier_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('money', 20, 2);
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('cash_register_topup', function (Blueprint $table) {
+        Schema::create('cash_register_topups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('casier_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('money', 20, 2);
@@ -31,9 +31,9 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('cash_register_log', function(Blueprint $table){
+        Schema::create('cash_register_logs', function(Blueprint $table){
             $table->id();
-            $table->foreignId('cash_register_id')->constrained('cash_register')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('cash_register_id')->constrained('cash_registers')->cascadeOnUpdate()->cascadeOnDelete();
             $table->enum('status', ['plus', 'minus']);
             $table->decimal('money', 20, 2);
             $table->softDeletesTz();

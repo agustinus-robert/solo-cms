@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Tax extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps;
+    use HasFactory, HasAuditLog, SoftDeletes, Userstamps;
 
-    public $table = "tax_rate";
+    public $table = "tax_rates";
 
     protected $fillable = [
         'code',

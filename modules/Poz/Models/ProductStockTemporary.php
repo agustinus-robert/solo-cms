@@ -12,7 +12,7 @@ class ProductStockTemporary extends Model
 {
     use HasFactory, Restorable;
 
-    public $table = "product_stock_temporary";
+    public $table = "product_stock_temporaries";
 
     protected $fillable = [
         'product_id',

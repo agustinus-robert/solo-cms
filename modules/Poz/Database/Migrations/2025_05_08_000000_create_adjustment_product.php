@@ -15,10 +15,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('product_adjustment', function (Blueprint $table) {
+        Schema::create('product_adjustments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('product')->onDelete('cascade');
-            $table->foreignId('supplier_id')->constrained('supplier')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('supplier_id')->constrained('ref_suppliers')->onDelete('cascade');
             $table->enum('status', ['plus', 'minus']);
             $table->integer('qty');
             $table->integer('shift');

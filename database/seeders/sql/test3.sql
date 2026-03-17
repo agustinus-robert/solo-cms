@@ -58,7 +58,7 @@ COMMIT;
 -- Records of brand
 -- ----------------------------
 BEGIN;
-INSERT INTO "brand" ("id", "code", "name", "slug", "description", "location", "image_name", "is_shortcut", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '0641363212', 'Apple', 'apple', 'segala produk tentang apple', NULL, NULL, NULL, 10000003, NULL, 10000003, NULL, '2026-03-15 21:49:16+07', '2026-03-15 21:49:16+07'), (3, '3901186248', 'Apple', 'apple', 'Segala tentang apple', NULL, NULL, NULL, 10000003, NULL, 10000003, NULL, '2026-03-15 21:51:35+07', '2026-03-15 21:51:35+07');
+INSERT INTO "ref_brands" ("id", "code", "name", "slug", "description", "location", "image_name", "is_shortcut", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '0641363212', 'Apple', 'apple', 'segala produk tentang apple', NULL, NULL, NULL, 10000003, NULL, 10000003, NULL, '2026-03-15 21:49:16+07', '2026-03-15 21:49:16+07'), (3, '3901186248', 'Apple', 'apple', 'Segala tentang apple', NULL, NULL, NULL, 10000003, NULL, 10000003, NULL, '2026-03-15 21:51:35+07', '2026-03-15 21:51:35+07');
 COMMIT;
 
 -- ----------------------------
@@ -83,7 +83,7 @@ COMMIT;
 -- Records of category
 -- ----------------------------
 BEGIN;
-INSERT INTO "category" ("id", "code", "name", "slug", "description", "location", "image_name", "parent_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '6876518982', 'Gadget', 'gadget', 'gadget', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:55:04+07', '2026-03-15 21:55:04+07'), (3, '0357719201', 'Monitor', 'monitor', 'monitor', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:55:23+07', '2026-03-15 21:55:23+07'), (4, '6519457746', 'Laptop', 'laptop', 'laptop kategori', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 22:14:34+07', '2026-03-15 22:14:34+07');
+INSERT INTO "ref_categories" ("id", "code", "name", "slug", "description", "location", "image_name", "parent_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '6876518982', 'Gadget', 'gadget', 'gadget', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:55:04+07', '2026-03-15 21:55:04+07'), (3, '0357719201', 'Monitor', 'monitor', 'monitor', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:55:23+07', '2026-03-15 21:55:23+07'), (4, '6519457746', 'Laptop', 'laptop', 'laptop kategori', 'dummy/', 'no-pictures.png', NULL, NULL, NULL, NULL, NULL, '2026-03-15 22:14:34+07', '2026-03-15 22:14:34+07');
 COMMIT;
 
 -- ----------------------------
@@ -305,28 +305,28 @@ COMMIT;
 -- Records of outlet
 -- ----------------------------
 BEGIN;
-INSERT INTO "outlet" ("id", "admin_id", "code", "name", "description", "location", "image_name", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, 10000003, '2046993528', 'Tokoku', 'dekat toko', NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:51:09+07', '2026-03-15 21:51:09+07');
+INSERT INTO "outlets" ("id", "admin_id", "code", "name", "description", "location", "image_name", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, 10000003, '2046993528', 'Tokoku', 'dekat toko', NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-15 21:51:09+07', '2026-03-15 21:51:09+07');
 COMMIT;
 
 -- ----------------------------
 -- Records of outlet_brand
 -- ----------------------------
 BEGIN;
-INSERT INTO "outlet_brand" ("id", "outlet_id", "brand_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO "outlet_brands" ("id", "outlet_id", "brand_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
 -- Records of outlet_category
 -- ----------------------------
 BEGIN;
-INSERT INTO "outlet_category" ("id", "outlet_id", "category_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL), (2, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL), (3, 2, 4, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO "outlet_categories" ("id", "outlet_id", "category_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL), (2, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL), (3, 2, 4, NULL, NULL, NULL, NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
 -- Records of outlet_product
 -- ----------------------------
 BEGIN;
-INSERT INTO "outlet_product" ("id", "outlet_id", "product_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL), (2, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL), (3, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL), (4, 2, 4, NULL, NULL, NULL, NULL, NULL, NULL), (5, 2, 5, NULL, NULL, NULL, NULL, NULL, NULL), (6, 2, 6, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO "outlet_products" ("id", "outlet_id", "product_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL), (2, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL), (3, 2, 3, NULL, NULL, NULL, NULL, NULL, NULL), (4, 2, 4, NULL, NULL, NULL, NULL, NULL, NULL), (5, 2, 5, NULL, NULL, NULL, NULL, NULL, NULL), (6, 2, 6, NULL, NULL, NULL, NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -375,7 +375,7 @@ COMMIT;
 -- Records of outlet_tax_rate
 -- ----------------------------
 BEGIN;
-INSERT INTO "outlet_tax_rate" ("id", "outlet_id", "tax_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO "outlet_tax_rates" ("id", "outlet_id", "tax_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -394,7 +394,7 @@ COMMIT;
 -- Records of product
 -- ----------------------------
 BEGIN;
-INSERT INTO "product" ("id", "type", "alert_qty", "code", "name", "barcode", "brand_id", "category_id", "sub_category_id", "unit_id", "tax_rate_id", "price", "description", "location", "image_name", "wholesale", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 1, NULL, '4836354248', 'Iphone 4', '1', 3, 2, NULL, 1, 2, 3000000.00, NULL, 'file_product/69b6cc286e15c', 'O9iLhbiNRGcCowpq1KF3UXFisQIbfn-metaaXBob25lNC5qcGc=-.jpg', 2000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:11:36+07', '2026-03-15 22:11:36+07'), (2, 1, NULL, '3006239453', 'iphone xr', '1', 3, 2, NULL, 1, 2, 5000000.00, NULL, 'file_product/69b6cc6f3cdbc', 'TmxWfrKJCQfit8R8G1zFAABnqm0Bq4-metaaXBob25lLXhyLnBuZw==-.png', 4000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:12:47+07', '2026-03-15 22:12:47+07'), (3, 1, NULL, '8443647235', 'Iphone 13 Pro Max', '1', 3, 2, NULL, 1, 2, 7000000.00, NULL, 'file_product/69b6ccc19cfe6', 'R3KfDTJ6w0NtWu5BR6UKv6AKueBAsi-metaaXBob25lIDEzIHByb21heC5qcGc=-.jpg', 6000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:14:09+07', '2026-03-15 22:14:09+07'), (4, 1, NULL, '6023140254', 'Macbook pro m1', '1', 3, 4, NULL, 1, 2, 15000000.00, NULL, 'file_product/69b6cd35979fb', '9R986l76inoZAIagIGhwFCwoQFWQA9-metabGFwdG9wIG1hY2Jvb2suanBn-.jpg', 12000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:16:05+07', '2026-03-15 22:16:05+07'), (5, 1, NULL, '0130137840', 'Apple Watch', '1', 3, 2, NULL, 1, 2, 700000.00, NULL, 'file_product/69b6cda694448', 'YjiO2AOb1TZ3tB7z98tFqWD2XP4dYx-metaYXBwbGUgd2F0Y2gucG5n-.png', 400000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:17:58+07', '2026-03-15 22:17:58+07'), (6, 1, NULL, '7299687569', 'Imac', '1', 3, 3, NULL, 1, 2, 2000000.00, NULL, 'file_product/69b6cdf67c158', 'mOO8zJyyfjksVIuMrwR6t4ZDXc5vRe-metaaW1hYy5qcGc=-.jpg', 1000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:19:18+07', '2026-03-15 22:19:18+07');
+INSERT INTO "products" ("id", "type", "alert_qty", "code", "name", "barcode", "brand_id", "category_id", "sub_category_id", "unit_id", "tax_rate_id", "price", "description", "location", "image_name", "wholesale", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 1, NULL, '4836354248', 'Iphone 4', '1', 3, 2, NULL, 1, 2, 3000000.00, NULL, 'file_product/69b6cc286e15c', 'O9iLhbiNRGcCowpq1KF3UXFisQIbfn-metaaXBob25lNC5qcGc=-.jpg', 2000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:11:36+07', '2026-03-15 22:11:36+07'), (2, 1, NULL, '3006239453', 'iphone xr', '1', 3, 2, NULL, 1, 2, 5000000.00, NULL, 'file_product/69b6cc6f3cdbc', 'TmxWfrKJCQfit8R8G1zFAABnqm0Bq4-metaaXBob25lLXhyLnBuZw==-.png', 4000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:12:47+07', '2026-03-15 22:12:47+07'), (3, 1, NULL, '8443647235', 'Iphone 13 Pro Max', '1', 3, 2, NULL, 1, 2, 7000000.00, NULL, 'file_product/69b6ccc19cfe6', 'R3KfDTJ6w0NtWu5BR6UKv6AKueBAsi-metaaXBob25lIDEzIHByb21heC5qcGc=-.jpg', 6000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:14:09+07', '2026-03-15 22:14:09+07'), (4, 1, NULL, '6023140254', 'Macbook pro m1', '1', 3, 4, NULL, 1, 2, 15000000.00, NULL, 'file_product/69b6cd35979fb', '9R986l76inoZAIagIGhwFCwoQFWQA9-metabGFwdG9wIG1hY2Jvb2suanBn-.jpg', 12000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:16:05+07', '2026-03-15 22:16:05+07'), (5, 1, NULL, '0130137840', 'Apple Watch', '1', 3, 2, NULL, 1, 2, 700000.00, NULL, 'file_product/69b6cda694448', 'YjiO2AOb1TZ3tB7z98tFqWD2XP4dYx-metaYXBwbGUgd2F0Y2gucG5n-.png', 400000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:17:58+07', '2026-03-15 22:17:58+07'), (6, 1, NULL, '7299687569', 'Imac', '1', 3, 3, NULL, 1, 2, 2000000.00, NULL, 'file_product/69b6cdf67c158', 'mOO8zJyyfjksVIuMrwR6t4ZDXc5vRe-metaaW1hYy5qcGc=-.jpg', 1000000.00, 10000003, NULL, 10000003, NULL, '2026-03-15 22:19:18+07', '2026-03-15 22:19:18+07');
 COMMIT;
 
 -- ----------------------------
@@ -705,7 +705,7 @@ COMMIT;
 -- Records of supplier
 -- ----------------------------
 BEGIN;
-INSERT INTO "supplier" ("id", "code", "name", "email", "phone", "address", "location", "image_name", "user_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 'DIN804', 'Dina Martina Supplier', 'idare@conn.net', '1-440-428-6327', '46888 Gusikowski Islands Suite 348
+INSERT INTO "ref_suppliers" ("id", "code", "name", "email", "phone", "address", "location", "image_name", "user_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 'DIN804', 'Dina Martina Supplier', 'idare@conn.net', '1-440-428-6327', '46888 Gusikowski Islands Suite 348
 Robertsmouth, GA 78816', 'Lake Duncanport', NULL, 10000004, 10000004, NULL, NULL, NULL, '2026-03-14 22:31:36+07', '2026-03-14 22:31:36+07'), (2, 'SAN841', 'Sania Sari Supplier', 'gudrun.zieme@gulgowski.org', '+14405405092', '2755 Jude Loop
 Emardborough, MS 42886-9477', 'Rexhaven', NULL, 10000005, 10000005, NULL, NULL, NULL, '2026-03-14 22:31:36+07', '2026-03-14 22:31:36+07'), (3, 'NIS321', 'Nisa Matutina Supplier', 'lebsack.narciso@turcotte.com', '+1-484-438-8074', '2372 Felipa Views
 East Markburgh, WA 31526-1656', 'East Brettown', NULL, 10000006, 10000006, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (4, 'DON891', 'Doni Simanjuntak Supplier', 'vanessa.schmidt@okeefe.com', '+15598757346', '97779 Schiller Centers
@@ -728,7 +728,7 @@ COMMIT;
 -- Records of tax_rate
 -- ----------------------------
 BEGIN;
-INSERT INTO "tax_rate" ("id", "code", "name", "rate", "actived_on", "sale_active", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '7614684001', 'Pajak 11', 11.00, 1, 0, 10000003, NULL, 10000003, NULL, '2026-03-15 22:07:56+07', '2026-03-15 22:07:56+07');
+INSERT INTO "ref_tax_rates" ("id", "code", "name", "rate", "actived_on", "sale_active", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (2, '7614684001', 'Pajak 11', 11.00, 1, 0, 10000003, NULL, 10000003, NULL, '2026-03-15 22:07:56+07', '2026-03-15 22:07:56+07');
 COMMIT;
 
 -- ----------------------------
@@ -755,7 +755,7 @@ COMMIT;
 -- Records of unit
 -- ----------------------------
 BEGIN;
-INSERT INTO "unit" ("id", "code", "name", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, '6242085774', 'PCS', NULL, NULL, NULL, NULL, '2025-08-14 14:19:13+07', '2025-08-14 14:19:13+07');
+INSERT INTO "ref_units" ("id", "code", "name", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, '6242085774', 'PCS', NULL, NULL, NULL, NULL, '2025-08-14 14:19:13+07', '2025-08-14 14:19:13+07');
 COMMIT;
 
 -- ----------------------------

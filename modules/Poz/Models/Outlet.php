@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Account\Models\User;
@@ -10,9 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Outlet extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog;
 
-    public $table = "outlet";
+    public $table = "outlets";
 
     protected $fillable = [
         'code',

@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('outlet', function (Blueprint $table) {
+        Schema::create('outlets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('code', 10);
@@ -32,15 +32,15 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('user_casier_outlet', function (Blueprint $table) {
+        Schema::create('user_casier_outlets', function (Blueprint $table) {
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
-        Schema::create('outlet_product', function (Blueprint $table) {
+        Schema::create('outlet_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -50,10 +50,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_brand', function (Blueprint $table) {
+        Schema::create('outlet_brands', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('brand_id')->constrained('brand')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('brand_id')->constrained('ref_brands')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -63,10 +63,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_category', function (Blueprint $table) {
+        Schema::create('outlet_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained('category')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained('ref_categories')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -76,10 +76,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_unit', function (Blueprint $table) {
+        Schema::create('outlet_units', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('unit_id')->constrained('unit')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('unit_id')->constrained('ref_units')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -89,10 +89,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_tax_rate', function (Blueprint $table) {
+        Schema::create('outlet_tax_rates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('tax_id')->constrained('tax_rate')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('tax_id')->constrained('ref_tax_rates')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -102,10 +102,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_sale', function (Blueprint $table) {
+        Schema::create('outlet_sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('sale_id')->constrained('sale')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sale_id')->constrained('sales')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -115,10 +115,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_purchase', function (Blueprint $table) {
+        Schema::create('outlet_purchases', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('purchase_id')->constrained('purchase')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -128,10 +128,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_return', function (Blueprint $table) {
+        Schema::create('outlet_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('return_id')->constrained('return')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('return_id')->constrained('returns')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -141,10 +141,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_supplier', function (Blueprint $table) {
+        Schema::create('outlet_suppliers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('supplier_id')->constrained('supplier')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->constrained('ref_suppliers')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -154,10 +154,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_product_stock', function (Blueprint $table) {
+        Schema::create('outlet_product_stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_stock_id')->constrained('product_stock')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_stock_id')->constrained('product_stocks')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -167,10 +167,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_product_adjustment', function (Blueprint $table){
+        Schema::create('outlet_product_adjustments', function (Blueprint $table){
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('adjustment_id')->constrained('product_adjustment')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('adjustment_id')->constrained('product_adjustments')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -188,7 +188,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('outlet');
-        Schema::dropIfExists('user_casier_outlet');
+
     }
 };

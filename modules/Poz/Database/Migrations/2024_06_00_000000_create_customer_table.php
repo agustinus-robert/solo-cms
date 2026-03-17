@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('customer', function (Blueprint $table) {
+        Schema::create('ref_customers', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10);
             $table->string('name', 100);

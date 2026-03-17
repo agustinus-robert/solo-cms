@@ -15,13 +15,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('desk', function (Blueprint $table) {
+        Schema::create('ref_desks', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10);
             $table->string('name', 255);
             $table->integer('is_available');
 
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->text('description')->nullable();
             $table->string('location')->nullable();

@@ -17,10 +17,10 @@ return new class extends Migration
     {
         DB::statement('SET CONSTRAINTS ALL DEFERRED');
 
-        Schema::create('sale', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
-            $table->foreignId('customer_id')->nullable()->constrained('customer')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('customer_id')->nullable()->constrained('ref_customers')->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('sale_status');
             $table->decimal('discount', 20, 2);
             $table->decimal('sub_total', 20, 2);
@@ -39,8 +39,8 @@ return new class extends Migration
 
         Schema::create('sale_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sale_id')->constrained('sale')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sale_id')->constrained('sales')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             //   $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->integer('qty');
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('sale_direct', function (Blueprint $table) {
+        Schema::create('sale_directs', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
             $table->string('customer_name')->nullable();
@@ -78,8 +78,8 @@ return new class extends Migration
 
         Schema::create('sale_direct_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sale_id')->constrained('sale_direct')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sale_id')->constrained('sale_directs')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('product_name');
             $table->integer('qty');
             $table->decimal('price', 20, 2);
@@ -90,9 +90,9 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('sale_direct_chart', function (Blueprint $table) {
+        Schema::create('sale_direct_charts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('product_name', 225);
             $table->integer('qty');
             $table->decimal('price', 20, 2);
@@ -107,7 +107,7 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('sale_direct_customer_desk', function (Blueprint $table) {
+        Schema::create('sale_direct_customer_desks', function (Blueprint $table) {
             $table->id();
             $table->string('customer_name');
             $table->string('desk_name');

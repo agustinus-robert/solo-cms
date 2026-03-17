@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('product_quotation', function (Blueprint $table) {
+        Schema::create('product_quotations', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
             $table->tinyInteger('payment_on');
@@ -31,7 +31,7 @@ return new class extends Migration
 
         Schema::create('product_quotation_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_quotation_id')->constrained('product_quotation')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_quotation_id')->constrained('product_quotations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->decimal('price', 20, 2);
             $table->tinyInteger('status');
@@ -44,10 +44,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('outlet_product_quotation', function (Blueprint $table){
+        Schema::create('outlet_product_quotations', function (Blueprint $table){
             $table->id();
-            $table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('quotation_id')->constrained('product_quotation')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('quotation_id')->constrained('product_quotations')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();

@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('return', function (Blueprint $table) {
+        Schema::create('returns', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
             $table->timestampTz('return_date')->nullable();
@@ -34,8 +34,8 @@ return new class extends Migration
 
         Schema::create('return_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('return_id')->constrained('return')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('return_id')->constrained('returns')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             //$table->foreignId('outlet_id')->constrained('outlet')->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->integer('qty');

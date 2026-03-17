@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SaleDirect extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog;
 
-    public $table = "sale_direct";
+    public $table = "sale_directs";
 
     protected $fillable = [
         'reference',

@@ -32,7 +32,7 @@ trait EventMeetTrait
                     'classroom_id'=> $item['rombel'][0],   // rombel/class ID
                     'start_at'    => $this->mergeDateTime($date, $item[0]),
                     'end_at'      => $this->mergeDateTime($date, $item[1]),
-                    'day'         => Carbon::parse($date)->dayOfWeekIso, 
+                    'day'         => Carbon::parse($date)->dayOfWeekIso,
                     'date'        => $date
                 ];
             }

@@ -2,6 +2,7 @@
 
 namespace Modules\Poz\Models;
 
+use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,9 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Purchase extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog;
 
-    public $table = "purchase";
+    public $table = "purchases";
 
     protected $fillable = [
         'reference',
