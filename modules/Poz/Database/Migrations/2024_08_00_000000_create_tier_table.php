@@ -17,7 +17,6 @@ return new class extends Migration
     {
         Schema::create('ref_tiers', function (Blueprint $table) {
             $table->id();
-            $table->integer('type');
             $table->string('name', 100);
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

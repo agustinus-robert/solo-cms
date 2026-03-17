@@ -17,10 +17,23 @@
 
             <form wire:submit="save" enctype="multipart/form-data">
                 <div class="row g-3">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <label class="form-label small fw-bold text-secondary">Nama Tier</label>
                         <input type="text" class="form-control @error('form.name') is-invalid @enderror" wire:model="form.name" placeholder="Masukkan nama tier...">
                         @error('form.name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-secondary">Tier Kategori</label>
+                        <select class="form-select @error('form.ref_tier_id') is-invalid @enderror" wire:model="form.ref_tier_id">
+                            <option value="">Pilih</option>
+                            @foreach($tiers as $tier)
+                                <option value="{{ $tier->id }}">{{ $tier->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('form.type')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

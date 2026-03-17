@@ -40,6 +40,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::get('datatable_return', 'ReturnController@returnTable')->name('return.datatables');
         Route::get('datatable_adjustment', 'AdjustmentController@adjustmentTable')->name('adjustment.datatables');
         Route::get('datatable_quotation', 'QutationController@quotationTable')->name('quotation-transaction.datatables');
+        Route::get('datatable_tiers', 'TierVariantController@tierTable')->name('tier.datatables');
     });
 
     Route::prefix('master')->namespace('Master')->name('master.')->group(function () {
@@ -95,6 +96,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
             ->only(['index', 'show', 'update'])
             ->parameters(['qutations' => 'qutation']);
 
+        Route::resource('tier-variant', 'TierVariantController')->parameters(['tier-variants' => 'tier-variant']);
         Route::resource('purchase', 'PurchaseController')->parameters(['purchases' => 'purchase']);
         Route::resource('return', 'ReturnController')->parameters(['returns' => 'return']);
         Route::resource('adjustment', 'AdjustmentController')->parameters(['adjustments' => 'adjustment']);

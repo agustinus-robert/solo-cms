@@ -1,15 +1,15 @@
 <?php
 
-namespace Modules\Poz\Http\Controllers\Master;
+namespace Modules\Poz\Http\Controllers\Transaction;
 
 use Modules\Reference\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables as Table;
-use Modules\Poz\Models\Tier;
+use Modules\Poz\Models\TierTransaction;
 use Modules\Poz\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TierController extends Controller
+class TierVariantController extends Controller
 {
     /**
      * Show the dashboard page.
@@ -17,23 +17,22 @@ class TierController extends Controller
     public function index()
     {
         $data = [];
-        // dbuilder_table untuk membuat generate table pada kolom header dan pemanggilan kolom database
+
         $data['column'] = [
-            //DT_RowIndex usahakan false karena tidak ada secara fisik pada database
-            dbuilder_table('image', 'Gambar', false, false, 'w10'),
             dbuilder_table('name', 'Nama', false, true),
+            dbuilder_table('tier', 'Kategori Tier', false, true),
             dbuilder_table('action', 'Aksi')
         ];
 
-        $data['title'] = 'Daftar Tier';
+        $data['title'] = 'Daftar Tier Variant';
 
-        return view('poz::master.tier.index', $data);
+        return view('poz::transaction.tiers', $data);
     }
 
     public function create(Request $request)
     {
 
-        return view('poz::master.tier.index', [
+        return view('poz::transaction.tiers', [
             'action' => 'Create'
         ]);
     }
@@ -41,28 +40,27 @@ class TierController extends Controller
     public function edit(Request $request)
     {
 
-        return view('poz::master.tier.index', [
+        return view('poz::transaction.tiers', [
             'action' => 'Update'
         ]);
     }
 
     public function destroy(Request $request)
     {
-        $tier = Tier::findOrFail($request->tier); // Mencari pozt berdasarkan ID
+        $tier = TierTransaction::findOrFail($request->tier); // Mencari pozt berdasarkan ID
         $tier->delete(); // Melakukan soft delete
 
-        return redirect(route('poz::master.tier.index'))->with('msg-sukses', "Data berhasil dihapus");
+        return redirect(route('poz::transaction.tier-variant.index'))->with('msg-sukses', "Data berhasil dihapus");
     }
 
     public function tierTable(Request $request)
     {
         $outletId = $request->outlet;
-        $tier = Tier::with('user', 'outlets')
+        $tier = TierTransaction::with('user', 'outlets')
             ->whereNull('deleted_at')
             ->whereHas('outlets', function ($query) use ($outletId) {
                 $query->where('outlet_id', $outletId);
             });
-
 
         if (!empty($search = $request->search)) {
             $tier->where(function ($query) use ($search) {
@@ -81,21 +79,15 @@ class TierController extends Controller
 
         return Table::of($tier)
             ->addIndexColumn()
-            ->addColumn('image', function ($row) {
-                if (!empty($row->location) && !empty($row->image_name)) {
-                    $image = $row->location . '/' . $row->image_name;
-
-                    return "<img width='50' height='50' src='" . asset('uploads/' . $image) . "' />";
-                } else {
-                    return "<img src='https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930' width='50' height='50' />";
-                }
+            ->addColumn('tier', function ($row) use ($request) {
+                return $row->tiers->name;
             })
             ->addColumn('action', function ($row) use ($request) {
                 $template = '';
                 $outletId = $request->outlet;
 
-                $template .= view('poz::layouts_master.component.button_edit', array('id' => $row->id, 'update' => route('poz::master.tier.edit', ['tier' => $row->id]) . '?outlet=' . $outletId))->render();
-                $template .= view('poz::layouts_master.component.button_delete', array('id' => $row->id, 'delete' => route('poz::master.tier.destroy', ['tier' => $row->id]) . '?outlet=' . $outletId))->render();
+                $template .= view('poz::layouts_master.component.button_edit', array('id' => $row->id, 'update' => route('poz::transaction.tier-variant.edit', ['tier_variant' => $row->id]) . '?outlet=' . $outletId))->render();
+                $template .= view('poz::layouts_master.component.button_delete', array('id' => $row->id, 'delete' => route('poz::transaction.tier-variant.destroy', ['tier_variant' => $row->id]) . '?outlet=' . $outletId))->render();
 
 
                 return $template;

@@ -142,7 +142,7 @@
                                         'sale' => 'transaction.sale.create', 'purchase' => 'transaction.purchase.create',
                                         'retur' => 'transaction.return.create', 'adjustment' => 'transaction.adjustment.create',
                                         'adjustment-supplier' => 'supplierz.adjustment.create', 'quotation' => 'supplierz.quotation.create',
-                                        'tier' => 'master.tier.create'
+                                        'tier' => 'master.tier.create', 'tier-variant' => 'transaction.tier-variant.create'
                                     ];
                                     $labels = ['quotation' => 'Penawaran', 'retur' => 'Return'];
                                     $currentRoute = $routes[$menu] ?? null;

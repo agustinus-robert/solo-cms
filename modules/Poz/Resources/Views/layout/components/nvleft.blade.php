@@ -85,6 +85,12 @@
         </a>
         <ul class="sub-menu mm-collapse">
             <li class="nav-main-item">
+                <a href="{{ route('poz::transaction.tier-variant.index', request()->query()) }}" class="nav-main-link">
+                    <span class="nav-main-link-name">Variant Tier</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
                 <a href="{{ route('poz::transaction.product.index', request()->query()) }}" class="nav-main-link">
                     <span class="nav-main-link-name">Kelola</span>
                 </a>
