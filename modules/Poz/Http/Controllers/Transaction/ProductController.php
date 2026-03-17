@@ -5,6 +5,8 @@ namespace Modules\Poz\Http\Controllers\Transaction;
 use Modules\Reference\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables as Table;
 use Modules\Poz\Models\Product;
+use Modules\Poz\Models\TierTransaction;
+use Modules\Poz\Models\Tier;
 use Modules\Poz\Models\Brand;
 use Modules\Poz\Models\Category;
 use Illuminate\Http\Request;
@@ -39,6 +41,42 @@ class ProductController extends Controller
 
         return view('poz::transaction.product', [
             'action' => 'Create'
+        ]);
+    }
+
+    public function show($product)
+    {
+        $product = Product::with(['metas', 'brand', 'category'])->findOrFail($product);
+
+        $tier1 = '';
+        $tier2 = '';
+        $tierCount = $product->getMeta('tier_count', 1);
+        $tier1Name = $product->getMeta('tier_name_1', 'Pilihan 1');
+        $tier2Name = $product->getMeta('tier_name_2', 'Pilihan 2');
+
+        $tier1 = Tier::find($tier1Name);
+        $options1 = TierTransaction::whereHas('tiers', function($q) use ($tier1Name) {
+                        $q->where('id', $tier1Name);
+                    })->get();
+
+        $options2 = [];
+        if ($tierCount == 2) {
+            $tier2 = Tier::find($tier2Name);
+            $options2 = TierTransaction::whereHas('tiers', function($q) use ($tier2Name) {
+                            $q->where('id', $tier2Name);
+                        })->get();
+        }
+
+        return view('poz::transaction.product.show', [
+            'product'    => $product,
+            'tierCount'  => $tierCount,
+            'tier1Name'  => $tier1Name,
+            'tier2Name'  => $tier2Name,
+            'options1'   => $options1,
+            'options2'   => $options2,
+            'tier1'      => $tier1,
+            'tier2'      => $tier2,
+            'action'     => 'Show'
         ]);
     }
 
@@ -103,6 +141,7 @@ class ProductController extends Controller
 
 
                 // $template .= view('poz::layouts_master.component.button_detail', array('id' => $row->id))->render();
+                $template .= view('poz::layouts_master.component.button_show', array('id' => $row->id, 'show' => route('poz::transaction.product.show', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
                 $template .= view('poz::layouts_master.component.button_edit', array('id' => $row->id, 'update' => route('poz::transaction.product.edit', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
                 $template .= view('poz::layouts_master.component.button_delete', array('id' => $row->id, 'delete' => route('poz::transaction.product.destroy', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
 

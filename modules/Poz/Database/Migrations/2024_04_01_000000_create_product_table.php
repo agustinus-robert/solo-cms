@@ -83,16 +83,27 @@ return new class extends Migration
         Schema::create('product_master_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->jsonb('attributes');
             $table->string('code', 10);
             $table->string('name', 100);
             $table->decimal('price', 20, 2);
             $table->integer('qty');
             $table->integer('alert_qty');
-            $table->text('config');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+        });
+
+        Schema::create('product_metas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->string('meta_key')->index();
+            $table->text('meta_value')->nullable();
+
+            $table->timestampsTz();
         });
 
         Schema::create('product_galleries', function (Blueprint $table) {
