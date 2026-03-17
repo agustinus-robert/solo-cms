@@ -23,6 +23,7 @@
                 <div class="row g-4">
 
                     @if ($action == 'direction')
+                        {{-- VIEW DIRECTION --}}
                         <div class="col-md-7 border-end">
                             <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Informasi Dasar</h6>
                             <div class="row g-3">
@@ -62,15 +63,20 @@
                                         <option value="1">PCS</option>
                                     </select>
                                 </div>
-                                {{-- Hidden Type untuk validasi --}}
+                                {{-- TinyMCE Direction --}}
+                                <div class="col-12" wire:ignore>
+                                    <label class="form-label small fw-bold">Deskripsi</label>
+                                    <textarea id="description" class="form-control" wire:model="form.description"></textarea>
+                                </div>
+
                                 <input type="hidden" wire:model="form.type" value="standard">
                                 <input type="hidden" wire:model="form.barcode" value="1">
                             </div>
                         </div>
 
                         <div class="col-md-5">
-                            <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Input Stok & Batch</h6>
-                            <div class="bg-light p-3 rounded-3">
+                            <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Input Stok & Konfigurasi</h6>
+                            <div class="bg-light p-3 rounded-3 mb-3">
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Supplier</label>
                                     <select class="form-select border-0 shadow-none" wire:model="sch.supplier">
@@ -78,7 +84,7 @@
                                         @foreach($supplier as $sup) <option value="{{ $sup->id }}">{{$sup->name}}</option> @endforeach
                                     </select>
                                 </div>
-                                <div class="row g-2">
+                                <div class="row g-2 mb-0">
                                     <div class="col-7">
                                         <label class="form-label small fw-bold">Shift</label>
                                         <select class="form-select border-0 shadow-none" wire:model="sch.shifts">
@@ -94,92 +100,25 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {{-- Visibilitas Card Direction --}}
+                            <div class="p-3 border rounded-3 bg-white">
+                                <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Visibilitas</h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="posDir" wire:model="form.is_pos" checked>
+                                    <label class="form-check-label small fw-bold" for="posDir">Tampilkan di POS</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="ecommerceDir" wire:model="form.is_ecommerce">
+                                    <label class="form-check-label small fw-bold" for="ecommerceDir">Tampilkan di E-commerce</label>
+                                </div>
+                            </div>
                         </div>
 
                     @else
-                        {{-- VIEW TAMBAH PRODUK BIASA --}}
-                        <div class="col-md-8">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Code</label>
-                                    <input disabled wire:model="form.code" type="text" class="form-control bg-light">
-                                </div>
-                                <div class="col-md-8">
-                                    <label class="form-label small fw-bold">Nama Produk</label>
-                                    <input type="text" class="form-control @error('form.name') is-invalid @enderror" wire:model="form.name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Tipe Produk</label>
-                                    <select class="form-select @error('form.type') is-invalid @enderror" wire:model="form.type">
-                                        <option value="">Pilih Tipe</option>
-                                        <option value="1">Standard</option>
-                                        <option value="2">Service</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Brand</label>
-                                    <select class="form-select" wire:model="form.brand_id">
-                                        <option value="">Pilih Brand</option>
-                                        @foreach ($brand as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Kategori</label>
-                                    <select class="form-select" wire:model="form.category_id" wire:change="sub_category_changed($event.target.value)">
-                                        <option value="">Pilih Kategori</option>
-                                        @foreach ($category as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Sub Kategori</label>
-                                    <select class="form-select" wire:model="form.sub_category_id" {{ $categoryHasSub != 1 ? 'disabled' : '' }}>
-                                        <option value="">Pilih Sub</option>
-                                        @foreach ($subCategory as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Unit</label>
-                                    <select class="form-select @error('form.unit_id') is-invalid @enderror" wire:model="form.unit_id">
-                                        <option value="">Pilih Unit</option>
-                                        <option value="1">PCS</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-primary">Harga Modal</label>
-                                    <input type="number" wire:model="form.wholesale" class="form-control">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold">Harga Jual</label>
-                                    <input type="number" wire:model="form.price" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="p-3 bg-light rounded-3 h-100">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Gambar Produk</label>
-                                    <input type="file" class="form-control form-control-sm" wire:model="form.document">
-                                </div>
-                                <hr>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Barcode Tipe</label>
-                                    <select class="form-select form-select-sm @error('form.barcode') is-invalid @enderror" wire:model="form.barcode">
-                                        <option value="0">Pilih Barcode</option>
-                                        <option value="1">CODE128</option>
-                                    </select>
-                                </div>
-                                <div class="mb-0">
-                                    <label class="form-label small fw-bold">Pajak</label>
-                                    <select class="form-select form-select-sm @error('form.tax_rate_id') is-invalid @enderror" wire:model="form.tax_rate_id">
-                                        <option value="">Tanpa Pajak</option>
-                                        @foreach ($tax as $value) <option value="{{ $value->id }}">{{ $value->name }}</option> @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                        @include('poz::livewire.transaction.product-partials.left-form')
+                        @include('poz::livewire.transaction.product-partials.right-form')
                     @endif
-
                 </div>
             </div>
 
@@ -198,3 +137,23 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+    <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#description',
+            height: "300",
+            paste_data_images: true,
+            relative_urls: false,
+            plugins: 'autosave autoresize preview paste searchreplace code fullscreen image link media table charmap hr pagebreak advlist lists wordcount',
+            menubar: false,
+            toolbar: "formatselect bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | preview code",
+            setup: function (editor) {
+                editor.on('blur', function (e) {
+                    @this.set('form.description', editor.getContent());
+                });
+            }
+        });
+    </script>
+@endpush

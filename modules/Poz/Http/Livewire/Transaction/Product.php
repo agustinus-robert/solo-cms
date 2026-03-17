@@ -50,6 +50,8 @@ class Product extends Component
             $this->form['category_id'] = $product->category_id;
             $this->form['alert_qty'] = $product->alert_qty;
             $this->form['wholesale'] = $product->wholesale;
+            $this->form['description'] = $product->description;
+
             if (!empty($product->sub_category_id)) {
                 $this->categoryHasSub = 1;
                 $this->subCategory = Category::find($product->sub_category_id)->get();

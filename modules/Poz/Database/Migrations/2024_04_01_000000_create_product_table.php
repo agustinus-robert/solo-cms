@@ -40,6 +40,30 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
+        Schema::create('product_meta', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')
+                ->constrained('product')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->string('meta_key')->index();
+            $table->text('meta_value')->nullable();
+
+            $table->timestampsTz();
+        });
+
+        Schema::create('product_promotions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->tinyInteger('type');
+            $table->json('config');
+            $table->dateTimeTz('start_date');
+            $table->dateTimeTz('end_date');
+            $table->boolean('is_active')->default(true);
+            $table->timestampsTz();
+        });
+
         Schema::create('product_label_variant', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('product')->cascadeOnUpdate()->cascadeOnDelete();
@@ -60,6 +84,7 @@ return new class extends Migration
             $table->decimal('price', 20, 2);
             $table->integer('qty');
             $table->integer('alert_qty');
+            $table->text('config');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

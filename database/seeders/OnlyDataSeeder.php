@@ -19,7 +19,6 @@ class OnlyDataSeeder extends Seeder
 
         $this->command->info("Memulai Import (Skip data yang sudah ada)...");
 
-        // Matikan proteksi foreign key
         DB::statement("SET session_replication_role = 'replica'");
 
         $handle = fopen($path, "r");
@@ -32,10 +31,7 @@ class OnlyDataSeeder extends Seeder
             while (($line = fgets($handle)) !== false) {
                 $trim = trim($line);
 
-                // 1. Abaikan baris kosong
                 if ($trim === '') continue;
-
-                // 2. Deteksi dan lewati komentar blok /* ... */ (Penyebab error Navicat tadi)
                 if (str_starts_with($trim, '/*')) {
                     $isInsideComment = true;
                 }
@@ -46,18 +42,15 @@ class OnlyDataSeeder extends Seeder
                     continue;
                 }
 
-                // 3. Abaikan komentar satu baris, BEGIN, dan COMMIT
                 if (str_starts_with($trim, '--') || $trim === 'BEGIN;' || $trim === 'COMMIT;') {
                     continue;
                 }
 
                 $fullStatement .= $line;
 
-                // 4. Jika menemukan akhir perintah (;)
                 if (str_ends_with($trim, ';')) {
                     if (stripos($fullStatement, 'INSERT INTO') !== false) {
 
-                        // Tambahkan 'ON CONFLICT DO NOTHING' agar kalau ID sudah ada, dia LEWATI (Skip)
                         $rawSql = rtrim(trim($fullStatement), ';');
                         $safeSql = $rawSql . " ON CONFLICT DO NOTHING;";
 

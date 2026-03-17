@@ -30,6 +30,7 @@ trait ProductRepository
         'price',
         'wholesale',
         'location',
+        'description',
         'image_name'
     ];
 
