@@ -11,6 +11,7 @@ use Modules\Poz\Models\Category;
 use Modules\Poz\Models\Tax;
 use Modules\Poz\Models\Unit;
 use Modules\Poz\Models\Supplier;
+use Modules\Poz\Models\Tier;
 use Livewire\WithFileUploads;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Modules\Poz\Http\Requests\ProductStoreRequest;
@@ -21,7 +22,7 @@ use DB;
 
 class Product extends Component
 {
-    use WithFileUploads, ProductRepository;
+    use WithFileUploads, ProductRepository, LivewireAlert;
 
     public $form = [];
     public $action;
@@ -52,6 +53,13 @@ class Product extends Component
             $this->form['wholesale'] = $product->wholesale;
             $this->form['description'] = $product->description;
 
+            $this->form['selling_method'] = $product->getMeta('selling_method', 1);
+            $this->form['tier_count']     = $product->getMeta('tier_count', 1);
+            $this->form['tier_name_1']    = $product->getMeta('tier_name_1');
+            $this->form['tier_name_2']    = $product->getMeta('tier_name_2');
+            $this->form['is_pos']         = (bool) $product->getMeta('is_pos', true);
+            $this->form['is_ecommerce']   = (bool) $product->getMeta('is_ecommerce', false);
+
             if (!empty($product->sub_category_id)) {
                 $this->categoryHasSub = 1;
                 $this->subCategory = Category::find($product->sub_category_id)->get();
@@ -71,6 +79,10 @@ class Product extends Component
             if ($action !== 'direction') {
                 $this->action = 'Tambah';
             }
+            $this->form['selling_method'] = 1;
+            $this->form['tier_count']     = 1;
+            $this->form['is_pos']         = true;
+            $this->form['is_ecommerce']   = false;
             $digits = '0123456789';
             $randomNumbers = substr(str_shuffle(str_repeat($digits, 10)), 0, 10);
             $this->form['code'] = $randomNumbers;
@@ -149,6 +161,27 @@ class Product extends Component
         }
     }
 
+    public function updatedForm($value, $key)
+    {
+        if ($key === 'tier_name_1' || $key === 'tier_name_2') {
+            $t1 = $this->form['tier_name_1'] ?? null;
+            $t2 = $this->form['tier_name_2'] ?? null;
+
+            if (!empty($t1) && !empty($t2) && $t1 === $t2) {
+                $this->form[$key] = '';
+                $this->alert('error', 'Nama Tier 1 dan Tier 2 tidak boleh sama!', [
+                    'position' => 'center',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+            }
+        }
+
+        if ($key === 'tier_count' && $value == 1) {
+            $this->form['tier_name_2'] = null;
+        }
+    }
+
     public function render()
     {
         $outletId = $this->form['outlet'];
@@ -168,6 +201,11 @@ class Product extends Component
             })->get();
 
         $data['unit'] = Unit::whereNull('deleted_at')
+            ->whereHas('outlets', function ($query) use ($outletId) {
+                $query->where('outlet_id', $outletId);
+            })->get();
+
+        $data['tiers'] = Tier::whereNull('deleted_at')
             ->whereHas('outlets', function ($query) use ($outletId) {
                 $query->where('outlet_id', $outletId);
             })->get();

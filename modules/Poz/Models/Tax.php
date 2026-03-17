@@ -14,7 +14,7 @@ class Tax extends Model
 {
     use HasFactory, HasAuditLog, SoftDeletes, Userstamps;
 
-    public $table = "tax_rates";
+    public $table = "ref_tax_rates";
 
     protected $fillable = [
         'code',
@@ -36,6 +36,6 @@ class Tax extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_tax_rate', 'tax_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_tax_rates', 'tax_id', 'outlet_id');
     }
 }

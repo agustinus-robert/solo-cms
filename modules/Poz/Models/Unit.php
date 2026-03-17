@@ -16,7 +16,7 @@ class Unit extends Model
 {
     use HasFactory, HasAuditLog, SoftDeletes, Userstamps;
 
-    public $table = "units";
+    public $table = "ref_units";
 
     protected $fillable = [
         'code',
@@ -39,6 +39,6 @@ class Unit extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_unit', 'unit_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_units', 'unit_id', 'outlet_id');
     }
 }

@@ -47,6 +47,6 @@ class Brand extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_brand', 'brand_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_brands', 'brand_id', 'outlet_id');
     }
 }

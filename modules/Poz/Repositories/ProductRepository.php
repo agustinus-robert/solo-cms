@@ -99,6 +99,8 @@ trait ProductRepository
                 $productStock->outlets()->syncWithoutDetaching($casier->outlet_id);
             }
 
+            $this->saveMetas($product, $data);
+
             return true;
         }
 
@@ -127,6 +129,9 @@ trait ProductRepository
                 $product->outlets()->attach($outletId);
             }
 
+            $product->metas()->delete();
+            $this->saveMetas($product, $data);
+
             return true;
         }
         return false;
@@ -153,5 +158,29 @@ trait ProductRepository
             return true;
         }
         return false;
+    }
+
+    private function saveMetas($product, $data)
+    {
+        $metaKeys = [
+            'selling_method',
+            'tier_count',
+            'tier_name_1',
+            'tier_name_2',
+            'is_pos',
+            'is_ecommerce'
+        ];
+
+        foreach ($metaKeys as $key) {
+            if (isset($data[$key])) {
+                $value = $data[$key];
+                if (is_bool($value)) $value = $value ? '1' : '0';
+
+                $product->metas()->create([
+                    'meta_key'   => $key,
+                    'meta_value' => $value
+                ]);
+            }
+        }
     }
 }

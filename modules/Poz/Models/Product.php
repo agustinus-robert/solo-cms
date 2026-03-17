@@ -62,7 +62,7 @@ class Product extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_product', 'product_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_products', 'product_id', 'outlet_id');
     }
 
     public function purchaseItems()
@@ -86,5 +86,16 @@ class Product extends Model
 
     public function schedule(){
         return $this->hasMany(SupplierSchedule::class, 'product_id');
+    }
+
+    public function metas()
+    {
+        return $this->hasMany(ProductMeta::class, 'product_id');
+    }
+
+    public function getMeta($key, $default = null)
+    {
+        $meta = $this->metas->where('meta_key', $key)->first();
+        return $meta ? $meta->meta_value : $default;
     }
 }

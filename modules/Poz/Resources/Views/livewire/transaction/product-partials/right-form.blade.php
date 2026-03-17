@@ -1,6 +1,5 @@
 <div class="col-md-4">
     <div class="d-flex flex-column gap-3">
-        {{-- CARD 1: KONFIGURASI --}}
         <div class="p-3 bg-light rounded-3 border">
             <div class="mb-3">
                 <label class="form-label small fw-bold">Gambar Produk</label>
@@ -36,22 +35,31 @@
                 </select>
             </div>
 
-            {{-- Inputan Nama Tier --}}
-            <div class="p-2 border rounded bg-white">
+            <div class="p-2 border rounded bg-white shadow-sm">
                 <div class="mb-2">
                     <label class="small fw-bold text-muted">Nama Tier 1</label>
-                    <input type="text" class="form-control form-control-sm" wire:model="form.tier_name_1" placeholder="cth: Warna">
+                    <select class="form-select form-select-sm" wire:model.live="form.tier_name_1">
+                        <option value="">Pilih Tier 1</option>
+                        @foreach($tiers as $t)
+                            <option value="{{ $t->id }}">{{ $t->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
+
                 @if(($form['tier_count'] ?? 1) == 2)
                 <div class="mb-0">
                     <label class="small fw-bold text-muted">Nama Tier 2</label>
-                    <input type="text" class="form-control form-control-sm" wire:model="form.tier_name_2" placeholder="cth: Ukuran">
+                    <select class="form-select form-select-sm" wire:model.live="form.tier_name_2">
+                        <option value="">Pilih Tier 2</option>
+                        @foreach($tiers as $t)
+                            <option value="{{ $t->id }}">{{ $t->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 @endif
             </div>
         </div>
 
-        {{-- CARD 2: VISIBILITAS (DIPISAH) --}}
         <div class="p-3 bg-white border rounded-3 shadow-sm">
             <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem;">Visibilitas</h6>
             <div class="form-check mb-2">
