@@ -83,14 +83,27 @@ return new class extends Migration
         Schema::create('product_master_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('code', 10);
-            $table->string('name', 100);
-            $table->decimal('price', 20, 2);
-            $table->integer('qty');
-            $table->integer('alert_qty');
+            $table->jsonb('product_variant');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletesTz();
+            $table->timestampsTz();
+        });
+
+        Schema::create('product_master_variant_adjustment', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('code')->index();
+            $table->enum('status', ['plus', 'minus']);
+            $table->integer('qty');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletesTz();
+            $table->timestampsTz();
         });
 
         Schema::create('product_metas', function (Blueprint $table) {

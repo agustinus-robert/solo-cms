@@ -141,7 +141,7 @@ class ProductController extends Controller
 
 
                 // $template .= view('poz::layouts_master.component.button_detail', array('id' => $row->id))->render();
-                $template .= view('poz::layouts_master.component.button_show', array('id' => $row->id, 'show' => route('poz::transaction.product.show', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
+                $template .= view('poz::layouts_master.component.button_show', array('id' => $row->id, 'show' => route('poz::transaction.product-variant.show', ['product_variant' => $row->id]) . '?outlet=' . $outletId))->render();
                 $template .= view('poz::layouts_master.component.button_edit', array('id' => $row->id, 'update' => route('poz::transaction.product.edit', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
                 $template .= view('poz::layouts_master.component.button_delete', array('id' => $row->id, 'delete' => route('poz::transaction.product.destroy', ['product' => $row->id]) . '?outlet=' . $outletId))->render();
 

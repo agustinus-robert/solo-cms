@@ -8,8 +8,9 @@
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-xl-10">
-            <form action="" method="POST" id="variantForm">
+            <form action="{{ route('poz::transaction.product-variant.store') }}" method="POST" id="variantForm">
                 @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}" />
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -47,46 +48,92 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="variant-row">
-                                        <td class="px-3">
-                                            <select name="tier_1_ids[]" class="form-select form-select-sm t1-select border-0 bg-light" required>
-                                                <option value="">Pilih...</option>
-                                                @foreach($options1 as $opt)
-                                                    <option value="{{ $opt->id }}">{{ $opt->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        @if($tierCount == 2)
-                                        <td>
-                                            <select name="tier_2_ids[]" class="form-select form-select-sm t2-select border-0 bg-light" required>
-                                                <option value="">Pilih...</option>
-                                                @foreach($options2 as $opt)
-                                                    <option value="{{ $opt->id }}">{{ $opt->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        @endif
-                                        <td>
-                                            <input type="text" name="codes[]" class="form-control form-control-sm border-0 bg-light" value="{{ $product->code }}-{{ rand(100,999) }}">
-                                        </td>
-                                        <td>
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-light border-0">Rp</span>
-                                                <input type="number" name="prices[]" class="form-control form-control-sm border-0 bg-light" value="{{ (int)$product->price }}">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input type="number" name="qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="0">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="alert_qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="5">
-                                        </td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-link text-danger p-0 remove-row">
-                                                <i class="fa fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    @if(count($savedVariants) > 0)
+                                        {{-- TAMPILKAN DATA DARI DATABASE --}}
+                                        @foreach($savedVariants as $index => $item)
+                                        <tr class="variant-row">
+                                            <td class="px-3">
+                                                <select name="tier_1_ids[]" class="form-select form-select-sm t1-select border-0 bg-light" required>
+                                                    <option value="">Pilih...</option>
+                                                    @foreach($options1 as $opt)
+                                                        <option value="{{ $opt->id }}" {{ $item['tier_1_id'] == $opt->id ? 'selected' : '' }}>{{ $opt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            @if($tierCount == 2)
+                                            <td>
+                                                <select name="tier_2_ids[]" class="form-select form-select-sm t2-select border-0 bg-light" required>
+                                                    <option value="">Pilih...</option>
+                                                    @foreach($options2 as $opt)
+                                                        <option value="{{ $opt->id }}" {{ $item['tier_2_id'] == $opt->id ? 'selected' : '' }}>{{ $opt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            @endif
+                                            <td>
+                                                <input type="text" name="codes[]" class="form-control form-control-sm border-0 bg-light" value="{{ $item['code'] }}">
+                                            </td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text bg-light border-0">Rp</span>
+                                                    <input type="number" name="prices[]" class="form-control form-control-sm border-0 bg-light" value="{{ $item['price'] }}">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="{{ $item['qty'] }}">
+                                            </td>
+                                            <td>
+                                                <input type="number" name="alert_qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="{{ $item['alert_qty'] }}">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-link text-danger p-0 remove-row">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @else
+                                        <tr class="variant-row">
+                                            <td class="px-3">
+                                                <select name="tier_1_ids[]" class="form-select form-select-sm t1-select border-0 bg-light" required>
+                                                    <option value="">Pilih...</option>
+                                                    @foreach($options1 as $opt)
+                                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            @if($tierCount == 2)
+                                            <td>
+                                                <select name="tier_2_ids[]" class="form-select form-select-sm t2-select border-0 bg-light" required>
+                                                    <option value="">Pilih...</option>
+                                                    @foreach($options2 as $opt)
+                                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            @endif
+                                            <td>
+                                                <input type="text" name="codes[]" class="form-control form-control-sm border-0 bg-light" value="{{ $product->code }}-{{ rand(100,999) }}">
+                                            </td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text bg-light border-0">Rp</span>
+                                                    <input type="number" name="prices[]" class="form-control form-control-sm border-0 bg-light" value="{{ (int)$product->price }}">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="0">
+                                            </td>
+                                            <td>
+                                                <input type="number" name="alert_qtys[]" class="form-control form-control-sm border-0 bg-light text-center" value="5">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-link text-danger p-0 remove-row">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

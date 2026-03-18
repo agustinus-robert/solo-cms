@@ -13,15 +13,17 @@ use Illuminate\Database\Eloquent\Builder;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ProductVariant extends Model
+class ProductVariantAdjustment extends Model
 {
     use HasFactory, HasAuditLog, Restorable, SoftDeletes, Userstamps;
 
-    public $table = "product_master_variants";
+    public $table = "product_master_variant_adjustments";
 
     protected $fillable = [
         'product_id',
-        'product_variant', // json untuk mengambil variant tier
+        'code',
+        'status',
+        'qty',
         'created_by',
         'updated_by',
         'deleted_by'

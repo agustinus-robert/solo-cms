@@ -91,6 +91,9 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
 
     Route::prefix('transaction')->namespace('Transaction')->name('transaction.')->group(function () {
         Route::resource('product', 'ProductController')->parameters(['products' => 'product']);
+        Route::resource('product-variant', 'ProductVariantController')->parameters(['product-variants' => 'product-variant'])->only([
+            'show', 'store'
+        ]);
         Route::resource('sale', 'SaleController')->parameters(['sales' => 'sale']);
         Route::resource('qutation', 'QutationController')
             ->only(['index', 'show', 'update'])
