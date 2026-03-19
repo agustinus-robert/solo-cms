@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Poz\Models;
+namespace Modules\Web\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
