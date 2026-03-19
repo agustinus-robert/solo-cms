@@ -16,9 +16,15 @@ Route::group(['middleware' => ['web']], function () {
         'edit', 'update'
     ]);
 
+
+    Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
+    Route::post('wishlist/toggle', [MainController::class, 'call'])->defaults('controller', 'wishlist')->defaults('method', 'toggle')->name('web.whistlist.add');
+
     mapMain('shop', 'shop', 'index', 'web.shop');
     mapMain('shop/detail/{param}', 'shop', 'show', 'web.shop.show');
     mapMain('contact', 'contact', 'index', 'web.contact');
+    mapMain('cart/render-dropdown', 'cart', 'renderDropdown', 'web.cart.render');
+    mapMain('wishlist/render-corner', 'wishlist', 'renderCorner', 'web.wishlist.render');
 
     Route::any('{controller?}/{method?}/{param?}', [MainController::class, 'call'])
         ->name('web.page');

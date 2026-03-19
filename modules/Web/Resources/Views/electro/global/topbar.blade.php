@@ -100,13 +100,11 @@
                         </a>
                     @endauth
 
-                    <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3">
-                        <span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span>
-                    </a>
-
-                    <a href="#" class="text-muted d-flex align-items-center justify-content-center">
+                    @include('web::components.chart-version.electro.whistlist-corner')
+                    @include('web::components.chart-version.electro.chart-corner')
+                    {{-- <a href="#" class="text-muted d-flex align-items-center justify-content-center">
                         <span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                    </a>
+                    </a> --}}
                 </div>
             </div>
         </div>
