@@ -41,6 +41,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::get('datatable_adjustment', 'AdjustmentController@adjustmentTable')->name('adjustment.datatables');
         Route::get('datatable_quotation', 'QutationController@quotationTable')->name('quotation-transaction.datatables');
         Route::get('datatable_tiers', 'TierVariantController@tierTable')->name('tier.datatables');
+        Route::get('datatable_promotions', 'PromotionController@promotionTable')->name('promotion.datatables');
     });
 
     Route::prefix('master')->namespace('Master')->name('master.')->group(function () {
@@ -91,9 +92,12 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
 
     Route::prefix('transaction')->namespace('Transaction')->name('transaction.')->group(function () {
         Route::resource('product', 'ProductController')->parameters(['products' => 'product']);
+        Route::resource('product-promotion', 'PromotionController')->parameters(['product-promotions' => 'product-promotion'])
+        ->except(['show']);
         Route::resource('product-variant', 'ProductVariantController')->parameters(['product-variants' => 'product-variant'])->only([
             'show', 'store'
         ]);
+
         Route::resource('sale', 'SaleController')->parameters(['sales' => 'sale']);
         Route::resource('qutation', 'QutationController')
             ->only(['index', 'show', 'update'])

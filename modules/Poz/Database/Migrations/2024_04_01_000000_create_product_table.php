@@ -55,16 +55,14 @@ return new class extends Migration
 
         Schema::create('product_promotions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')
-                ->constrained('products')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
 
             $table->string('name');
             $table->tinyInteger('type');
             $table->json('config');
             $table->dateTimeTz('start_date');
             $table->dateTimeTz('end_date');
+            $table->text('location');
+            $table->text('image_name');
             $table->boolean('is_active')->default(true);
             $table->timestampsTz();
         });

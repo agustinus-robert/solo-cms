@@ -91,6 +91,12 @@
             </li>
 
             <li class="nav-main-item">
+                <a href="{{ route('poz::transaction.product-promotion.index', request()->query()) }}" class="nav-main-link">
+                    <span class="nav-main-link-name">Promo</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
                 <a href="{{ route('poz::transaction.product.index', request()->query()) }}" class="nav-main-link">
                     <span class="nav-main-link-name">Kelola</span>
                 </a>

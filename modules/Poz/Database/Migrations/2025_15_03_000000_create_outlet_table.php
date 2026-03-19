@@ -205,6 +205,19 @@ return new class extends Migration
             $table->softDeletesTz();
             $table->timestampsTz();
         });
+
+        Schema::create('outlet_product_promotions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('transaction_product_promotion_id')->constrained('product_promotion_transaction')->cascadeOnUpdate()->cascadeOnDelete();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletesTz();
+            $table->timestampsTz();
+        });
     }
 
     /**
