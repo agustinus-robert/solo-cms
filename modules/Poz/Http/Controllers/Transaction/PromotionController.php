@@ -128,13 +128,14 @@ class PromotionController extends Controller
             'type'        => 'required|integer',
             'start_date'  => 'required|date',
             'end_date'    => 'nullable|date|after_or_equal:start_date',
-            'config'      => 'required|array',
+            'config'      => 'required|array'
         ]);
 
         DB::beginTransaction();
         try {
             $data = $request->only(['name', 'type', 'start_date', 'end_date']);
-            $data['config'] = $this->formatConfigWithModels($request->config, $request->type);
+
+            $newConfig = $this->formatConfigWithModels($request->config, $request->type);
 
             if ($request->hasFile('image')) {
                 if ($promotion->image_name && file_exists(public_path('uploads/' . $promotion->location . '/' . $promotion->image_name))) {
@@ -145,13 +146,17 @@ class PromotionController extends Controller
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $location = 'promotion';
                 $file->move(public_path('uploads/' . $location), $filename);
+
                 $data['location'] = $location;
                 $data['image_name'] = $filename;
             }
 
             $data['updated_by'] = Auth::id();
 
-            $promotion->update($data);
+            $promotion->fill($data);
+            $promotion->config = $newConfig;
+            $promotion->save();
+
             $promotion->outlets()->sync($request->outlet_id);
 
             DB::commit();
