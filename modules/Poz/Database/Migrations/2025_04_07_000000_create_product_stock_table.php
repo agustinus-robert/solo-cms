@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('grand_total', 20, 2)->nullable();
             $table->string('shift')->nullable();
             $table->tinyInteger('is_not_stock')->nullable();
+            $table->string('variant_code');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();

@@ -52,6 +52,7 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::get('datatable_warehouse', 'WarehouseController@unitTable')->name('warehouse.datatables');
         Route::get('datatable_outlet', 'OutletController@outletTable')->name('outlet.datatables');
         Route::get('datatable_casier', 'CasierController@casierTable')->name('casier.datatables');
+        Route::get('datatable_supplier', 'SupplierController@supplierTable')->name('supplier.datatables');
         Route::get('datatable_tier', 'TierController@tierTable')->name('tier.datatables');
     });
 

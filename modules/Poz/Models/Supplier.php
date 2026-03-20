@@ -31,7 +31,7 @@ class Supplier extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_supplier', 'supplier_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_suppliers', 'supplier_id', 'outlet_id');
     }
 
     public function stock(){

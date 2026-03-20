@@ -55,28 +55,7 @@ trait SupplierRepository
                     'current_team_id' => 1
                 ]);
 
-                if ($user->save()) {
-                    $empl = $user->employee()->create([
-                        'joined_at' => Carbon::parse(now()),
-                    ]);
-
-                    $contract = $empl->contract()->create([
-                        'kd' => ($user->id+ 1) . '/AFD-SUPPLIER/'.date('Y'),
-                        'contract_id' => 2,
-                        'work_location' => 1,
-                        'start_at' => '2021-01-01 01:00:00',
-                        'end_at' => null,
-                        'created_by' => User::first()->id,
-                        'updated_by' => User::first()->id
-                    ]);
-
-                    $contract->position()->create([
-                        'empl_id' => $contract->empl_id,
-                        'position_id' => 9,
-                        'start_at' => $contract->start_at,
-                        'end_at' => $contract->end_at,
-                    ]);
-                }
+                $user->save();
 
                 $outletId = $data['outlet'];
 

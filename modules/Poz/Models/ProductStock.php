@@ -21,6 +21,7 @@ class ProductStock extends Model
         'stockable_type',
         'stockable_id',
         'status',
+        'variant_code',
         'qty',
         'wholesale',
         'pricesale',
@@ -49,11 +50,11 @@ class ProductStock extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_product_stock', 'product_stock_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_product_stocks', 'product_stock_id', 'outlet_id');
     }
 
     public function outlet(){
-        return $this->belongsTo(Outlet::class, 'outlet_product_stock', 'product_stock_id', 'outlet_id');
+        return $this->belongsTo(Outlet::class, 'outlet_product_stocks', 'product_stock_id', 'outlet_id');
     }
 
     public function product()

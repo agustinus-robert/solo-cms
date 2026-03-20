@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('ref_suppliers')->onDelete('cascade');
             $table->enum('status', ['plus', 'minus']);
             $table->integer('qty');
-            $table->integer('shift');
+            $table->integer('shift')->nullable();
             $table->integer('product_status')->nullable();
             $table->text('note')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

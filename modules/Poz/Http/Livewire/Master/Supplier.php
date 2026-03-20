@@ -34,6 +34,7 @@ class Supplier extends Component
             $this->form['email'] = $supplier->email;
             $this->form['phone'] = $supplier->phone;
             $this->form['address'] = $supplier->address;
+            $this->form['is_schedule'] = $supplier->is_schedule;
             if (!empty($supplier->location) && !empty($supplier->image_name)) {
                 $this->form['document'] = $supplier->location . '/' . $supplier->image_name;
             } else {

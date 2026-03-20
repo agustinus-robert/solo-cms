@@ -42,7 +42,7 @@ class AdjustmentSupplier extends Component
     }
 
     public function showProduct($outletId){
-    
+
        if (empty($outletId)) {
          $this->outletNow = null;
         $this->products = collect();
@@ -53,7 +53,7 @@ class AdjustmentSupplier extends Component
       $this->outletNow = $outletId;
       $this->products = Product::whereHas('schedule', function ($query) use ($outletId) {
             $query->whereHas('supplier', function ($q) use ($outletId) {
-                $q->where('user_id', auth()->id()) 
+                $q->where('user_id', auth()->id())
                 ->whereHas('outlets', fn($oq) => $oq->where('outlet.id', $outletId));
             });
         })->get();

@@ -52,6 +52,6 @@ class Adjustment extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_product_adjustment', 'adjustment_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_product_adjustments', 'adjustment_id', 'outlet_id');
     }
 }
