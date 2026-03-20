@@ -5,7 +5,7 @@
 @section('navtitle', env('APP_NAME') . ' Penjualan')
 
 @section('header')
-    <div class="app-content-top-area"> <!--begin::Container-->
+    <div class="app-content-top-area">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -13,11 +13,11 @@
                 </div>
                 <div class="col-md-6 text-end"> <a class="btn btn-primary" href="{{ route('poz::transaction.sale.create') }}">Create Sell</a> </div>
             </div>
-        </div> <!--end::Container-->
+        </div>
     </div>
 
-    <div class="app-content-header"> <!--begin::Container-->
-        <div class="container-fluid"> <!--begin::Row-->
+    <div class="app-content-header">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
                     <h3 class="mb-0">Sale</h3>
@@ -30,9 +30,9 @@
                         </li>
                     </ol>
                 </div>
-            </div> <!--end::Row-->
-        </div> <!--end::Container-->
-    </div> <!--end::App Content Header--> <!--begin::App Content-->
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('content')
@@ -52,7 +52,6 @@
                     'drawCallback' => 'function() { ajaxParam(); }',
                 ],
                 'title' => 'Daftar Penjualan',
-                'menu' => 'sale',
             ];
         @endphp
 

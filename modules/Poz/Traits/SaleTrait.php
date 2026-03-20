@@ -12,13 +12,20 @@ use Illuminate\Support\Carbon;
 
 trait SaleTrait
 {
-    public function getAvailableStock($productId, $outletId)
+    /**
+     * Mengambil stok tersedia berdasarkan Produk, Outlet, dan Variant Code.
+     */
+    public function getAvailableStock($productId, $outletId, $variantCode = null)
     {
         $today = Carbon::today();
 
-        $stockIn = ProductStock::where('product_id', $productId)
+        $baseStock = ProductStock::where('product_id', $productId)
+            ->when($variantCode, function ($q) use ($variantCode) {
+                return $q->where('variant_code', $variantCode);
+            });
+
+        $stockIn = (clone $baseStock)
             ->where('status', 'plus')
-            ->whereDate('created_at', $today)
             ->whereHasMorph('stockable', [Purchase::class, Adjustment::class], function ($query) use ($outletId) {
                 $query->whereHas('outlets', function ($q) use ($outletId) {
                     $q->where('outlets.id', $outletId);
@@ -26,9 +33,8 @@ trait SaleTrait
             })
             ->sum('qty');
 
-        $stockOut = ProductStock::where('product_id', $productId)
+        $stockOut = (clone $baseStock)
             ->where('status', 'minus')
-            ->whereDate('created_at', $today)
             ->whereHasMorph('stockable', [SaleDirect::class, Sale::class, Adjustment::class], function ($query) use ($outletId) {
                 $query->whereHas('outlets', function ($q) use ($outletId) {
                     $q->where('outlets.id', $outletId);
@@ -37,6 +43,9 @@ trait SaleTrait
             ->sum('qty');
 
         $qtyInCart = SaleDirectCart::where('product_id', $productId)
+            ->when($variantCode, function ($q) use ($variantCode) {
+                return $q->where('variant_code', $variantCode);
+            })
             ->whereDate('created_at', $today)
             ->whereHas('outlets', function ($q) use ($outletId) {
                 $q->where('outlets.id', $outletId);
@@ -46,17 +55,21 @@ trait SaleTrait
         return (float)($stockIn - $stockOut - $qtyInCart);
     }
 
+    /**
+     * Menghitung total penjualan dari item yang dipilih.
+     */
     public function calculateSaleTotals($items, $discount = 0)
     {
         $subtotal = collect($items)->sum(fn($item) => (float)$item['qty'] * (float)$item['price']);
+
         $afterDiscount = max(0, $subtotal - (float)$discount);
         $ppn = $afterDiscount * 0.11;
 
         return [
-            'subtotal'    => $subtotal,
+            'subtotal'    => (float)$subtotal,
             'discount'    => (float)$discount,
-            'ppn'         => $ppn,
-            'grand_total' => $afterDiscount + $ppn
+            'ppn'         => (float)$ppn,
+            'grand_total' => (float)($afterDiscount + $ppn)
         ];
     }
 }

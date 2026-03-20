@@ -8,6 +8,7 @@ use Modules\Poz\Models\Product;
 use Modules\Poz\Models\Sale as SaleData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Traits\SaleTrait;
 
 class SaleController extends Controller
@@ -30,17 +31,19 @@ class SaleController extends Controller
     {
         $outletId = $request->query('outlet', auth()->user()->current_outlet_id);
 
-        $products = Product::whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
-            ->get()
-            ->map(function($p) use ($outletId) {
-                $p->stok_tersedia = $this->getAvailableStock($p->id, $outletId);
-                return $p;
-            });
+        $products = Product::with(['variant'])
+            ->whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
+            ->get();
+
+        $stocks = ProductStock::whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
+            ->select('variant_code', 'qty', 'status')
+            ->get();
 
         return view('poz::transaction.sale', [
             'action' => 'Buat',
             'outletId' => $outletId,
             'products' => $products,
+            'stocks' => $stocks,
             'sale' => null,
             'selectedItems' => []
         ]);
@@ -51,21 +54,29 @@ class SaleController extends Controller
         $sale = SaleData::with('saleItems.product')->findOrFail($request->sale);
         $outletId = $request->query('outlet', auth()->user()->current_outlet_id);
 
-        $products = Product::whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
-            ->get()
-            ->map(function($p) use ($outletId) {
-                $p->stok_tersedia = $this->getAvailableStock($p->id, $outletId);
-                return $p;
-            });
+        $products = Product::with(['variant'])
+            ->whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
+            ->get();
+
+        // AMBIL SEMUA MUTASI STOK
+        $stocks = ProductStock::whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
+            ->select('variant_code', 'qty', 'status')
+            ->get();
 
         $selectedItems = $sale->saleItems->map(function($item) use ($outletId) {
+            // Karena di JS kita pakai 'bought_variants', sesuaikan strukturnya di sini
             return [
                 'id' => $item->product_id,
                 'name' => $item->product->name,
-                'qty' => $item->qty,
-                'price' => (int)$item->price,
-                // Gunakan fungsi langsung karena kita masih di dalam context Controller
-                'maxStock' => $this->getAvailableStock($item->product_id, $outletId) + $item->qty
+                'bought_variants' => [
+                    [
+                        'code' => $item->variant_code, // Pastikan kolom ini ada di sale_items
+                        'name' => $item->variant_name ?? 'Default',
+                        'qty' => $item->qty,
+                        'price' => (int)$item->price,
+                        'maxStock' => $this->getAvailableStock($item->product_id, $outletId) + $item->qty
+                    ]
+                ]
             ];
         });
 
@@ -73,6 +84,7 @@ class SaleController extends Controller
             'action' => 'Perbarui',
             'outletId' => $outletId,
             'products' => $products,
+            'stocks' => $stocks, // KIRIM KE VIEW
             'sale' => $sale,
             'selectedItems' => $selectedItems
         ]);
