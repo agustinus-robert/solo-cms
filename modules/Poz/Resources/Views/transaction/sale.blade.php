@@ -38,7 +38,7 @@
 @section('content')
 
     @if (str_contains(url()->full(), 'create') || str_contains(url()->full(), 'edit'))
-        @livewire('poz::transaction.sale', ['action' => $action])
+        @include('poz::transaction.sale.upsert', ['action' => $action])
     @else
         @php
             $arr = [

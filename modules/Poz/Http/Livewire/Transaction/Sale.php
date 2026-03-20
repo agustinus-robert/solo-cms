@@ -130,53 +130,8 @@ class Sale extends Component
 
     public function updatedQuery()
     {
-        // if(empty($this->inv['warehouse_id'])){
-        //     $this->results = [];
-        //     $this->alert('error', 'Gudang harus dipilih', [
-        //         'position' => 'center'
-        //     ]);
-
-        //     $this->query = '';
-        //     return;
-        // }
-
-        // if (strlen($this->query) < 3) {
-        //     $this->results = [];
-        //     return;
-        // }
-
         $outletId = $this->form['outlet'];
-
-        // $this->results = Product::withSum('purchaseItems', 'qty')->where('name', 'ilike', '%' . $this->query . '%')
-        //     ->whereHas('purchaseItems', function ($query) {
-        //         $query->where('qty', '>', 0);
-        //     })
-        //     ->whereHas('outlets', function ($query) use ($outletId) {
-        //         $query->where('outlet_id', $outletId);
-        //     })
-        //     ->limit(5)
-        //     ->get();
-        // $this->results = Product::withSum(['productStockAdjustItems as stock_plus_qty' => function ($query) {
-        // $query->withoutGlobalScopes()
-        //       ->where('status', 'plus');
-        // }], 'qty')
-        // ->where('name', 'ilike', '%' . $this->query . '%')
-        // ->whereHas('productStockAdjustItems', function ($query) {
-        //     $query->where('status', 'plus')
-        //         ->where('qty', '>', 0);
-        // })
-        // ->whereHas('outlets', function ($query) use ($outletId) {
-        //     $query->where('outlet_id', $outletId);
-        // })
-        // ->limit(5)
-        // ->get();
-
         $this->resulterProduct($outletId, []);
-
-
-
-        //->toSql();
-
     }
 
     // Fungsi untuk menambahkan item ke dalam tabel
@@ -332,7 +287,6 @@ class Sale extends Component
             return false;
         }
 
-        // Update qty jika stok cukup
         $item['qty'] = $qty;
         $this->resulterProduct($outletId, $this->selectedItems);
         $this->updateGrandTotal();
@@ -348,44 +302,6 @@ class Sale extends Component
         });
         $this->updateGrandTotal();
     }
-
-    // protected function rules()
-    // {
-    //     $rules = (new ProductStoreRequest())->rules();
-
-    //     if($this->categoryHasSub == 1 && count($this->subCategory)){
-    //         $rules['form.sub_category_id'] = 'required';
-    //     } else {
-    //         $rules['form.sub_category_id'] = 'nullable';
-    //     }
-    //     return $rules;
-    // }
-
-    // protected function attributes()
-    // {
-    //     $attrs = (new ProductStoreRequest())->attributes();
-    //     if($this->categoryHasSub == 1 && count($this->subCategory)){
-    //         $attrs['form.sub_category_id'] = 'Sub Kategori';
-    //     }
-
-    //     return $attrs;
-    // }
-
-    // protected function messages(){
-
-    //     $message = (new ProductStoreRequest())->messages();
-    //     if($this->categoryHasSub == 1 && count($this->subCategory)){
-    //         $rules['form.sub_category_id'] = ':attribute tidak boleh kosong';
-    //     }
-
-    //     return $message;
-    // }
-
-    // public function sub_category_changed($cat_id){
-    //     $this->categoryHasSub = 1;
-
-    //     $this->subCategory = Category::where(['parent_id' => $cat_id, 'deleted_at' => null])->get();
-    // }
 
     public function updateDiscount()
     {

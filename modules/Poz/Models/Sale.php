@@ -42,6 +42,6 @@ class Sale extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_sale', 'sale_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_sales', 'sale_id', 'outlet_id');
     }
 }

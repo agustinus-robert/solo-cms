@@ -43,6 +43,6 @@ class Purchase extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_purchase', 'purchase_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_purchases', 'purchase_id', 'outlet_id');
     }
 }

@@ -111,7 +111,13 @@
         </a>
         <ul class="sub-menu mm-collapse">
             <li class="nav-main-item">
-                <a href="{{ route('poz::transaction.pos-sale.index', request()->query()) }}" class="nav-main-link">
+                <a href="{{ route('poz::transaction.sale.index', request()->query()) }}" class="nav-main-link">
+                    <span class="nav-main-link-name">Penjualan Reguler</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a href="{{ route('poz::transaction.sale.index', request()->query()) }}" class="nav-main-link">
                     <span class="nav-main-link-name">Penjualan POS</span>
                 </a>
             </li>

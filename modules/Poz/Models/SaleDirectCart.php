@@ -48,4 +48,9 @@ class SaleDirectCart extends Model
     {
         return $this->hasMany(SaleDirectItems::class, 'sale_id');
     }
+
+    public function outlets()
+    {
+        return $this->belongsToMany(Outlet::class, 'outlet_sales', 'sale_id', 'outlet_id');
+    }
 }

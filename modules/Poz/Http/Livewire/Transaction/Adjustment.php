@@ -76,6 +76,7 @@ class Adjustment extends Component
         if (empty($productId)) {
             $this->shift = collect();
             $this->variants = [];
+            $this->form['variant_code'] = null;
             return;
         }
 
@@ -83,9 +84,19 @@ class Adjustment extends Component
         $outNow = $this->form['outlet'];
 
         $variantRecord = ProductVariant::where('product_id', $productId)->first();
+
         if ($variantRecord) {
             $allVariants = json_decode($variantRecord->product_variant, true);
-            $this->variants = collect($allVariants)->where('status', 'active')->toArray();
+            $activeVariants = collect($allVariants)->where('status', 'active');
+
+            $this->variants = $activeVariants->toArray();
+
+            $firstVariant = $activeVariants->first();
+            if ($activeVariants->count() === 1 && ($firstVariant['variant_type'] ?? '') === 'no_variant') {
+                $this->form['variant_code'] = $firstVariant['code'];
+            } else {
+                $this->form['variant_code'] = null;
+            }
         } else {
             $this->variants = [];
             $this->form['variant_code'] = null;

@@ -64,13 +64,29 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold text-secondary">Varian <span class="badge {{ count($variants) > 0 ? 'bg-primary' : 'bg-light text-muted' }} ms-1" style="font-size: 0.6rem;">{{ count($variants) }}</span></label>
+                        <label class="form-label small fw-bold text-secondary">
+                            Varian
+                            <span class="badge {{ count($variants) > 0 ? 'bg-primary' : 'bg-light text-muted' }} ms-1" style="font-size: 0.6rem;">
+                                {{ count($variants) }}
+                            </span>
+                        </label>
+
+                        @php
+                            $isNoVariant = count($variants) === 1 && ($variants[array_key_first($variants)]['variant_type'] ?? '') === 'no_variant';
+                        @endphp
+
                         <select class="form-select border-light shadow-none @error('form.variant_code') is-invalid @enderror"
-                                wire:model="form.variant_code" {{ count($variants) == 0 ? 'disabled' : '' }}>
-                            <option value="">{{ count($variants) == 0 ? '-- Tanpa Varian --' : 'Pilih Varian Produk' }}</option>
-                            @foreach ($variants as $v)
-                                <option value="{{ $v['code'] }}">{{ $v['name'] }} (Stok: {{ $v['qty'] }})</option>
-                            @endforeach
+                                wire:model="form.variant_code"
+                                {{ count($variants) == 0 || $isNoVariant ? 'disabled' : '' }}>
+
+                            @if($isNoVariant)
+                                <option value="{{ $variants[array_key_first($variants)]['code'] }}">Standar / No Variant</option>
+                            @else
+                                <option value="">{{ count($variants) == 0 ? '-- Tanpa Varian --' : 'Pilih Varian Produk' }}</option>
+                                @foreach ($variants as $v)
+                                    <option value="{{ $v['code'] }}">{{ $v['name'] }} (Stok: {{ $v['qty'] }})</option>
+                                @endforeach
+                            @endif
                         </select>
                         @error('form.variant_code') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
