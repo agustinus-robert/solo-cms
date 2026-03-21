@@ -19,6 +19,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('casier_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('money', 20, 2);
+            $table->enum('status', ['open', 'closed'])->default('closed')->after('money');
+            $table->timestamp('opened_at')->nullable()->after('status');
+            $table->timestamp('closed_at')->nullable()->after('opened_at');
             $table->softDeletesTz();
             $table->timestampsTz();
         });
@@ -36,6 +39,8 @@ return new class extends Migration
             $table->foreignId('cash_register_id')->constrained('cash_registers')->cascadeOnUpdate()->cascadeOnDelete();
             $table->enum('status', ['plus', 'minus']);
             $table->decimal('money', 20, 2);
+            $table->string('log_type')->default('transaction')->after('status');
+            $table->string('reason')->nullable()->after('money');
             $table->softDeletesTz();
             $table->timestampsTz();
         });

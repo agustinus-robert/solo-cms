@@ -173,6 +173,13 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($value);
     }
 
+    public function getOutletIdAttribute()
+    {
+        return \DB::table('user_casier_outlets')
+            ->where('user_id', $this->id)
+            ->value('outlet_id');
+    }
+
     /**
      * Get display name attributes.
      */

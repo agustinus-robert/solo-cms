@@ -18,10 +18,15 @@ class CashRegister extends Model
     protected $fillable = [
         'casier_id',
         'money',
+        'status',
+        'opened_at',
+        'closed_at',
     ];
 
     protected $casts = [
-        'money' => 'float',
+        'opened_at' => 'datetime',
+        'closed_at' => 'datetime',
+        'money'     => 'float',
         'deleted_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -34,5 +39,10 @@ class CashRegister extends Model
 
     public function logCash(){
         return $this->hasMany(CashHistoryRegister::class, 'cash_register_id');
+    }
+
+    public function outlets()
+    {
+        return $this->belongsToMany(Outlet::class, 'outlet_cash_registers', 'cash_register_id', 'outlet_id');
     }
 }

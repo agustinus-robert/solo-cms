@@ -115,5 +115,8 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
         Route::resource('transfer', 'TransferController')->parameters(['transfers' => 'transfer']);
         Route::get('transfer_status/{transfer_id}/', 'TransferController@change_status')->name('transfer.purchase_status');
         Route::get('transfer-invoice/{transfer_id}', 'TransferController@invoice')->name('transfer.invoice');
+        Route::post('cash-registers/update', 'CashRegisterController@update')->name('cash-registers.update');
+        Route::post('cash-registers/open', 'CashRegisterController@open')->name('cash-registers.open');
+        Route::post('cash-registers/close',  'CashRegisterController@close')->name('cash-registers.close');
     });
 });

@@ -218,6 +218,19 @@ return new class extends Migration
             $table->softDeletesTz();
             $table->timestampsTz();
         });
+
+        Schema::create('outlet_cash_registers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('cash_register_id')->constrained('cash_registers')->cascadeOnUpdate()->cascadeOnDelete();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletesTz();
+            $table->timestampsTz();
+        });
     }
 
     /**

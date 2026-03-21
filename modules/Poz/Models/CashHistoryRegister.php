@@ -19,6 +19,8 @@ class CashHistoryRegister extends Model
         'cash_register_id',
         'status',
         'money',
+        'log_type',
+        'reason'
     ];
 
     protected $casts = [

@@ -6,14 +6,23 @@ use Modules\Reference\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables as Table;
 use Modules\Poz\Models\Product;
 use Modules\Poz\Models\Sale as SaleData;
+use Modules\Poz\Models\CashRegister;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // Tambahkan ini
 use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Traits\SaleTrait;
 
 class SaleController extends Controller
 {
     use SaleTrait;
+
+    private function getActiveShift()
+    {
+        return CashRegister::where('status', 'open')
+            ->where('casier_id', Auth::id())
+            ->first();
+    }
 
     public function index()
     {
@@ -29,7 +38,8 @@ class SaleController extends Controller
 
     public function create(Request $request)
     {
-        $outletId = $request->query('outlet', auth()->user()->current_outlet_id);
+        $outletId = $request->query('outlet', Auth::user()->outlet_id);
+        $cashRegister = $this->getActiveShift();
 
         $products = Product::with(['variant'])
             ->whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
@@ -45,32 +55,33 @@ class SaleController extends Controller
             'products' => $products,
             'stocks' => $stocks,
             'sale' => null,
-            'selectedItems' => []
+            'selectedItems' => [],
+            'cashRegister' => $cashRegister
         ]);
     }
 
     public function edit(Request $request)
     {
         $sale = SaleData::with('saleItems.product')->findOrFail($request->sale);
-        $outletId = $request->query('outlet', auth()->user()->current_outlet_id);
+        $outletId = $request->query('outlet', Auth::user()->outlet_id);
+
+        $cashRegister = $this->getActiveShift();
 
         $products = Product::with(['variant'])
             ->whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
             ->get();
 
-        // AMBIL SEMUA MUTASI STOK
         $stocks = ProductStock::whereHas('outlets', fn($q) => $q->where('outlet_id', $outletId))
             ->select('variant_code', 'qty', 'status')
             ->get();
 
         $selectedItems = $sale->saleItems->map(function($item) use ($outletId) {
-            // Karena di JS kita pakai 'bought_variants', sesuaikan strukturnya di sini
             return [
                 'id' => $item->product_id,
                 'name' => $item->product->name,
                 'bought_variants' => [
                     [
-                        'code' => $item->variant_code, // Pastikan kolom ini ada di sale_items
+                        'code' => $item->variant_code,
                         'name' => $item->variant_name ?? 'Default',
                         'qty' => $item->qty,
                         'price' => (int)$item->price,
@@ -84,9 +95,10 @@ class SaleController extends Controller
             'action' => 'Perbarui',
             'outletId' => $outletId,
             'products' => $products,
-            'stocks' => $stocks, // KIRIM KE VIEW
+            'stocks' => $stocks,
             'sale' => $sale,
-            'selectedItems' => $selectedItems
+            'selectedItems' => $selectedItems,
+            'cashRegister' => $cashRegister
         ]);
     }
 
@@ -94,6 +106,12 @@ class SaleController extends Controller
     {
         $items = $request->items;
         $outletId = $request->outlet_id;
+
+        // 1. CEK REGISTER BERDASARKAN USER LOGIN
+        $register = $this->getActiveShift();
+        if (!$register) {
+            return back()->with('msg-gagal', "Anda belum membuka sesi kasir!");
+        }
 
         if(empty($items)) return back()->with('msg-gagal', "Pilih minimal satu produk!");
 
@@ -104,16 +122,34 @@ class SaleController extends Controller
             }
         }
 
-        $totals = $this->calculateSaleTotals($items, $request->discount);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('poz::transaction.sale.index')->with('msg-sukses', "Data berhasil disimpan");
+            $totals = $this->calculateSaleTotals($items, $request->discount);
+
+            $grandTotal = $totals['grand_total'];
+            $register->increment('money', $grandTotal);
+
+            $register->logCash()->create([
+                'status'   => 'plus',
+                'money'    => $grandTotal,
+                'log_type' => 'transaction',
+                'reason'   => "Penjualan POS #" . ($totals['reference'] ?? 'Direct'),
+            ]);
+
+            DB::commit();
+            return redirect()->route('poz::transaction.sale.index')->with('msg-sukses', "Data berhasil disimpan");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('msg-gagal', "Error: " . $e->getMessage());
+        }
     }
 
     public function destroy(Request $request)
     {
         $sale = SaleData::findOrFail($request->sale);
         $sale->delete();
-
         return redirect(route('poz::transaction.sale.index'))->with('msg-sukses', "Data berhasil dihapus");
     }
 
@@ -125,7 +161,6 @@ class SaleController extends Controller
 
     public function saleTable(Request $request)
     {
-        $outletId = $request->outlet;
         $sale = SaleData::select('id','reference', 'sale_status', 'grand_total');
         $saledirect = DB::table('sale_directs')
             ->select('id', 'reference', 'sale_status', 'grand_total')
@@ -160,7 +195,6 @@ class SaleController extends Controller
                 return 'Rp ' . number_format($row->grand_total, 2);
             })
             ->addColumn('action', function ($row) {
-                // Gunakan helper route Anda untuk tombol action
                 $template = '<div class="btn-group">';
                 $template .= '<a href="'.route('poz::transaction.sale.pos-invoice', ['sale_id' => $row->id]).'" class="btn btn-sm btn-info"><i class="fa fa-print"></i></a>';
                 $template .= '<a href="'.route('poz::transaction.sale.edit', ['sale' => $row->id]).'" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>';
