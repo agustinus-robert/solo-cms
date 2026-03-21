@@ -18,6 +18,7 @@ class SaleItems extends Model
         'sale_id',
         'product_id',
         'qty',
+        'code_variants',
         'created_by',
         'updated_by',
         'deleted_by',

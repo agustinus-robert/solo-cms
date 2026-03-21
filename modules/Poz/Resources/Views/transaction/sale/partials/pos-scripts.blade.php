@@ -86,11 +86,14 @@
         renderCart();
     }
 
-    function updateSummary() {
+   function updateSummary() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const inputDisc = document.getElementById('inputDiscount');
         const discount = (inputDisc && inputDisc.value !== "") ? parseFloat(inputDisc.value) : 0;
-        const grandTotal = Math.max(0, subtotal - discount);
+
+        const afterDiscount = Math.max(0, subtotal - discount);
+        const ppn = afterDiscount * 0.11;
+        const grandTotal = afterDiscount + ppn;
 
         const elSub = document.getElementById('textSubtotal');
         const elGrand = document.getElementById('textGrandTotal');
@@ -98,13 +101,9 @@
 
         if(elSub) elSub.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
         if(elGrand) elGrand.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(grandTotal);
+
         if(btnSub) btnSub.disabled = (cart.length === 0);
 
-        const paymentType = document.getElementById('paymentType');
-        const wrapperSaldo = document.getElementById('wrapperSaldoKasir');
-        if (wrapperSaldo && paymentType) {
-            wrapperSaldo.style.display = (paymentType.value === 'cash') ? 'block' : 'none';
-        }
         calculateChange(grandTotal);
     }
 
@@ -188,6 +187,36 @@
         if(inputDisc) inputDisc.addEventListener('input', updateSummary);
         if(inputPaid) inputPaid.addEventListener('input', () => calculateChange());
         if(paymentType) paymentType.addEventListener('change', () => updateSummary());
+        const posForm = document.getElementById('saleForm');
+
+        if (posForm) {
+            posForm.addEventListener('submit', function(e) {
+                if (cart.length === 0) {
+                    e.preventDefault();
+                    alert('Keranjang masih kosong!');
+                    return;
+                }
+
+                const formattedItems = cart.map(item => {
+                    return {
+                        id: item.product_id,
+                        bought_variants: [{
+                            code: item.variant_code,
+                            qty: item.qty,
+                            price: item.price
+                        }]
+                    };
+                });
+
+                const itemsInput = document.getElementById('itemsInput');
+                if (itemsInput) {
+                    itemsInput.value = JSON.stringify(formattedItems);
+                    console.log("Data items berhasil disiapkan:", itemsInput.value);
+                } else {
+                    console.error("Elemen itemsInput tidak ditemukan!");
+                }
+            });
+        }
 
         initSearch();
         renderCart();

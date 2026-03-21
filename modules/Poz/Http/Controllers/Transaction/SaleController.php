@@ -5,11 +5,12 @@ namespace Modules\Poz\Http\Controllers\Transaction;
 use Modules\Reference\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables as Table;
 use Modules\Poz\Models\Product;
+use Modules\Poz\Models\ProductVariant;
 use Modules\Poz\Models\Sale as SaleData;
 use Modules\Poz\Models\CashRegister;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Tambahkan ini
+use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Traits\SaleTrait;
 
@@ -104,45 +105,32 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
-        $items = $request->items;
+        $items = json_decode($request->items, true);
         $outletId = $request->outlet_id;
-
-        // 1. CEK REGISTER BERDASARKAN USER LOGIN
-        $register = $this->getActiveShift();
-        if (!$register) {
-            return back()->with('msg-gagal', "Anda belum membuka sesi kasir!");
-        }
-
-        if(empty($items)) return back()->with('msg-gagal', "Pilih minimal satu produk!");
-
-        foreach ($items as $item) {
-            $stock = $this->getAvailableStock($item['id'], $outletId);
-            if ($item['qty'] > $stock) {
-                return back()->with('msg-gagal', "Stok {$item['name']} tidak mencukupi!");
-            }
-        }
 
         try {
             DB::beginTransaction();
 
             $totals = $this->calculateSaleTotals($items, $request->discount);
-
-            $grandTotal = $totals['grand_total'];
-            $register->increment('money', $grandTotal);
-
-            $register->logCash()->create([
-                'status'   => 'plus',
-                'money'    => $grandTotal,
-                'log_type' => 'transaction',
-                'reason'   => "Penjualan POS #" . ($totals['reference'] ?? 'Direct'),
-            ]);
+            $sale = $this->createSaleTransaction($request, $totals);
+            $this->storeSaleItems($sale, $items);
+            $this->deductStock($items, $outletId, $sale->id);
 
             DB::commit();
-            return redirect()->route('poz::transaction.sale.index')->with('msg-sukses', "Data berhasil disimpan");
+            return redirect()->route('poz::transaction.sale.index')
+                            ->with('msg-sukses', "Transaksi #" . $sale->reference . " Berhasil!");
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('msg-gagal', "Error: " . $e->getMessage());
+
+            dd([
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString()
+            ]);
+
+            return back()->with('msg-gagal', "Gagal simpan: " . $e->getMessage());
         }
     }
 

@@ -19,6 +19,7 @@
     <form id="saleForm" action="{{ route('poz::transaction.sale.store') }}" method="POST">
         @csrf
         @if($sale) <input type="hidden" name="id" value="{{ $sale->id }}"> @endif
+        <input type="hidden" name="items" id="itemsInput">
         <input type="hidden" name="outlet_id" value="{{ $outletId }}">
 
         @if($isPos)

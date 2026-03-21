@@ -18,7 +18,11 @@ return new class extends Migration
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('supplier_id')->constrained('ref_suppliers')->onDelete('cascade');
+            $table->foreignId('supplier_id')
+                ->nullable()
+                ->constrained('ref_suppliers')
+                ->onDelete('cascade');
+
             $table->nullableMorphs('stockable');
             $table->enum('status', ['plus', 'minus']);
             $table->integer('qty');

@@ -1,86 +1,108 @@
 <div class="pos-main-layout">
     {{-- KIRI: AREA PRODUK --}}
     <div class="pos-left-section">
-        <div class="card border-0 shadow-sm rounded-4 pos-card-wrapper-manual">
-            <div class="card-body p-3">
-                {{-- Search Partial --}}
-                @include('poz::transaction.sale.partials.search')
+    <div class="card border-0 shadow-sm rounded-4 pos-card-wrapper-manual">
+        <div class="card-body p-3">
+            {{-- Search Partial --}}
+            @include('poz::transaction.sale.partials.search')
 
-                {{-- Area Produk Scrollable --}}
-                <div class="scroll-y-products-manual mt-3">
-                    <div class="row g-2">
-                        @foreach($products as $p)
-                            @php
-                                $allVariants = [];
-                                if ($p->variant) {
-                                    foreach ($p->variant as $vRow) {
-                                        $vData = is_string($vRow->product_variant) ? json_decode($vRow->product_variant) : $vRow->product_variant;
-                                        if (is_array($vData)) {
-                                            foreach ($vData as $v) {
-                                                $vObj = (object) $v;
-                                                if (($vObj->status ?? '') !== 'deleted' && ($vObj->deleted_at ?? null) === null) {
-                                                    $mutations = collect($stocks)->where('variant_code', $vObj->code);
-                                                    $realStock = $mutations->reduce(fn($carry, $item) => $item->status === 'plus' ? $carry + $item->qty : $carry - $item->qty, 0);
-                                                    $vObj->real_stock = $realStock < 0 ? 0 : $realStock;
-                                                    $allVariants[] = $vObj;
-                                                }
+            {{-- Area Produk Scrollable --}}
+            <div class="scroll-y-products-manual mt-3">
+                <div class="row g-2">
+                    @foreach($products as $p)
+                        @php
+                            $allVariants = [];
+
+                            // 1. Ambil list variant dari JSON master hanya untuk mapping CODE dan NAME
+                            if ($p->variant) {
+                                foreach ($p->variant as $vRow) {
+                                    $vData = is_string($vRow->product_variant) ? json_decode($vRow->product_variant) : $vRow->product_variant;
+
+                                    if (is_array($vData)) {
+                                        foreach ($vData as $v) {
+                                            $vObj = (object) $v;
+
+                                            // Validasi status variant
+                                            if (($vObj->status ?? '') !== 'deleted' && ($vObj->deleted_at ?? null) === null) {
+
+                                                // HITUNG STOK DARI LEDGER $stocks (sum plus - sum minus)
+                                                // Cocokkan berdasarkan variant_code
+                                                $mutations = collect($stocks)->where('variant_code', $vObj->code);
+
+                                                $realStock = $mutations->reduce(function($carry, $item) {
+                                                    return $item->status === 'plus' ? $carry + $item->qty : $carry - $item->qty;
+                                                }, 0);
+
+                                                $vObj->real_stock = $realStock < 0 ? 0 : $realStock;
+                                                $allVariants[] = $vObj;
                                             }
                                         }
                                     }
                                 }
+                            }
 
-                                if (empty($allVariants)) {
-                                    $mutations = collect($stocks)->where('variant_code', $p->code);
-                                    $pStock = $mutations->reduce(fn($carry, $item) => $item->status === 'plus' ? $carry + $item->qty : $carry - $item->qty, 0);
-                                    $allVariants[] = (object)[
-                                        'code' => $p->code, 'name' => 'Default', 'price' => $p->price,
-                                        'real_stock' => $pStock < 0 ? 0 : $pStock, 'variant_type' => 'no_variant'
-                                    ];
-                                }
+                            // 2. Fallback jika produk tidak punya variant
+                            if (empty($allVariants)) {
+                                $mutations = collect($stocks)->where('variant_code', $p->code);
 
-                                $totalStock = collect($allVariants)->sum('real_stock');
-                                $isOut = $totalStock <= 0;
-                                $isSingle = count($allVariants) === 1;
-                            @endphp
+                                $pStock = $mutations->reduce(function($carry, $item) {
+                                    return $item->status === 'plus' ? $carry + $item->qty : $carry - $item->qty;
+                                }, 0);
 
-                            <div class="col-6 col-md-4 col-xl-3 mb-2">
-                                <div class="card h-100 product-card-item rounded-3 {{ $isOut ? 'is-out' : '' }} {{ $isSingle ? 'cursor-pointer' : '' }}"
-                                     @if($isSingle && !$isOut)
-                                        onclick="addItemToCart({{ json_encode($p) }}, {{ json_encode($allVariants[0]) }})"
-                                     @endif>
+                                $allVariants[] = (object)[
+                                    'code' => $p->code,
+                                    'name' => 'Default',
+                                    'price' => $p->price,
+                                    'real_stock' => $pStock < 0 ? 0 : $pStock,
+                                    'variant_type' => 'no_variant'
+                                ];
+                            }
 
-                                    @if($isOut)
-                                        <div class="position-absolute top-50 start-50 translate-middle bg-danger text-white px-2 py-1 rounded small fw-bold" style="z-index: 10;">HABIS</div>
-                                    @endif
+                            $totalStock = collect($allVariants)->sum('real_stock');
+                            $isOut = $totalStock <= 0;
+                            $isSingle = count($allVariants) === 1;
+                        @endphp
 
-                                    <div class="p-2 text-center">
-                                        <img src="{{ $p->image_name ? asset('uploads/'.$p->location.'/'.$p->image_name) : asset('assets/img/no-image.png') }}"
-                                             class="rounded-2" style="height: 100px; width: 100%; object-fit: cover;">
+                        <div class="col-6 col-md-4 col-xl-3 mb-2">
+                            <div class="card h-100 product-card-item rounded-3 {{ $isOut ? 'is-out' : '' }} {{ ($isSingle && !$isOut) ? 'cursor-pointer' : '' }}"
+                                 @if($isSingle && !$isOut)
+                                    onclick="addItemToCart({{ json_encode($p) }}, {{ json_encode($allVariants[0]) }})"
+                                 @endif>
+
+                                @if($isOut)
+                                    <div class="position-absolute top-50 start-50 translate-middle bg-danger text-white px-2 py-1 rounded small fw-bold" style="z-index: 10;">
+                                        HABIS
                                     </div>
+                                @endif
 
-                                    <div class="card-body p-2 text-center text-dark">
-                                        <h6 class="small fw-bold mb-1 text-truncate">{{ $p->name }}</h6>
-                                        <div class="text-primary small fw-bold mb-2">Rp {{ number_format($p->price, 0, ',', '.') }}</div>
+                                <div class="p-2 text-center">
+                                    <img src="{{ $p->image_name ? asset('uploads/'.$p->location.'/'.$p->image_name) : asset('assets/img/no-image.png') }}"
+                                         class="rounded-2" style="height: 100px; width: 100%; object-fit: cover;">
+                                </div>
 
-                                        <div class="d-flex flex-wrap justify-content-center gap-1">
-                                            @foreach($allVariants as $v)
-                                                <button type="button"
-                                                        class="btn btn-xs {{ $v->real_stock > 0 ? 'btn-outline-primary' : 'btn-light disabled text-muted' }} py-0 px-1"
-                                                        style="font-size: 9px;"
-                                                        onclick="event.stopPropagation(); addItemToCart({{ json_encode($p) }}, {{ json_encode($v) }})">
-                                                    {{ ($v->name == 'Default' || $v->variant_type == 'no_variant') ? 'Stok' : $v->name }}: {{ $v->real_stock }}
-                                                </button>
-                                            @endforeach
-                                        </div>
+                                <div class="card-body p-2 text-center text-dark">
+                                    <h6 class="small fw-bold mb-1 text-truncate" title="{{ $p->name }}">{{ $p->name }}</h6>
+                                    <div class="text-primary small fw-bold mb-2">Rp {{ number_format($p->price, 0, ',', '.') }}</div>
+
+                                    <div class="d-flex flex-wrap justify-content-center gap-1">
+                                        @foreach($allVariants as $v)
+                                            <button type="button"
+                                                    class="btn btn-xs {{ $v->real_stock > 0 ? 'btn-outline-primary' : 'btn-light disabled text-muted' }} py-0 px-1"
+                                                    style="font-size: 9px;"
+                                                    onclick="event.stopPropagation(); addItemToCart({{ json_encode($p) }}, {{ json_encode($v) }})">
+                                                {{ ($v->name == 'Default' || $v->variant_type == 'no_variant') ? 'Stok' : $v->name }}: {{ $v->real_stock }}
+                                            </button>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     {{-- KANAN: SIDEBAR KERANJANG --}}
     <div class="pos-right-sidebar">

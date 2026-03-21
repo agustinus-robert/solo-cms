@@ -11,9 +11,6 @@ use Carbon\Carbon;
 
 class CashRegisterController extends Controller
 {
-    /**
-     * Cari Register yang sedang OPEN milik USER LOGIN di OUTLET tersebut
-     */
     private function getActiveRegister($outletId)
     {
         return CashRegister::where('status', 'open')

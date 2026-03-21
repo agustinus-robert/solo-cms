@@ -32,7 +32,7 @@ trait AdjustmentRepository
     public function storeAdjustment(array $data, $outletId)
     {
         return \DB::transaction(function () use ($data, $outletId) {
-            $adjustment = new Adjustment(Arr::only($data, $this->keys));
+            $adjustment = new Adjustment(\Illuminate\Support\Arr::only($data, $this->keys));
 
             if ($adjustment->save()) {
                 if ($outletId) {
@@ -44,40 +44,6 @@ trait AdjustmentRepository
 
                     $stockableId = $adjustment->id;
                     $stockableType = Adjustment::class;
-
-                    if (!empty($data['variant_code'])) {
-                        $variantRow = ProductVariant::where('product_id', $data['product_id'])->first();
-
-                        if ($variantRow) {
-                            $items = json_decode($variantRow->product_variant, true);
-                            $found = false;
-
-                            foreach ($items as &$item) {
-                                if ($item['code'] === $data['variant_code']) {
-                                    if ($data['status'] === 'plus') {
-                                        $item['qty'] += $data['qty'];
-                                    } else {
-                                        $item['qty'] -= $data['qty'];
-                                    }
-                                    $found = true;
-                                    break;
-                                }
-                            }
-
-                            if ($found) {
-                                $variantRow->update(['product_variant' => json_encode($items)]);
-
-                                $stockableId = $variantRow->id;
-                                $stockableType = ProductVariant::class;
-                            }
-                        }
-                    } else {
-                        if ($data['status'] === 'plus') {
-                            $product->increment('stock', $data['qty']);
-                        } else {
-                            $product->decrement('stock', $data['qty']);
-                        }
-                    }
 
                     $productStock = ProductStock::create([
                         'product_id'     => $data['product_id'],
