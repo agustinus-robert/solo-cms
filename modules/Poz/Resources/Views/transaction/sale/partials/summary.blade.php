@@ -23,15 +23,16 @@
     <span class="fw-bold text-success" id="textChange">Rp 0</span>
 </div>
 
+<div class="d-flex justify-content-between align-items-center mt-1">
+    <span class="text-secondary">Diskon (Rp)</span>
+    <input type="number" id="inputDiscount" name="discount" class="form-control form-control-sm py-0 border-light shadow-none"
+            style="width: 200px;" value="{{ $sale->discount ?? 0 }}" {{ !$isOpen ? 'disabled' : '' }}>
+</div>
+
 <div class="mt-2">
     <div class="d-flex justify-content-between small">
         <span class="text-secondary">Subtotal</span>
         <span id="textSubtotal">Rp 0</span>
-    </div>
-    <div class="d-flex justify-content-between align-items-center small mt-1">
-        <span class="text-secondary">Diskon (Rp)</span>
-        <input type="number" id="inputDiscount" name="discount" class="form-control form-control-sm py-0 border-light shadow-none"
-               style="width: 80px;" value="{{ $sale->discount ?? 0 }}" {{ !$isOpen ? 'disabled' : '' }}>
     </div>
     <div class="d-flex justify-content-between small mt-1">
         <span class="text-secondary">PPN (11%)</span>
