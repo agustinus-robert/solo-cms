@@ -12,55 +12,25 @@
 @once
     @push('styles')
     <style>
-        .variant-picker input[type="radio"] {
-            display: none;
-        }
+        .variant-picker input[type="radio"] { display: none; }
         .variant-picker label {
-            display: block;
-            padding: 15px;
-            border: 2px solid #ebedef;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            margin-bottom: 12px;
-            position: relative;
+            display: block; padding: 15px; border: 2px solid #ebedef;
+            border-radius: 10px; cursor: pointer; transition: all 0.2s ease-in-out;
+            margin-bottom: 12px; position: relative;
         }
         .variant-picker input[type="radio"]:checked + label {
-            border-color: #0d6efd;
-            background-color: #f0f7ff;
+            border-color: #0d6efd; background-color: #f0f7ff;
         }
         .variant-picker input[type="radio"]:checked + label::after {
-            content: "\f058";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.2rem;
-            color: #0d6efd;
+            content: "\f058"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+            position: absolute; top: 15px; right: 15px; font-size: 1.2rem; color: #0d6efd;
         }
-        .variant-picker label:hover {
-            border-color: #dee2e6;
-            background-color: #f8f9fa;
-        }
+        .variant-picker label:hover { border-color: #dee2e6; background-color: #f8f9fa; }
         .modal-content { border-radius: 15px; }
 
-        /* Qty Spinner Styling */
-        .qty-input-group {
-            width: 110px;
-            display: flex;
-            align-items: center;
-        }
-        .qty-input-group input {
-            text-align: center;
-            border-left: 0;
-            border-right: 0;
-            border-radius: 0;
-        }
-        .qty-input-group .btn {
-            padding: 0px 8px;
-            font-weight: bold;
-        }
+        .qty-input-group { width: 110px; display: flex; align-items: center; }
+        .qty-input-group input { text-align: center; border-left: 0; border-right: 0; border-radius: 0; }
+        .qty-input-group .btn { padding: 0px 8px; font-weight: bold; }
     </style>
     @endpush
 
@@ -97,7 +67,7 @@
             await processAddToCart(productId, null, btn);
         });
 
-        async function processAddToCart(productId, variantId = null, btnElement = null, quantity = 1) {
+        async function processAddToCart(productId, variantId = null, btnElement = null, quantity = 1, variantCode = null) {
             let originalContent = btnElement ? btnElement.innerHTML : '';
             if (btnElement) {
                 btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Adding...';
@@ -115,6 +85,7 @@
                     body: JSON.stringify({
                         id: productId,
                         variant_id: variantId,
+                        variant_code: variantCode,
                         qty: quantity
                     })
                 });
@@ -127,6 +98,8 @@
                     const modalInstance = bootstrap.Modal.getInstance(modalEl);
                     if (modalInstance) modalInstance.hide();
                     if (typeof refreshCartUI === 'function') await refreshCartUI();
+                } else {
+                    alert(data.message || 'Gagal menambahkan');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -143,50 +116,59 @@
             document.getElementById('modal-product-id').value = productId;
 
             let html = '';
-            variants.forEach((v, index) => {
-                let displayName = "";
-                let displayPrice = 0;
-                let availableStock = v.available_qty ?? 0;
+            variants.forEach((v) => {
+                // Ambil data yang sudah didecode oleh controller
+                const subVariants = v.decoded_variants || [];
 
-                try {
-                    let rawData = (typeof v.product_variant === 'string') ? JSON.parse(v.product_variant) : v.product_variant;
-                    if (Array.isArray(rawData) && rawData.length > 0) {
-                        displayName = rawData.map(item => item.name).join(', ');
-                        displayPrice = rawData[0].price || 0;
-                    }
-                } catch(e) {
-                    displayName = "Varian Tidak Terbaca";
-                }
+                subVariants.forEach((sub) => {
+                    if (sub.status === 'deleted') return;
 
-                html += `
-                    <div class="variant-option">
-                        <input type="radio" name="selected_variant" id="v_${v.id}" value="${v.id}" ${index === 0 ? 'checked' : ''}>
-                        <label for="v_${v.id}">
-                            <div class="d-flex flex-column text-start">
-                                <span class="fs-6 fw-bold text-dark">${displayName}</span>
-                                <span class="text-primary fw-bold">Rp ${new Intl.NumberFormat('id-ID').format(displayPrice)}</span>
+                    let stock = parseFloat(sub.real_stock) || 0;
+                    const isOutOfStock = stock <= 0;
+                    const uniqueId = `${v.id}_${sub.code}`;
 
-                                <span class="text-muted small mt-1">Sisa Stok: <strong class="${availableStock <= 0 ? 'text-danger' : 'text-success'}">${availableStock}</strong></span>
-
-                                <div class="mt-2" onclick="event.preventDefault();">
-                                    <div class="input-group qty-input-group">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeModalQty('${v.id}', -1, ${availableStock})">-</button>
-                                        <input type="number" id="qty_input_${v.id}" class="form-control form-control-sm" value="1" min="1" max="${availableStock}" readonly>
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeModalQty('${v.id}', 1, ${availableStock})">+</button>
+                    html += `
+                        <div class="variant-option">
+                            <input type="radio" name="selected_variant" id="v_${uniqueId}"
+                                value="${v.id}"
+                                data-code="${sub.code}"
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            <label for="v_${uniqueId}">
+                                <div class="d-flex flex-column text-start">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fs-6 fw-bold text-dark">${sub.name || 'Varian'}</span>
+                                        ${isOutOfStock ? '<span class="badge bg-danger">Habis</span>' : ''}
                                     </div>
+                                    <span class="text-primary fw-bold">Rp ${new Intl.NumberFormat('id-ID').format(sub.price || 0)}</span>
+                                    <span class="text-muted small mt-1">Sisa Stok: <strong class="${isOutOfStock ? 'text-danger' : 'text-success'}">${stock}</strong></span>
+
+                                    ${!isOutOfStock ? `
+                                    <div class="mt-2" onclick="event.preventDefault();">
+                                        <div class="input-group qty-input-group">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeModalQty('${uniqueId}', -1, ${stock})">-</button>
+                                            <input type="number" id="qty_input_${uniqueId}" class="form-control form-control-sm" value="1" min="1" max="${stock}" readonly>
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="changeModalQty('${uniqueId}', 1, ${stock})">+</button>
+                                        </div>
+                                    </div>
+                                    ` : ''}
                                 </div>
-                            </div>
-                        </label>
-                    </div>`;
+                            </label>
+                        </div>`;
+                });
             });
 
             container.innerHTML = html;
-            const myModal = new bootstrap.Modal(document.getElementById('variantModal'));
+            const modalEl = document.getElementById('variantModal');
+            let myModal = bootstrap.Modal.getInstance(modalEl);
+            if (!myModal) {
+                myModal = new bootstrap.Modal(modalEl);
+            }
             myModal.show();
         }
 
-        window.changeModalQty = function(id, amount, max) {
-            const input = document.getElementById('qty_input_' + id);
+        window.changeModalQty = function(uniqueId, amount, max) {
+            const input = document.getElementById('qty_input_' + uniqueId);
+            if (!input) return;
             let current = parseInt(input.value);
             let next = current + amount;
             if (next >= 1 && next <= max) input.value = next;
@@ -202,16 +184,18 @@
             }
 
             const variantId = selected.value;
-            const qty = document.getElementById('qty_input_' + variantId).value;
+            const variantCode = selected.getAttribute('data-code');
+            const uniqueId = `${variantId}_${variantCode}`;
+            const qty = document.getElementById('qty_input_' + uniqueId).value;
 
             const btn = this;
-            const oldText = btn.innerText;
+            const oldText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i> Memproses...';
             btn.disabled = true;
 
-            await processAddToCart(productId, variantId, null, qty);
+            await processAddToCart(productId, variantId, null, qty, variantCode);
 
-            btn.innerText = oldText;
+            btn.innerHTML = oldText;
             btn.disabled = false;
         });
     </script>

@@ -8,24 +8,47 @@ use Modules\Web\Models\Chart;
 use Modules\Poz\Models\Product;
 use Modules\Poz\Models\ProductVariant;
 use Illuminate\Support\Facades\Auth;
+use Modules\Poz\Traits\SaleTrait;
 
 class CartController extends Controller
 {
+    use SaleTrait;
+
     public function add(Request $request)
     {
         $productId = $request->id;
         $variantId = $request->variant_id;
         $qtyInput  = (int) ($request->qty ?? 1);
 
-        $product = Product::with('variant')->findOrFail($productId);
+        $product = Product::with(['variant', 'outlets'])->findOrFail($productId);
+        $outletId = $product->outlets->first()?->id;
 
         if ($product->variant->count() > 0 && is_null($variantId)) {
-            $variants = $product->variant->map(function($v) {
+            $variants = $product->variant->map(function($v) use ($outletId) {
                 $rawData = is_string($v->product_variant) ? json_decode($v->product_variant, true) : $v->product_variant;
-                $code = $rawData[0]['code'] ?? null;
 
-                $v->available_qty = \Modules\Poz\Models\ProductVariant::getAvailableQty($code);
-                return $v;
+                if (is_array($rawData)) {
+                    foreach ($rawData as &$item) {
+                        $dbStock = (float) $this->getAvailableStock($v->product_id, $outletId, $item['code'] ?? null);
+
+                        $globalBooked = Chart::all()->sum(function($cart) use ($v, $item) {
+                            $cItems = $cart->items ?? [];
+                            $cKey = $v->id . "_" . ($item['code'] ?? '');
+                            foreach($cItems as $key => $ci) {
+                                if($ci['product_id'] == $v->product_id && ($ci['code'] ?? '') == ($item['code'] ?? '')) {
+                                    return (int)$ci['qty'];
+                                }
+                            }
+                            return 0;
+                        });
+
+                        $item['real_stock'] = max(0, $dbStock - $globalBooked);
+                    }
+                }
+
+                $itemArray = $v->toArray();
+                $itemArray['decoded_variants'] = $rawData;
+                return $itemArray;
             });
 
             return response()->json([
@@ -46,43 +69,53 @@ class CartController extends Controller
         $cartRecord = Chart::firstOrNew($search, $defaults);
         $items = $cartRecord->items ?? [];
 
-        $finalName  = $product->name;
-        $finalCode  = $product->code ?? "-";
-        $finalPrice = (float) $product->wholesale;
-        $realStock  = 0;
+        $finalName   = $product->name;
+        $finalCode   = $product->code ?? "-";
+        $finalPrice  = (float) $product->wholesale;
+        $variantCode = null;
 
         if ($variantId) {
-            $v = $product->variant->where('id', $variantId)->first();
+            $v = ProductVariant::find($variantId);
             if ($v) {
                 $rawData = is_string($v->product_variant) ? json_decode($v->product_variant, true) : $v->product_variant;
-                if (is_array($rawData) && count($rawData) > 0) {
-                    $target = $rawData[0];
-                    $finalName  = $product->name . " (" . ($target['name'] ?? '') . ")";
-                    $finalCode  = $target['code'] ?? $product->code;
-                    $finalPrice = (float) ($target['price'] ?? $product->wholesale);
-                    $realStock  = (int) ($target['qty'] ?? 0);
+                $target = $rawData[0];
+                if ($request->has('variant_code')) {
+                    foreach($rawData as $sub) {
+                        if ($sub['code'] == $request->variant_code) {
+                            $target = $sub;
+                            break;
+                        }
+                    }
                 }
+                $finalName   = $product->name . " (" . ($target['name'] ?? '') . ")";
+                $finalCode   = $target['code'] ?? $product->code;
+                $variantCode = $target['code'] ?? null;
+                $finalPrice  = (float) ($target['price'] ?? $product->wholesale);
             }
-        } else {
-            $realStock = (int) ($product->stock ?? 0);
         }
 
-        $totalReserved = Chart::where('items', 'LIKE', '%"code":"' . $finalCode . '"%')
-            ->get()
-            ->sum(function ($c) use ($finalCode) {
-                $cartItems = $c->items ?? [];
-                return collect($cartItems)->where('code', $finalCode)->sum('qty');
-            });
+        $stockInDb = (int) $this->getAvailableStock($productId, $outletId, $variantCode);
+
+        $totalBookedGlobal = Chart::all()->sum(function($cart) use ($productId, $finalCode) {
+            $cItems = $cart->items ?? [];
+            $sum = 0;
+            foreach($cItems as $ci) {
+                if($ci['product_id'] == $productId && ($ci['code'] ?? '') == $finalCode) {
+                    $sum += (int)$ci['qty'];
+                }
+            }
+            return $sum;
+        });
 
         $itemKey = $variantId ? "{$productId}_{$variantId}" : $productId;
         $qtyInMyCart = isset($items[$itemKey]) ? (int) $items[$itemKey]['qty'] : 0;
 
-        $availableForMe = $realStock - ($totalReserved - $qtyInMyCart);
+        $virtualStock = $stockInDb - ($totalBookedGlobal - $qtyInMyCart);
 
-        if (($qtyInMyCart + $qtyInput) > $availableForMe) {
+        if ($qtyInput > $virtualStock) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok tidak cukup! Sisa tersedia: ' . $availableForMe
+                'message' => 'Stok tidak cukup! Sisa: ' . max(0, $virtualStock)
             ], 422);
         }
 
@@ -91,6 +124,7 @@ class CartController extends Controller
         } else {
             $items[$itemKey] = [
                 'product_id' => (int) $product->id,
+                'variant_id' => $variantId,
                 'code'       => $finalCode,
                 'name'       => $finalName,
                 'qty'        => $qtyInput,
@@ -99,14 +133,13 @@ class CartController extends Controller
         }
 
         $items[$itemKey]['subtotal'] = $items[$itemKey]['qty'] * $items[$itemKey]['price'];
-
         $cartRecord->items = $items;
         $cartRecord->save();
 
         return response()->json([
             'success' => true,
             'cart_count' => count($items),
-            'message' => 'Berhasil ditambahkan ke keranjang'
+            'message' => 'Berhasil ditambahkan'
         ]);
     }
 
@@ -114,17 +147,11 @@ class CartController extends Controller
     {
         $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
         $cartRecord = Chart::where($identifier)->first();
-
         $items = $cartRecord ? $cartRecord->items : [];
-
         $total = 0;
-        foreach ($items as $item) {
-            $total += $item['price'] * $item['qty'];
+        if(is_array($items)) {
+            foreach ($items as $item) { $total += $item['price'] * $item['qty']; }
         }
-
-        return view('web::components.chart-version.electro.chart-corner', [
-            'items' => $items,
-            'total' => $total
-        ])->render();
+        return view('web::components.chart-version.electro.chart-corner', ['items' => $items, 'total' => $total])->render();
     }
 }

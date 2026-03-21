@@ -98,6 +98,7 @@ return new class extends Migration
             $table->decimal('price', 20, 2);
             $table->text('location');
             $table->text('image_name');
+            $table->text('variant_code');
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
