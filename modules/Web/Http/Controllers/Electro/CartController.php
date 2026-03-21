@@ -147,11 +147,63 @@ class CartController extends Controller
     {
         $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
         $cartRecord = Chart::where($identifier)->first();
-        $items = $cartRecord ? $cartRecord->items : [];
-        $total = 0;
-        if(is_array($items)) {
-            foreach ($items as $item) { $total += $item['price'] * $item['qty']; }
+        $items = $cartRecord ? ($cartRecord->items ?? []) : [];
+
+        if (!empty($items)) {
+            $productIds = array_column($items, 'product_id');
+
+            $productData = Product::whereIn('id', $productIds)
+                ->select('id', 'location', 'image_name')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($items as $key => &$item) {
+                $pId = $item['product_id'];
+                if (isset($productData[$pId])) {
+                    $item['location'] = $productData[$pId]->location;
+                    $item['image_name'] = $productData[$pId]->image_name;
+                } else {
+                    $item['location'] = null;
+                    $item['image_name'] = null;
+                }
+            }
         }
-        return view('web::components.chart-version.electro.chart-corner', ['items' => $items, 'total' => $total])->render();
+
+        $total = 0;
+        foreach ($items as $item) {
+            $total += ($item['price'] ?? 0) * ($item['qty'] ?? 0);
+        }
+
+        return view('web::components.chart-version.electro.chart-corner', [
+            'items' => $items,
+            'total' => $total
+        ])->render();
+    }
+
+    public function remove($id)
+    {
+        $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
+        $cartRecord = Chart::where($identifier)->first();
+
+        if ($cartRecord) {
+            $items = $cartRecord->items ?? [];
+
+            if (isset($items[$id])) {
+                unset($items[$id]);
+                $cartRecord->items = $items;
+                $cartRecord->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item berhasil dihapus',
+                    'cart_count' => count($items)
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Item tidak ditemukan'
+        ], 404);
     }
 }

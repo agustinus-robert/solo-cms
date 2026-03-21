@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Web\Http\Controllers\EditorController; // Pastikan path-nya bener
 use Modules\Web\Http\Controllers\MainController;
+use Modules\Web\Http\Controllers\Electro\CartController;
+
 
 function mapMain($path, $controller, $method, $name = null) {
     return Route::get($path, [MainController::class, 'call'])
@@ -18,6 +20,8 @@ Route::group(['middleware' => ['web']], function () {
 
 
     Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
+    Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('web.cart.remove');
+
     Route::post('wishlist/toggle', [MainController::class, 'call'])->defaults('controller', 'wishlist')->defaults('method', 'toggle')->name('web.whistlist.add');
 
     mapMain('shop', 'shop', 'index', 'web.shop');

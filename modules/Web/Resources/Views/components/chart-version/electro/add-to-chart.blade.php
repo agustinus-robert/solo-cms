@@ -116,8 +116,9 @@
             document.getElementById('modal-product-id').value = productId;
 
             let html = '';
+            let hasSelected = false;
+
             variants.forEach((v) => {
-                // Ambil data yang sudah didecode oleh controller
                 const subVariants = v.decoded_variants || [];
 
                 subVariants.forEach((sub) => {
@@ -127,12 +128,19 @@
                     const isOutOfStock = stock <= 0;
                     const uniqueId = `${v.id}_${sub.code}`;
 
+                    let checkedAttr = '';
+                    if (!isOutOfStock && !hasSelected) {
+                        checkedAttr = 'checked';
+                        hasSelected = true;
+                    }
+
                     html += `
                         <div class="variant-option">
                             <input type="radio" name="selected_variant" id="v_${uniqueId}"
                                 value="${v.id}"
                                 data-code="${sub.code}"
-                                ${isOutOfStock ? 'disabled' : ''}>
+                                ${isOutOfStock ? 'disabled' : ''}
+                                ${checkedAttr}>
                             <label for="v_${uniqueId}">
                                 <div class="d-flex flex-column text-start">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -158,12 +166,25 @@
             });
 
             container.innerHTML = html;
+
+            const btnConfirm = document.getElementById('btn-confirm-variant');
+            if (!hasSelected) {
+                btnConfirm.disabled = true;
+                btnConfirm.innerText = 'Stok Habis';
+            } else {
+                btnConfirm.disabled = false;
+                btnConfirm.innerText = 'Konfirmasi & Tambah';
+            }
+
             const modalEl = document.getElementById('variantModal');
             let myModal = bootstrap.Modal.getInstance(modalEl);
             if (!myModal) {
                 myModal = new bootstrap.Modal(modalEl);
             }
-            myModal.show();
+
+            if (!modalEl.classList.contains('show')) {
+                myModal.show();
+            }
         }
 
         window.changeModalQty = function(uniqueId, amount, max) {
@@ -197,6 +218,34 @@
 
             btn.innerHTML = oldText;
             btn.disabled = false;
+        });
+
+        window.addEventListener('cart-updated', async function() {
+            const modalEl = document.getElementById('variantModal');
+
+            if (modalEl && modalEl.classList.contains('show')) {
+                const productId = document.getElementById('modal-product-id').value;
+                console.log('Update detected, refreshing variants for product:', productId);
+
+                try {
+                    const response = await fetch("{{ route('web::web.cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ id: productId, qty: 0 })
+                    });
+
+                    const data = await response.json();
+                    if (data.status === 'NEED_VARIANT') {
+                        openVariantSelection(productId, data.variants);
+                    }
+                } catch (error) {
+                    console.error('Gagal sinkronisasi stok modal:', error);
+                }
+            }
         });
     </script>
     @endpush

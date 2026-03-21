@@ -22,10 +22,12 @@
         <div id="cart-items-list" class="cart-items-scroll" style="max-height: 280px; overflow-y: auto; overflow-x: hidden;">
             @forelse($items as $id => $item)
                 <div class="d-flex align-items-center mb-3 pe-2 cart-item-row" data-id="{{ $id }}">
-                    <img src="{{ $item['image'] ?? 'https://via.placeholder.com/50' }}"
-                         class="rounded border"
-                         style="width: 50px; height: 50px; object-fit: cover;"
-                         alt="{{ $item['name'] }}">
+                   <img src="{{ (!empty($item['location']) && !empty($item['image_name']))
+                            ? asset('uploads/'.$item['location'].'/'.$item['image_name'])
+                            : 'https://via.placeholder.com/50' }}"
+                    class="rounded border"
+                    style="width: 50px; height: 50px; object-fit: cover;"
+                    alt="{{ $item['name'] }}">
                     <div class="flex-grow-1 ms-3">
                         <h6 class="mb-0" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
                             {{ $item['name'] }}
@@ -67,48 +69,71 @@
 
 @once
     @push('scripts')
-        <script>
-            window.refreshCartUI = async function() {
+    <script>
+        window.refreshCartUI = async function() {
+            try {
+                const response = await fetch("{{ route('web::web.cart.render') }}");
+                const html = await response.text();
+
                 const wrapper = document.getElementById('cart-dropdown-wrapper');
                 if (!wrapper) return;
 
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('cart-dropdown-wrapper');
+
+                if (newContent) {
+                    wrapper.innerHTML = newContent.innerHTML;
+
+                    const triggerEl = document.getElementById('cart-trigger');
+                    if (triggerEl) {
+                        new bootstrap.Dropdown(triggerEl);
+                    }
+                }
+
+                window.dispatchEvent(new Event('cart-updated'));
+            } catch (error) {
+                console.error('Gagal refresh keranjang:', error);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshCartUI();
+        });
+
+        document.addEventListener('click', async function(e) {
+            const btnRemove = e.target.closest('.btn-remove-cart');
+            if (!btnRemove) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const id = btnRemove.getAttribute('data-id');
+            if (confirm('Hapus item ini dari keranjang?')) {
                 try {
-                    const response = await fetch("{{ route('web::web.cart.render') }}");
-                    const html = await response.text();
+                    const response = await fetch("{{ route('web::web.cart.remove', '') }}/" + id, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
 
-                    wrapper.outerHTML = html;
+                    const data = await response.json();
 
-                    const newTrigger = document.querySelector('#cart-trigger');
-                    if (newTrigger) {
-                        new bootstrap.Dropdown(newTrigger);
+                    if (data.success) {
+                        await refreshCartUI();
+                        console.log(data.message);
+                    } else {
+                        alert(data.message || 'Gagal menghapus item');
                     }
-
-                    console.log('Keranjang berhasil di-update secara AJAX!');
-                } catch (error) {
-                    console.error('Gagal refresh keranjang:', error);
+                } catch (err) {
+                    console.error('Error saat menghapus item:', err);
+                    alert('Terjadi kesalahan koneksi.');
                 }
-            };
-
-            document.addEventListener('click', async function(e) {
-                const btnRemove = e.target.closest('.btn-remove-cart');
-                if (btnRemove) {
-                    e.preventDefault();
-                    const id = btnRemove.getAttribute('data-id');
-
-                    if(confirm('Hapus item ini?')) {
-                        try {
-                            const res = await fetch(`/cart/remove/${id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            if (res.ok) refreshCartUI();
-                        } catch (err) { console.error(err); }
-                    }
-                }
-            });
-        </script>
-        @endpush
-    @endonce
+            }
+        });
+    </script>
+    @endpush
+@endonce
