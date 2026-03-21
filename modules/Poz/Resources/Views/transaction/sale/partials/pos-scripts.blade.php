@@ -86,7 +86,7 @@
         renderCart();
     }
 
-   function updateSummary() {
+    function updateSummary() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const inputDisc = document.getElementById('inputDiscount');
         const discount = (inputDisc && inputDisc.value !== "") ? parseFloat(inputDisc.value) : 0;
@@ -96,33 +96,54 @@
         const grandTotal = afterDiscount + ppn;
 
         const elSub = document.getElementById('textSubtotal');
+        const elPPN = document.getElementById('textPPN');
         const elGrand = document.getElementById('textGrandTotal');
-        const btnSub = document.getElementById('btnSubmit');
+        const btnSubmit = document.getElementById('btnSubmit');
 
-        if(elSub) elSub.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
-        if(elGrand) elGrand.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(grandTotal);
+        const formatter = new Intl.NumberFormat('id-ID');
 
-        if(btnSub) btnSub.disabled = (cart.length === 0);
+        if(elSub) elSub.innerText = 'Rp ' + formatter.format(subtotal);
+        if(elPPN) elPPN.innerText = 'Rp ' + formatter.format(ppn);
+        if(elGrand) elGrand.innerText = 'Rp ' + formatter.format(grandTotal);
+
+        if(btnSubmit) btnSubmit.disabled = (cart.length === 0);
 
         calculateChange(grandTotal);
     }
 
     function calculateChange(forcedGrandTotal = null) {
         let gt = forcedGrandTotal;
+
         if (gt === null) {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const discInput = document.getElementById('inputDiscount');
             const disc = (discInput && discInput.value !== "") ? parseFloat(discInput.value) : 0;
-            gt = Math.max(0, subtotal - disc);
+
+            const afterDiscount = Math.max(0, subtotal - disc);
+            gt = afterDiscount + (afterDiscount * 0.11);
         }
+
         const inputPaid = document.getElementById('amountPaid');
         const amountPaid = (inputPaid && inputPaid.value !== "") ? parseFloat(inputPaid.value) : 0;
+
         const change = amountPaid - gt;
         const textChange = document.getElementById('textChange');
+        const btnSubmit = document.getElementById('btnSubmit');
+
         if(!textChange) return;
 
-        textChange.innerText = (amountPaid === 0) ? 'Rp 0' : 'Rp ' + new Intl.NumberFormat('id-ID').format(change);
-        textChange.className = (change < 0) ? 'fw-bold text-danger' : 'fw-bold text-success';
+        if (amountPaid === 0) {
+            textChange.innerText = 'Rp 0';
+            textChange.className = 'fw-bold text-success';
+        } else {
+            textChange.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(change);
+
+            if (change < 0) {
+                textChange.className = 'fw-bold text-danger';
+            } else {
+                textChange.className = 'fw-bold text-success';
+            }
+        }
     }
 
     function initSearch() {

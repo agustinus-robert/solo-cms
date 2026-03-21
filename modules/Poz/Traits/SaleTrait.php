@@ -80,10 +80,12 @@ trait SaleTrait
         ];
     }
 
-   public function createSaleTransaction($request, $totals)
+    public function createSaleTransaction($request, $totals)
     {
         $grandTotal = (float)$totals['grand_total'];
-        $paidAmount = (float)($request->paid_amount ?? $grandTotal);
+
+        $paidAmount = (float)($request->amount_paid ?? $grandTotal);
+
         $change = $this->calculateChange($paidAmount, $grandTotal);
 
         $sale = Sale::create([
@@ -117,13 +119,14 @@ trait SaleTrait
 
         if ($register) {
             $register->decrement('money', $changeAmount);
-
             $register->logCash()->create([
                 'status'   => 'minus',
                 'money'    => $changeAmount,
                 'log_type' => 'transaction',
                 'reason'   => "Kembalian Penjualan #" . $reference,
             ]);
+        } else {
+            // \Log::info("Register tidak ketemu untuk outlet: " . $outletId);
         }
     }
 

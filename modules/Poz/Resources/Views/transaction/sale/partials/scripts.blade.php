@@ -14,10 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const amountPaid = getEl('amountPaid');
     const paymentType = getEl('paymentType');
     const textSubtotal = getEl('textSubtotal');
+    const textPPN = getEl('textPPN');
     const textGrandTotal = getEl('textGrandTotal');
     const textChange = getEl('textChange');
     const btnSubmit = getEl('btnSubmit');
-    const cashRegisterWrapper = document.querySelector('.alert-info')?.closest('.col-12'); // Wrapper saldo
+    const cashRegisterWrapper = document.querySelector('.alert-info')?.closest('.col-12');
 
     if (!itemsBody) return;
 
@@ -44,13 +45,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         const discount = parseInt(inputDiscount?.value) || 0;
-        const grandTotal = Math.max(0, subtotal - discount);
+        const afterDiscount = Math.max(0, subtotal - discount);
+        const ppn = afterDiscount * 0.11;
+        const grandTotal = afterDiscount + ppn;
+
         const paid = parseInt(amountPaid?.value) || 0;
         const change = paid - grandTotal;
 
         if(textSubtotal) textSubtotal.innerText = formatCurrency(subtotal);
+        if(textPPN) textPPN.innerText = formatCurrency(ppn);
         if(textGrandTotal) textGrandTotal.innerText = formatCurrency(grandTotal);
-        if(textChange) textChange.innerText = formatCurrency(change > 0 ? change : 0);
+
+        if(textChange) {
+            textChange.innerText = formatCurrency(change > 0 ? change : 0);
+            textChange.className = (paid > 0 && change < 0) ? 'fw-bold text-danger' : 'fw-bold text-success';
+        }
 
         if (cashRegisterWrapper) {
             cashRegisterWrapper.style.display = (paymentType.value === 'cash') ? 'block' : 'none';
@@ -59,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(btnSubmit) {
             const isCash = paymentType?.value === 'cash';
             const hasItems = selectedItems.length > 0;
-            const enoughMoney = isCash ? (paid >= grandTotal) : true;
+            const enoughMoney = isCash ? (paid >= Math.floor(grandTotal)) : true;
             btnSubmit.disabled = !(hasItems && enoughMoney);
         }
     }
@@ -87,10 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     const vData = typeof vRow.product_variant === 'string' ? JSON.parse(vRow.product_variant) : vRow.product_variant;
                     if (Array.isArray(vData)) {
                         vData.forEach(v => {
-                            if (v.status !== 'deleted' && v.deleted_at === null) allVariants.push(v);
+                            if (v.status !== 'deleted' && (v.deleted_at === null || v.deleted_at === undefined)) {
+                                allVariants.push(v);
+                            }
                         });
                     }
                 });
+            }
+
+            if (allVariants.length === 0) {
+                allVariants.push({ code: p.code, name: 'Default', price: p.price, variant_type: 'no_variant' });
             }
 
             const isSingle = allVariants.length === 1 && (allVariants[0].variant_type === 'no_variant' || allVariants[0].name.toLowerCase() === 'default');
@@ -100,18 +115,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const v = allVariants[0];
                 const stockQty = getRealStock(v.code);
                 const isOut = stockQty <= 0;
-                item.className = `list-group-item list-group-item-action p-3 border-bottom select-v-btn ${isOut ? 'disabled bg-light' : ''}`;
-                item.dataset.pid = p.id; item.dataset.vjson = JSON.stringify(v); item.dataset.realqty = stockQty;
+                item.className = `list-group-item list-group-item-action p-3 border-bottom select-v-btn ${isOut ? 'disabled bg-light text-muted' : 'cursor-pointer'}`;
+                item.dataset.pid = p.id;
+                item.dataset.vjson = JSON.stringify(v);
+                item.dataset.realqty = stockQty;
                 item.innerHTML = `<div class="d-flex justify-content-between align-items-center">
                     <div class="fw-bold text-dark text-uppercase">${p.name}</div>
-                    <div class="text-end"><span class="badge ${isOut ? 'bg-secondary' : 'bg-primary'}">${stockQty}</span></div>
+                    <div class="text-end"><span class="badge ${isOut ? 'bg-secondary' : 'bg-primary'}">${isOut ? 'HABIS' : stockQty}</span></div>
                 </div>`;
             } else {
                 item.className = 'list-group-item p-3 border-bottom';
                 let btns = '';
                 allVariants.forEach(v => {
                     const sQty = getRealStock(v.code);
-                    btns += `<button type="button" class="btn btn-sm ${sQty<=0?'btn-light':'btn-outline-primary'} me-2 mb-2 select-v-btn" data-pid="${p.id}" data-realqty="${sQty}" data-vjson='${JSON.stringify(v)}' ${sQty<=0?'disabled':''}>${v.name}: ${sQty}</button>`;
+                    btns += `<button type="button" class="btn btn-sm ${sQty<=0?'btn-light text-muted':'btn-outline-primary'} me-2 mb-2 select-v-btn"
+                                data-pid="${p.id}" data-realqty="${sQty}" data-vjson='${JSON.stringify(v)}' ${sQty<=0?'disabled':''}>
+                                ${v.name}: ${sQty}
+                            </button>`;
                 });
                 item.innerHTML = `<div class="fw-bold text-dark mb-2 text-uppercase small">${p.name}</div><div class="d-flex flex-wrap">${btns}</div>`;
             }
@@ -126,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const vObj = {
             code: variant.code,
             name: isDefault ? 'Produk Utama' : variant.name,
-            price: parseInt(variant.price),
+            price: parseInt(variant.price || product.price),
             qty: 1,
             maxStock: parseInt(variant.qty)
         };
@@ -148,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderTable() {
         itemsBody.innerHTML = '';
         if (selectedItems.length === 0) {
-            itemsBody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted small">Belum ada barang dipilih.</td></tr>';
+            itemsBody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted small">Belum ada barang dipilih.</td></tr>';
             calculateSummary();
             return;
         }
@@ -162,9 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 tPrice += (v.price * v.qty);
                 variantHtml += `
                     <div class="d-flex justify-content-between align-items-center bg-white p-2 mb-1 rounded border shadow-sm small">
-                        <div><b>${v.name}</b><br><span class="text-primary">${formatCurrency(v.price)}</span></div>
+                        <div style="flex:1"><b>${v.name}</b><br><span class="text-primary">${formatCurrency(v.price)}</span></div>
                         <div class="d-flex align-items-center gap-2">
-                            <input type="number" class="form-control form-control-sm text-center update-qty" style="width: 55px" data-p="${pIdx}" data-v="${vIdx}" value="${v.qty}">
+                            <input type="number" class="form-control form-control-sm text-center update-qty"
+                                   style="width: 55px" data-p="${pIdx}" data-v="${vIdx}" value="${v.qty}" min="1">
                             <button type="button" class="btn btn-sm text-danger remove-v" data-p="${pIdx}" data-v="${vIdx}">×</button>
                         </div>
                         <input type="hidden" name="items[${pIdx}][variants][${vIdx}][code]" value="${v.code}">
@@ -185,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (searchInput) searchInput.addEventListener('input', handleSearch);
+
     suggestionList.addEventListener('click', (e) => {
         const target = e.target.closest('.select-v-btn');
         if (!target || target.classList.contains('disabled')) return;
@@ -204,10 +226,17 @@ document.addEventListener('DOMContentLoaded', function() {
     itemsBody.addEventListener('input', (e) => {
         if (e.target.classList.contains('update-qty')) {
             const p = e.target.dataset.p, v = e.target.dataset.v;
-            let val = parseInt(e.target.value), data = selectedItems[p].bought_variants[v];
-            if (val > data.maxStock) val = data.maxStock;
+            let val = parseInt(e.target.value);
+            let data = selectedItems[p].bought_variants[v];
+
+            if (val > data.maxStock) {
+                alert('Stok maksimal tercapai!');
+                val = data.maxStock;
+            }
             if (val < 1 || isNaN(val)) val = 1;
-            data.qty = val; renderTable();
+
+            data.qty = val;
+            renderTable();
         }
     });
 

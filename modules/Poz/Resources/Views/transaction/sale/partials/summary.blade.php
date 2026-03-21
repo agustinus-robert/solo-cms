@@ -33,6 +33,10 @@
         <input type="number" id="inputDiscount" name="discount" class="form-control form-control-sm py-0 border-light shadow-none"
                style="width: 80px;" value="{{ $sale->discount ?? 0 }}" {{ !$isOpen ? 'disabled' : '' }}>
     </div>
+    <div class="d-flex justify-content-between small mt-1">
+        <span class="text-secondary">PPN (11%)</span>
+        <span id="textPPN">Rp 0</span>
+    </div>
 </div>
 
 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
