@@ -29,7 +29,6 @@
             .main-content-area { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; transition: all 0.3s ease; height: 100vh; }
             .builder-topbar { height: 65px; background: white; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #dee2e6; flex-shrink: 0; }
 
-            /* FIX SCROLL & VISIBILITY */
             #preview-container {
                 flex: 1;
                 padding: 20px;
@@ -161,13 +160,16 @@
                     btnOpen.classList.add('d-none');
                 }
 
-                // Triger window resize agar Owl Carousel menyesuaikan lebar barunya secara otomatis
                 setTimeout(() => {
                     window.dispatchEvent(new Event('resize'));
                 }, 300);
             }
         </script>
     @endif
+
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+    @include('web::electro.global.echos')
 
     @stack('scripts')
 </body>

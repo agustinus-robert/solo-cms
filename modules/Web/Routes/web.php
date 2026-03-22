@@ -19,6 +19,7 @@ Route::group(['middleware' => ['web']], function () {
     ]);
 
 
+    Route::get('cart/detail', [CartController::class, 'detail'])->name('web.cart.detail');
     Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
     Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('web.cart.remove');
 

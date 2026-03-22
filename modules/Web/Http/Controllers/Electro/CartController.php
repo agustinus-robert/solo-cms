@@ -10,9 +10,41 @@ use Modules\Poz\Models\ProductVariant;
 use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Traits\SaleTrait;
 
+use App\Events\ProductStockUpdated;
+
 class CartController extends Controller
 {
     use SaleTrait;
+
+    private function broadcastStock($productId, $variantCode = null)
+    {
+        $product = Product::with('outlets')->find($productId);
+        if (!$product) return;
+
+        $outletId = $product->outlets->first()?->id;
+        $stockInDb = (int) $this->getAvailableStock($productId, $outletId, $variantCode);
+
+        $totalBookedGlobal = Chart::all()->sum(function($cart) use ($productId, $variantCode) {
+            $cItems = $cart->items ?? [];
+            $sum = 0;
+            foreach ($cItems as $ci) {
+                if ($ci['product_id'] == $productId && ($ci['code'] ?? '') == ($variantCode ?? '')) {
+                    $sum += (int)$ci['qty'];
+                }
+            }
+            return $sum;
+        });
+
+        $remainingVirtualStock = max(0, $stockInDb - $totalBookedGlobal);
+
+        \Log::info("Memicu Broadcast:", [
+            'productId' => $productId,
+            'variantCode' => $variantCode,
+            'remainingStock' => $remainingVirtualStock
+        ]);
+
+        broadcast(new ProductStockUpdated($productId, $remainingVirtualStock, $variantCode));
+    }
 
     public function add(Request $request)
     {
@@ -136,6 +168,8 @@ class CartController extends Controller
         $cartRecord->items = $items;
         $cartRecord->save();
 
+        $this->broadcastStock($productId, $finalCode);
+
         return response()->json([
             'success' => true,
             'cart_count' => count($items),
@@ -189,9 +223,13 @@ class CartController extends Controller
             $items = $cartRecord->items ?? [];
 
             if (isset($items[$id])) {
+                $targetItem = $items[$id];
+
                 unset($items[$id]);
                 $cartRecord->items = $items;
                 $cartRecord->save();
+
+                $this->broadcastStock($targetItem['product_id'], $targetItem['code'] ?? null);
 
                 return response()->json([
                     'success' => true,
@@ -205,5 +243,37 @@ class CartController extends Controller
             'success' => false,
             'message' => 'Item tidak ditemukan'
         ], 404);
+    }
+
+    public function detail(Request $request)
+    {
+        $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
+        $cartRecord = Chart::where($identifier)->first();
+        $items = $cartRecord ? ($cartRecord->items ?? []) : [];
+
+        if (!empty($items)) {
+            $productIds = array_column($items, 'product_id');
+            $productData = Product::whereIn('id', $productIds)
+                ->select('id', 'location', 'image_name')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($items as $key => &$item) {
+                $pId = $item['product_id'];
+                $item['location'] = $productData[$pId]->location ?? null;
+                $item['image_name'] = $productData[$pId]->image_name ?? null;
+            }
+        }
+
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += ($item['price'] ?? 0) * ($item['qty'] ?? 0);
+        }
+
+        return view('web::electro.cart.detail', [
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'canEdit' => false
+        ]);
     }
 }
