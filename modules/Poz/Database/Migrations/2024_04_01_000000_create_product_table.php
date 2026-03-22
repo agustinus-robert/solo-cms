@@ -144,7 +144,7 @@ return new class extends Migration
             $table->id();
             $table->text('session_id')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->text('items')->nullable();
+            $table->jsonb('items')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

@@ -41,6 +41,8 @@ Route::group(['middleware' => ['web']], function () {
         Route::resource('address', 'AddressController');
         Route::resource('checkout', 'CheckoutController')->only('index', 'store');
         Route::get('finish/{reference}', 'FinishController@index')->name('finish.index');
+        Route::get('wishlist', 'WishlistController@index')->name('wishlist.index');
+        Route::post('wishlist/toggle', 'WishlistController@toggle')->name('wishlist.toggle');
     });
 
 

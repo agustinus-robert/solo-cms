@@ -27,6 +27,16 @@
                 <i class="bi bi-heart me-3"></i> Wishlist
             </a>
 
+             <hr class="my-1 text-muted opacity-25">
+
+            <li class="list-group-item bg-light small fw-bold text-muted text-uppercase border-0 py-2" style="font-size: 0.75rem; letter-spacing: 1px;">
+                Transaksi
+            </li>
+
+            <a href="#" class="list-group-item list-group-item-action border-0 py-3">
+                <i class="bi bi-basket me-3"></i> Daftar Transaksi
+            </a>
+
             <hr class="my-1 text-muted opacity-25">
 
             <li class="list-group-item bg-light small fw-bold text-muted text-uppercase border-0 py-2" style="font-size: 0.75rem; letter-spacing: 1px;">

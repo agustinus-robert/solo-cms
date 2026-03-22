@@ -4,9 +4,9 @@ namespace Modules\Web\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Wishlist extends Model
+class Whistlist extends Model
 {
-    protected $table = 'product_wishlists';
+    protected $table = 'product_whistlists';
 
     protected $fillable = [
         'session_id',
