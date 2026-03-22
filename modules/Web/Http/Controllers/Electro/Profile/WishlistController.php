@@ -59,4 +59,30 @@ class WishlistController extends Controller
             'message' => $action == 'added' ? 'Berhasil ditambah ke wishlist' : 'Dihapus dari wishlist'
         ]);
     }
+
+    public function getWishlistCount()
+    {
+        $count = 0;
+        if (auth()->check()) {
+            $wishlist = Whistlist::where('user_id', auth()->id())->first();
+            $count = is_array($wishlist->items) ? count($wishlist->items) : 0;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'count'  => $count
+        ]);
+    }
+
+    public function renderCorner()
+    {
+        $canEdit = false;
+        $count = 0;
+        if (auth()->check()) {
+            $wishlist = Whistlist::where('user_id', auth()->id())->first();
+            $count = count($wishlist->items ?? []);
+        }
+
+        return view('web::components.chart-version.electro.whistlist-corner', compact('count', 'canEdit'))->render();
+    }
 }

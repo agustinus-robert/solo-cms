@@ -23,7 +23,7 @@
                 <i class="bi bi-geo-alt me-3"></i> Alamat
             </a>
 
-            <a href="#" class="list-group-item list-group-item-action border-0 py-3">
+            <a href="{{ route('web::area.wishlist.index') }}" class="list-group-item list-group-item-action border-0 py-3">
                 <i class="bi bi-heart me-3"></i> Wishlist
             </a>
 

@@ -15,6 +15,6 @@ class Whistlist extends Model
     ];
 
     protected $casts = [
-        'items' => 'json'
+        'items' => 'array'
     ];
 }

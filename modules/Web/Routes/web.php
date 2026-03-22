@@ -22,14 +22,10 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
     Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('web.cart.remove');
 
-    Route::post('wishlist/toggle', [MainController::class, 'call'])->defaults('controller', 'wishlist')->defaults('method', 'toggle')->name('web.whistlist.add');
-
     mapMain('shop', 'shop', 'index', 'web.shop');
     mapMain('shop/detail/{param}', 'shop', 'show', 'web.shop.show');
     mapMain('contact', 'contact', 'index', 'web.contact');
     mapMain('cart/render-dropdown', 'cart', 'renderDropdown', 'web.cart.render');
-    mapMain('wishlist/render-corner', 'wishlist', 'renderCorner', 'web.wishlist.render');
-
 
     Route::group([
         'middleware' => ['auth'],
@@ -43,6 +39,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('finish/{reference}', 'FinishController@index')->name('finish.index');
         Route::get('wishlist', 'WishlistController@index')->name('wishlist.index');
         Route::post('wishlist/toggle', 'WishlistController@toggle')->name('wishlist.toggle');
+        Route::get('wishlist/render-corner', 'WishlistController@getWishlistCount')->name('wishlist.render');
     });
 
 

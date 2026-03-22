@@ -20,7 +20,7 @@
             @foreach($products as $product)
                 <div class="col-md-3 col-6" id="product-{{ $product->id }}">
                     <div class="card h-100 border-0 shadow-sm product-card">
-                        <img src="{{ $product->image_url }}" class="card-img-top p-3" alt="{{ $product->name }}">
+                        <img src="{{ asset('uploads/'.$product->location.'/'.$product->image_name) }}" class="card-img-top p-3" alt="{{ $product->name }}">
                         <div class="card-body">
                             <h6 class="card-title text-truncate">{{ $product->name }}</h6>
                             <p class="text-primary fw-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
