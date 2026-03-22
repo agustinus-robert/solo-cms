@@ -16,8 +16,9 @@ class AddressController extends BaseAddressController
         $addresses = UserAddress::where('user_id', $user->id)
             ->orderBy('is_main', 'desc')
             ->get();
+        $canEdit = false;
 
-        return view("web::electro.profile.address", compact('user', 'addresses'));
+        return view("web::electro.profile.address", compact('user', 'addresses', 'canEdit'));
     }
 
     public function store(Request $request)

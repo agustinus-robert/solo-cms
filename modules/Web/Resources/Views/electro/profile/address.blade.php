@@ -1,9 +1,15 @@
 @extends('web::electro.index')
 
+@section('title', "Daftar Alamat Pengiriman")
+
 @section('content')
 <div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            @include('web::electro.global.sidebar-area')
+        </div>
+
+        <div class="col-md-8">
             <div class="card border-0 shadow-sm p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 text-primary">
                     <h5 class="fw-bold mb-0">Daftar Alamat Pengiriman</h5>
@@ -11,7 +17,7 @@
                 </div>
 
                 <div class="row">
-                    @foreach($addresses as $addr)
+                    @forelse($addresses as $addr)
                     <div class="col-md-6 mb-3">
                         <div class="card {{ $addr->is_main ? 'border-primary bg-light' : 'border' }}">
                             <div class="card-body">
@@ -20,9 +26,9 @@
                                     <div class="d-flex gap-2">
                                         <button class="btn btn-sm btn-outline-dark" onclick='openUpsertModal(@json($addr))'>Edit</button>
                                         @if(!$addr->is_main)
-                                        <form action="{{ route('electro.address.destroy', $addr->id) }}" method="POST">
+                                        <form action="{{ route('web::area.address.destroy', $addr->id) }}" method="POST">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus?')">Hapus</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus alamat ini?')">Hapus</button>
                                         </form>
                                         @endif
                                     </div>
@@ -33,7 +39,11 @@
                             </div>
                         </div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">Belum ada alamat tersimpan.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -44,7 +54,7 @@
     <div class="modal-dialog">
         <form id="upsertForm" method="POST" class="modal-content">
             @csrf
-            <div class="modal-header">
+            <div id="method_field"></div> <div class="modal-header">
                 <h6 class="modal-title fw-bold" id="modalTitle">Form Alamat</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -87,24 +97,37 @@
 <script>
 function openUpsertModal(data = null) {
     const form = document.getElementById('upsertForm');
-    const modal = new bootstrap.Modal(document.getElementById('upsertModal'));
+    const methodField = document.getElementById('method_field');
+    const modalElement = document.getElementById('upsertModal');
+    let modal = bootstrap.Modal.getInstance(modalElement);
+    if (!modal) {
+        modal = new bootstrap.Modal(modalElement);
+    }
 
     if (data) {
         document.getElementById('modalTitle').innerText = 'Edit Alamat';
-        form.action = `/electro/address/upsert/${data.id}`;
-        document.getElementById('in_label').value = data.label;
-        document.getElementById('in_receiver').value = data.receiver_name;
-        document.getElementById('in_phone').value = data.phone;
-        document.getElementById('in_address').value = data.address;
-        document.getElementById('in_rt').value = data.rt;
-        document.getElementById('in_rw').value = data.rw;
-        document.getElementById('in_village').value = data.village;
+        let urlUpdate = "{{ route('web::area.address.update', 'ID_TEMP') }}";
+        form.action = urlUpdate.replace('ID_TEMP', data.id);
+        methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
+
+        document.getElementById('in_label').value = data.label || '';
+        document.getElementById('in_receiver').value = data.receiver_name || '';
+        document.getElementById('in_phone').value = data.phone || '';
+        document.getElementById('in_address').value = data.address || '';
+        document.getElementById('in_rt').value = data.rt || '';
+        document.getElementById('in_rw').value = data.rw || '';
+        document.getElementById('in_village').value = data.village || '';
         document.getElementById('in_main').checked = !!data.is_main;
+
     } else {
         document.getElementById('modalTitle').innerText = 'Tambah Alamat';
-        form.action = "{{ route('electro.address.upsert') }}";
+
+        form.action = "{{ route('web::area.address.store') }}";
+
+        methodField.innerHTML = '';
         form.reset();
     }
+
     modal.show();
 }
 </script>

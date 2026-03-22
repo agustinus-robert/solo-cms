@@ -88,6 +88,7 @@ return new class extends Migration
         });
 
         Schema::table('user_address', function (Blueprint $table) {
+            $table->increments('id');
             $table->dropPrimary(['user_id']);
 
             $table->id()->first();
