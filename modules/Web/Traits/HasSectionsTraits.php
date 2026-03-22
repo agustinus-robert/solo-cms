@@ -6,10 +6,6 @@ trait HasSectionsTraits
 {
     protected array $pageSections = [];
 
-    /**
-     * Menambahkan banyak section sekaligus dengan urutan
-     * Format: 'view_path' => ['data' => [...], 'order' => 1]
-     */
     public function setSections(array $sections): self
     {
         foreach ($sections as $view => $config) {
@@ -22,9 +18,6 @@ trait HasSectionsTraits
         return $this;
     }
 
-    /**
-     * Tambah satu section dengan order
-     */
     public function addSection(string $view, array $data = [], int $order = 99): self
     {
         $this->pageSections[] = [
@@ -36,12 +29,8 @@ trait HasSectionsTraits
         return $this;
     }
 
-    /**
-     * Mengambil section yang sudah diurutkan
-     */
     public function getPageSections(): array
     {
-        // Mengurutkan berdasarkan 'order' terkecil ke terbesar
         return collect($this->pageSections)->sortBy('order')->values()->all();
     }
 }

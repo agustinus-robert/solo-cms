@@ -55,7 +55,7 @@
 
             <div class="d-grid gap-2 mt-3">
                 <a href="{{ route('web::web.cart.detail') }}" class="btn btn-outline-primary btn-sm rounded-pill">Lihat Selengkapnya</a>
-                <a href="{{ url('/checkout') }}" class="btn btn-primary btn-sm rounded-pill">Checkout</a>
+                <a href="{{ route('web::area.checkout.index') }}" class="btn btn-primary btn-sm rounded-pill">Checkout</a>
             </div>
         </div>
     </div>

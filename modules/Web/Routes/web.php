@@ -39,6 +39,7 @@ Route::group(['middleware' => ['web']], function () {
     ], function () {
         Route::resource('customer', 'CustomerController');
         Route::resource('address', 'AddressController');
+        Route::resource('checkout', 'CheckoutController')->only('index', 'store');
     });
 
 
