@@ -66,11 +66,13 @@ class WishlistController extends Controller
         if (auth()->check()) {
             $wishlist = Whistlist::where('user_id', auth()->id())->first();
             $count = is_array($wishlist->items) ? count($wishlist->items) : 0;
+            $items = ($wishlist && is_array($wishlist->items)) ? $wishlist->items : [];
         }
 
         return response()->json([
             'status' => 'success',
-            'count'  => $count
+            'count'  => $count,
+            'items'  => $items
         ]);
     }
 

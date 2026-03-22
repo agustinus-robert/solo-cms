@@ -42,8 +42,6 @@
                     badge.classList.add('d-none');
                     icon.classList.remove('text-danger');
                 }
-
-                console.log('Wishlist AJAX Update: ' + count + ' items');
             }
         } catch (error) {
             console.error('Gagal fetch count wishlist:', error);

@@ -124,9 +124,16 @@
 
                     if (data.success) {
                         await refreshCartUI();
-                        console.log(data.message);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Terhapus!',
+                            text: 'Barang berhasil dihapus.',
+                            timer: 1000,
+                            showConfirmButton: false
+                        });
                     } else {
-                        alert(data.message || 'Gagal menghapus item');
+                        Swal.fire('Gagal!', data.message || 'Gagal menghapus item', 'error');
                     }
                 } catch (err) {
                     console.error('Error saat menghapus item:', err);

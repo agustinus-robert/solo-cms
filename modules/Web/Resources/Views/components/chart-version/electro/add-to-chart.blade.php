@@ -97,8 +97,24 @@
                     const modalEl = document.getElementById('variantModal');
                     const modalInstance = bootstrap.Modal.getInstance(modalEl);
                     if (modalInstance) modalInstance.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Produk sudah masuk keranjang.',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        position: 'center'
+                    });
                     if (typeof refreshCartUI === 'function') await refreshCartUI();
                 } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: data.message || 'Gagal menambahkan barang',
+                        confirmButtonColor: '#3085d6'
+                    });
+
                     alert(data.message || 'Gagal menambahkan');
                 }
             } catch (error) {
