@@ -131,6 +131,10 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class, 'user_id')->withDefault();
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class, 'user_id');
+    }
     /*
     * generate password
     */

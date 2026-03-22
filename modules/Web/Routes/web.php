@@ -18,7 +18,6 @@ Route::group(['middleware' => ['web']], function () {
         'edit', 'update'
     ]);
 
-
     Route::get('cart/detail', [CartController::class, 'detail'])->name('web.cart.detail');
     Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
     Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('web.cart.remove');
@@ -30,6 +29,18 @@ Route::group(['middleware' => ['web']], function () {
     mapMain('contact', 'contact', 'index', 'web.contact');
     mapMain('cart/render-dropdown', 'cart', 'renderDropdown', 'web.cart.render');
     mapMain('wishlist/render-corner', 'wishlist', 'renderCorner', 'web.wishlist.render');
+
+
+    Route::group([
+        'middleware' => ['auth'],
+        'prefix' => 'area',
+        'as' => 'area.',
+        'namespace' => 'Electro\Profile'
+    ], function () {
+        Route::resource('customer', 'CustomerController');
+        Route::resource('address', 'AddressController');
+    });
+
 
     Route::any('{controller?}/{method?}/{param?}', [MainController::class, 'call'])
         ->name('web.page');

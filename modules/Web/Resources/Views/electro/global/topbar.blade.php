@@ -2,51 +2,59 @@
     <div class="row gx-0 align-items-center">
         <div class="col-lg-4 text-center text-lg-start mb-lg-0">
             <div class="d-inline-flex align-items-center" style="height: 45px;">
-                <a href="#" class="text-muted me-2"> Help</a><small> / </small>
-                <a href="#" class="text-muted mx-2"> Support</a><small> / </small>
-                <a href="#" class="text-muted ms-2"> Contact</a>
+                <small class="text-muted me-3">
+                    <i class="fa fa-map-marker-alt me-2 text-primary"></i>Jl. Solo Surakarta
+                </small>
 
+                <small class="text-muted me-3">
+                    <i class="fa fa-calendar-alt me-2 text-primary"></i>Senin - Sabtu
+                </small>
+
+                <small class="text-muted">
+                    <i class="fa fa-clock me-2 text-primary"></i>08:00 - 17:00
+                </small>
             </div>
         </div>
         <div class="col-lg-4 text-center d-flex align-items-center justify-content-center">
-            <small class="text-dark">Call Us:</small>
+            <small class="text-dark">Hubungi Kami:</small>
             <a href="#" class="text-muted">(+012) 1234 567890</a>
         </div>
 
         <div class="col-lg-4 text-center text-lg-end">
             <div class="d-inline-flex align-items-center" style="height: 45px;">
-                <a href="{{ url('/login') }}" class="text-muted me-4"> Login</a>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small>
-                            USD</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="#" class="dropdown-item"> Euro</a>
-                        <a href="#" class="dropdown-item"> Dolar</a>
+                <a href="{{ url('/help') }}" class="text-muted me-3">
+                    <small><i class="fa fa-question-circle me-1"></i> Bantuan</small>
+                </a>
+
+                <a href="https://wa.me/628123456789" class="text-muted me-3">
+                    <small><i class="fa fa-phone-alt me-1"></i> Call Center</small>
+                </a>
+
+                <span class="text-muted me-3">|</span>
+
+                @guest
+                    <a href="{{ url('/login') }}" class="text-muted me-4"><small>Login</small></a>
+                @endguest
+
+                @auth
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-toggle text-muted ms-2" data-bs-toggle="dropdown">
+                            <small><i class="fa fa-user me-2"></i> {{ Auth::user()->name }}</small>
+                        </a>
+                        <div class="dropdown-menu rounded shadow-sm border-0 dropdown-menu-end">
+                            <a href="{{ route('web::area.customer.index') }}" class="dropdown-item"><i class="fa fa-id-card me-2"></i> Profile</a>
+                            <a href="#" class="dropdown-item"><i class="fa fa-heart me-2"></i> Wishlist</a>
+                            <a href="{{ route('web::web.cart.detail') }}" class="dropdown-item"><i class="fa fa-shopping-cart me-2"></i> My Cart</a>
+                            <hr class="dropdown-divider">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fa fa-sign-out-alt me-2"></i> Log Out
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-muted mx-2" data-bs-toggle="dropdown"><small>
-                            English</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="#" class="dropdown-item"> English</a>
-                        <a href="#" class="dropdown-item"> Turkish</a>
-                        <a href="#" class="dropdown-item"> Spanol</a>
-                        <a href="#" class="dropdown-item"> Italiano</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-muted ms-2" data-bs-toggle="dropdown"><small><i
-                                class="fa fa-home me-2"></i> My Dashboard</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="#" class="dropdown-item"> Login</a>
-                        <a href="#" class="dropdown-item"> Wishlist</a>
-                        <a href="#" class="dropdown-item"> My Card</a>
-                        <a href="#" class="dropdown-item"> Notifications</a>
-                        <a href="#" class="dropdown-item"> Account Settings</a>
-                        <a href="#" class="dropdown-item"> My Account</a>
-                        <a href="#" class="dropdown-item"> Log Out</a>
-                    </div>
-                </div>
+                @endauth
             </div>
         </div>
     </div>

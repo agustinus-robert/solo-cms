@@ -23,13 +23,10 @@ window.Echo.channel('products-market')
     .listen('.stock.updated', (data) => {
         console.log("Data Diterima di Browser:", data);
 
-        // Pastikan kita punya nilai yang konsisten (konversi ke string untuk selector)
         const pId = data.productId.toString();
         const vCode = data.variantCode ? data.variantCode.toString() : "";
         const newStock = parseInt(data.newStock);
 
-        // 1. UPDATE STOK DI KATALOG (Luar Modal)
-        // Gunakan template literal yang sesuai dengan class di HTML kamu
         const catalogBadges = document.querySelectorAll(`.stock-display-${pId}-${vCode}`);
         catalogBadges.forEach(badge => {
             badge.innerText = newStock;
@@ -42,8 +39,6 @@ window.Echo.channel('products-market')
             }
         });
 
-        // 2. UPDATE STOK DI DALAM MODAL
-        // Cari berdasarkan data-code yang dikirim
         const variantInput = document.querySelector(`input[name="selected_variant"][data-code="${vCode}"]`);
 
         if (variantInput) {
