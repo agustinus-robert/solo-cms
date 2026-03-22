@@ -22,7 +22,7 @@
 
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
-                            <img src="{{ $user->profile && $user->profile->avatar ? asset('storage/'.$user->profile->avatar) : asset('img/default-avatar.png') }}"
+                            <img src="{{ $user->profile && $user->profile->avatar ? asset('uploads/'.$user->profile->avatar) : asset('img/default-avatar.png') }}"
                                  class="rounded-circle border" style="width:120px; height:120px; object-fit: cover;">
                         </div>
                         <div class="mt-2">

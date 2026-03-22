@@ -39,18 +39,4 @@ trait HasProfileLogic
             throw $e;
         }
     }
-
-
-    public function saveAddress(Request $request, $id = null)
-    {
-        $userId = Auth::id();
-        $data = $request->all();
-
-        if ($request->has('is_main') || UserAddress::where('user_id', $userId)->count() == 0) {
-            UserAddress::where('user_id', $userId)->update(['is_main' => false]);
-            $data['is_main'] = true;
-        }
-
-        return UserAddress::updateOrCreate(['id' => $id, 'user_id' => $userId], $data);
-    }
 }

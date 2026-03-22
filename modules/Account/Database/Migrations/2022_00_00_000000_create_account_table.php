@@ -57,6 +57,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone')->nullable()->after('name');
 
+            $table->string('phone', 20)->nullable();
             $table->string('pob')->nullable();
             $table->date('dob')->nullable();
             $table->smallInteger('sex')->nullable();

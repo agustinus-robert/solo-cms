@@ -21,7 +21,7 @@ class UserProfile extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-    	'name', 'prefix', 'suffix', 'pob', 'dob', 'sex', 'blood', 'religion_id', 'is_dead', 'avatar', 'country_id', 'nik', 'child_num', 'siblings_count', 'diseases', 'height', 'weight', 'hobby_id', 'desire_id'
+    	'name', 'phone', 'prefix', 'suffix', 'pob', 'dob', 'sex', 'blood', 'religion_id', 'is_dead', 'avatar', 'country_id', 'nik', 'child_num', 'siblings_count', 'diseases', 'height', 'weight', 'hobby_id', 'desire_id'
     ];
 
     /**
