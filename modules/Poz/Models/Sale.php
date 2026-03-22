@@ -44,4 +44,9 @@ class Sale extends Model
     {
         return $this->belongsToMany(Outlet::class, 'outlet_sales', 'sale_id', 'outlet_id');
     }
+
+    public function midtrans()
+    {
+        return $this->hasOne(SaleMidtransPayment::class, 'sale_id');
+    }
 }

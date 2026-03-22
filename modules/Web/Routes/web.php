@@ -40,6 +40,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::resource('customer', 'CustomerController');
         Route::resource('address', 'AddressController');
         Route::resource('checkout', 'CheckoutController')->only('index', 'store');
+        Route::get('finish/{reference}', 'FinishController@index')->name('finish.index');
     });
 
 

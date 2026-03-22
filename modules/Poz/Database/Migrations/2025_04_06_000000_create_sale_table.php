@@ -20,7 +20,11 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
-            $table->foreignId('customer_id')->nullable()->constrained('ref_customers')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('customer_id')
+                ->nullable()
+                ->constrained('ref_customers')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->integer('sale_status');
             $table->decimal('discount', 20, 2);
             $table->decimal('sub_total', 20, 2);
@@ -120,6 +124,27 @@ return new class extends Migration
 
             $table->softDeletesTz();
             $table->timestampsTz();
+        });
+
+        Schema::create('sale_midtrans_payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('sale_id')->constrained('sales')->cascadeOnUpdate()->cascadeOnDelete();
+
+            $table->string('order_id')->unique();
+            $table->string('transaction_id')->nullable();
+            $table->string('payment_type');
+            $table->string('va_number')->nullable();
+            $table->string('pdf_url')->nullable();
+
+            $table->string('transaction_status');
+            $table->string('status_code')->nullable();
+
+            $table->decimal('gross_amount', 20, 2);
+            $table->json('full_response')->nullable();
+            $table->timestamp('settlement_time')->nullable();
+            $table->timestamp('expiry_time')->nullable();
+
+            $table->timestamps();
         });
     }
 

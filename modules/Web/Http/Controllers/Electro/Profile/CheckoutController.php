@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Poz\Models\Sale;
 use Modules\Account\Models\UserAddress;
+use Modules\Poz\Models\SaleMidtransPayment;
 use Modules\Web\Traits\CheckoutTrait;
+use Modules\Web\Traits\MidtransTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Poz\Models\Product;
 
 class CheckoutController extends Controller
 {
-    use CheckoutTrait;
+    use CheckoutTrait, MidtransTrait;
 
    public function index()
     {
@@ -46,46 +48,78 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'outlet_id' => 'required',
-            'address'   => 'required',
-            'phone'     => 'required'
+            'address_id'     => 'required',
+            'payment_method' => 'required',
+            'address'        => 'required',
+            'phone'          => 'required'
         ]);
 
         $cart = $this->getActiveCart();
-
-        if (!$cart) return back()->with('error', 'Data keranjang tidak ditemukan.');
+        if (!$cart || empty($cart->items)) return back()->with('error', 'Keranjang kosong.');
 
         DB::beginTransaction();
         try {
+
+            $firstItem = collect($cart->items)->first();
+            $product = Product::with('outlets')->find($firstItem['product_id']);
+
+            $outletId = $product->outlets->first()?->id;
+
+            if (!$outletId) {
+                throw new \Exception("Produk tidak memiliki data outlet yang valid.");
+            }
+
             $totals = $this->calculateCheckoutTotals($cart->items, $request->discount ?? 0);
+            $reference = 'WEB-' . strtoupper(uniqid());
 
             $sale = Sale::create([
-                'reference'   => 'WEB-' . strtoupper(uniqid()),
+                'reference'   => $reference,
                 'customer_id' => Auth::id(),
-                'sale_status' => 3,
+                'sale_status' => 1,
                 'sub_total'   => $totals['sub_total'],
                 'discount'    => $totals['discount'],
                 'grand_total' => $totals['grand_total'],
-                'paid_amount' => $totals['grand_total'],
-                'pos'         => 0,
-                'note'        => $request->note . ' | Alamat: ' . $request->address . ' | Telp: ' . $request->phone
+                'paid_amount' => 0,
+                'payment_method' => $request->payment_method,
+                'note'        => ($request->note ?? '-') . ' | Alamat: ' . $request->address . ' | Telp: ' . $request->phone
             ]);
 
-            $sale->outlets()->sync([$request->outlet_id]);
+            $sale->outlets()->sync([$outletId]);
 
             $this->storeCheckoutItems($sale, $cart->items);
+            $this->deductStockFromCart($cart->items, $outletId, $sale->id);
 
-            $this->deductStockFromCart($cart->items, $request->outlet_id, $sale->id);
+            $res = $this->chargeCoreApi($sale, $cart->items, $totals, $request->payment_method);
+
+            $vaNumber = null;
+            if ($request->payment_method == 'mandiri') {
+                $vaNumber = $res->bill_key ?? null;
+            } else {
+                $vaNumber = $res->va_numbers[0]->va_number ?? null;
+            }
+
+            SaleMidtransPayment::create([
+                'sale_id'            => $sale->id,
+                'order_id'           => $res->order_id,
+                'transaction_id'     => $res->transaction_id ?? null,
+                'payment_type'       => $res->payment_type,
+                'va_number'          => $vaNumber,
+                'pdf_url'            => $res->pdf_url ?? null,
+                'transaction_status' => $res->transaction_status,
+                'status_code'        => $res->status_code,
+                'gross_amount'       => $res->gross_amount,
+                'full_response'      => (array) $res,
+                'expiry_time'        => isset($res->expiry_time) ? date('Y-m-d H:i:s', strtotime($res->expiry_time)) : null,
+            ]);
 
             $cart->delete();
-
             DB::commit();
-            return redirect()->route('web.page', ['controller' => 'shop', 'method' => 'thanks'])
-                             ->with('success', 'Checkout Berhasil!');
 
+            return redirect()->route('web::area.finish.index', ['reference' => $reference]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal: ' . $e->getMessage());
+            \Log::error('Checkout Error [' . Auth::id() . ']: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

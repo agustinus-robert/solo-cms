@@ -10,9 +10,6 @@ use Modules\Account\Models\UserAddress;
 
 trait HasProfileLogic
 {
-    /**
-     * Logic Update User & Profile
-     */
     public function performProfileUpdate(Request $request)
     {
         $user = Auth::user();
