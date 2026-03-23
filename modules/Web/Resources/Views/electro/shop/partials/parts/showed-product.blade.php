@@ -88,48 +88,44 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('cart-updated', async function() {
-        console.log("Keranjang berubah, menyinkronkan stok...");
-
         try {
-            const syncRes = await fetch("{{ route('web::web.cart.add-on-detail') }}", {
+            const syncRes = await fetch("{{ route('web::web.cart.check-stock') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    id: "{{ $product->id }}",
-                    variant_code: activeCombination ? activeCombination.code : null,
-                    qty: 0
-                })
+                body: JSON.stringify({ id: "{{ $product->id }}" })
             });
 
             const syncData = await syncRes.json();
 
             if (isVariantRequired && syncData.variants) {
-                const updatedVar = syncData.variants.find(v => v.code === (activeCombination ? activeCombination.code : null));
+                const currentCode = activeCombination ? activeCombination.code : null;
+                const updatedVar = syncData.variants.find(v => String(v.code) === String(currentCode));
 
                 if (updatedVar) {
-                    const newStock = parseInt(updatedVar.qty);
+                    const newStock = parseInt(updatedVar.qty) || 0;
                     displayStock.innerText = newStock + ' items';
 
-                    if (activeCombination) {
-                        activeCombination.qty = newStock;
-                    }
+                    if (activeCombination) activeCombination.qty = newStock;
                     checkStockStatus(newStock);
                 }
-            }  else if (!isVariantRequired) {
+            } else {
+                const newStock = parseInt(syncData.main_stock ?? (syncData.variants?.[0]?.qty)) || 0;
 
-                const newStock = syncData.main_stock ?? (syncData.variants ? syncData.variants[0].qty : 0);
+                productDefaultStock = newStock;
+                displayStock.innerText = newStock + ' items';
 
-                productDefaultStock = parseInt(newStock);
-                displayStock.innerText = productDefaultStock + ' items';
+                if (activeCombination) {
+                    activeCombination.qty = newStock;
+                }
 
-                checkStockStatus(productDefaultStock);
+                checkStockStatus(newStock);
             }
         } catch (err) {
-            console.error("Gagal update stok otomatis:", err);
+            console.error("Gagal sinkron stok:", err);
         }
     });
 

@@ -70,24 +70,24 @@
 @once
     @push('scripts')
     <script>
-        window.refreshCartUI = async function() {
+       window.refreshCartUI = async function() {
             try {
                 const response = await fetch("{{ route('web::web.cart.render') }}");
                 const html = await response.text();
 
-                const wrapper = document.getElementById('cart-dropdown-wrapper');
-                if (!wrapper) return;
+                const oldWrapper = document.getElementById('cart-dropdown-wrapper');
+                if (!oldWrapper) return;
 
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newContent = doc.getElementById('cart-dropdown-wrapper');
+                const newWrapper = doc.getElementById('cart-dropdown-wrapper');
 
-                if (newContent) {
-                    wrapper.innerHTML = newContent.innerHTML;
+                if (newWrapper) {
+                    oldWrapper.replaceWith(newWrapper);
 
-                    const triggerEl = document.getElementById('cart-trigger');
-                    if (triggerEl) {
-                        new bootstrap.Dropdown(triggerEl);
+                    const newTrigger = newWrapper.querySelector('#cart-trigger');
+                    if (newTrigger && typeof bootstrap !== 'undefined') {
+                        new bootstrap.Dropdown(newTrigger);
                     }
                 }
 

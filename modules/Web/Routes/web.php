@@ -20,6 +20,7 @@ Route::group(['middleware' => ['web']], function () {
     ]);
 
     Route::get('cart/detail', [CartController::class, 'detail'])->name('web.cart.detail');
+    Route::post('cart/check-stock', [CartController::class, 'checkStock'])->name('web.cart.check-stock');
     Route::post('cart/add', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'add')->name('web.cart.add');
     Route::post('cart/add-on-detail', [MainController::class, 'call'])->defaults('controller', 'cart')->defaults('method', 'addOnDetail')->name('web.cart.add-on-detail');
 

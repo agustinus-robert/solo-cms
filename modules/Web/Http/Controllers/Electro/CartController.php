@@ -279,14 +279,86 @@ class CartController extends Controller
         ]);
     }
 
+   public function checkStock(Request $request)
+    {
+        $productId = $request->id;
+        $product = Product::with(['variant', 'outlets'])->findOrFail($productId);
+        $outletId = $product->outlets->first()?->id ?? 1;
+
+        $search = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
+        $cartRecord = Chart::where($search)->first();
+        $myItems = $cartRecord ? ($cartRecord->items ?? []) : [];
+
+        $variantModel = ProductVariant::where('product_id', $productId)->first();
+
+        if (!$variantModel) {
+            $finalCode = $product->sku;
+            $stockInDb = (int) $this->getAvailableStock($productId, $outletId, $finalCode);
+
+            $totalBookedGlobal = Chart::all()->sum(function($cart) use ($productId, $finalCode) {
+                $sum = 0;
+                foreach ($cart->items ?? [] as $ci) {
+                    if ($ci['product_id'] == $productId && ($ci['code'] ?? '') == $finalCode) {
+                        $sum += (int)$ci['qty'];
+                    }
+                }
+                return $sum;
+            });
+
+            // 🔥 Samakan logic key dengan fungsi add()
+            $itemKey = (string)$productId;
+            $qtyInMyCart = isset($myItems[$itemKey]) ? (int) $myItems[$itemKey]['qty'] : 0;
+
+            return response()->json([
+                'success' => true,
+                'main_stock' => max(0, $stockInDb - ($totalBookedGlobal - $qtyInMyCart)),
+                'variants' => []
+            ]);
+        }
+
+        // --- CASE 2: ADA VARIANT ---
+        $groupedData = $variantModel->getGroupedTiers($outletId);
+        $combinations = $groupedData ? $groupedData['combinations'] : [];
+
+        foreach ($combinations as &$comp) {
+            $vCode = $comp['code'];
+
+            $totalBooked = Chart::all()->sum(function($cart) use ($productId, $vCode) {
+                $sum = 0;
+                foreach ($cart->items ?? [] as $ci) {
+                    if ($ci['product_id'] == $productId && ($ci['code'] ?? '') == $vCode) {
+                        $sum += (int)$ci['qty'];
+                    }
+                }
+                return $sum;
+            });
+
+            // 🔥 Samakan logic key: di addOnDetail kamu pakai "productId_variantCode"
+            $itemKey = "{$productId}_{$vCode}";
+            $qtyInMyCart = isset($myItems[$itemKey]) ? (int) $myItems[$itemKey]['qty'] : 0;
+
+            // Note: $comp['qty'] dari getGroupedTiers biasanya sudah dbStock
+            $comp['qty'] = max(0, (int)$comp['qty'] - ($totalBooked - $qtyInMyCart));
+        }
+
+        $mainStock = (count($combinations) > 0) ? $combinations[0]['qty'] : $product->stock;
+
+        return response()->json([
+            'success' => true,
+            'variants' => $combinations,
+            'main_stock' => (int) $mainStock
+        ]);
+    }
+
     public function renderDropdown()
     {
         $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
         $cartRecord = Chart::where($identifier)->first();
-        $items = $cartRecord ? ($cartRecord->items ?? []) : [];
+
+        $items = ($cartRecord && is_array($cartRecord->items)) ? $cartRecord->items : [];
 
         if (!empty($items)) {
-            $productIds = array_column($items, 'product_id');
+            $productIds = array_unique(array_column($items, 'product_id'));
 
             $productData = Product::whereIn('id', $productIds)
                 ->select('id', 'location', 'image_name')
@@ -295,20 +367,14 @@ class CartController extends Controller
 
             foreach ($items as $key => &$item) {
                 $pId = $item['product_id'];
-                if (isset($productData[$pId])) {
-                    $item['location'] = $productData[$pId]->location;
-                    $item['image_name'] = $productData[$pId]->image_name;
-                } else {
-                    $item['location'] = null;
-                    $item['image_name'] = null;
-                }
+                $item['location'] = $productData[$pId]->location ?? null;
+                $item['image_name'] = $productData[$pId]->image_name ?? null;
             }
         }
 
-        $total = 0;
-        foreach ($items as $item) {
-            $total += ($item['price'] ?? 0) * ($item['qty'] ?? 0);
-        }
+        $total = array_reduce($items, function($carry, $item) {
+            return $carry + (($item['price'] ?? 0) * ($item['qty'] ?? 0));
+        }, 0);
 
         return view('web::components.chart-version.electro.chart-corner', [
             'items' => $items,
