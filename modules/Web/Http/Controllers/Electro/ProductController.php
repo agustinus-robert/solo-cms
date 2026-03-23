@@ -14,6 +14,12 @@ class ProductController extends Controller
         $groupedData = $product->variant->first()->getGroupedTiers();
         $canEdit = false;
 
-        return view('web::electro.shop.show', compact('product', 'canEdit', 'groupedData'));
+        $relatedProducts = Product::where('category_id', $product->category_id)
+        ->where('id', '!=', $product->id)
+        ->limit(6)
+        ->get();
+
+
+        return view('web::electro.shop.show', compact('product', 'canEdit', 'groupedData', 'relatedProducts'));
     }
 }

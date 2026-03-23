@@ -9,13 +9,14 @@ use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Traits\Userstamps\Userstamps;
 use Modules\Account\Models\User;
+use Modules\Web\Traits\HasProductReview;
 use Illuminate\Database\Eloquent\Builder;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, HasAuditLog, Restorable, SoftDeletes, Userstamps;
+    use HasFactory, HasAuditLog, Restorable, SoftDeletes, Userstamps, HasProductReview;
 
     public $table = "products";
 
@@ -67,6 +68,10 @@ class Product extends Model
     public function outlets()
     {
         return $this->belongsToMany(Outlet::class, 'outlet_products', 'product_id', 'outlet_id');
+    }
+
+    public function reviews(){
+        return $this->hasMany(ProductReview::class, 'product_id');
     }
 
     public function purchaseItems()

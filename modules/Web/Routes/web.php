@@ -46,6 +46,15 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('wishlist/render-corner', 'WishlistController@getWishlistCount')->name('wishlist.render');
     });
 
+    Route::group([
+        'prefix' => 'area',
+        'as' => 'area.',
+        'namespace' => 'Electro\Profile'
+    ], function () {
+        Route::post('customer/review/{productId}', 'ReviewController@store')->name('review.store');
+        Route::get('customer/review/list/{productId}', 'ReviewController@getReviews')->name('review.list');
+    });
+
 
     Route::any('{controller?}/{method?}/{param?}', [MainController::class, 'call'])
         ->name('web.page');

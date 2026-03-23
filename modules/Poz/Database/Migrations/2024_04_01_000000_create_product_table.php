@@ -151,6 +151,17 @@ return new class extends Migration
             $table->softDeletesTz();
             $table->timestampsTz();
         });
+
+        Schema::create('product_reviews', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+
+            $table->string('name');
+            $table->string('email');
+            $table->text('description');
+            $table->integer('rating')->default(5);
+            $table->timestamps();
+        });
     }
 
     /**
