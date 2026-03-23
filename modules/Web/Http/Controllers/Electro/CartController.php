@@ -177,6 +177,108 @@ class CartController extends Controller
         ]);
     }
 
+
+    public function addOnDetail(Request $request)
+    {
+        $productId   = $request->id;
+        $variantCode = $request->variant_code;
+        $qtyInput    = (int) ($request->qty ?? 1);
+
+        $product = Product::with(['variant', 'outlets'])->findOrFail($productId);
+        $outletId = $product->outlets->first()?->id ?? 1;
+
+        $finalPrice  = (float) $product->price;
+        $finalName   = $product->name;
+        $finalCode   = $product->sku;
+        $targetVariant = null;
+
+        if ($product->variant->count() > 0) {
+            if (!$variantCode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silahkan pilih varian terlebih dahulu.'
+                ], 422);
+            }
+
+            foreach ($product->variant as $v) {
+                $rawData = is_string($v->product_variant) ? json_decode($v->product_variant, true) : $v->product_variant;
+                foreach ($rawData as $sub) {
+                    if ($sub['code'] == $variantCode) {
+                        $targetVariant = $sub;
+                        $finalPrice    = (float) $sub['price'];
+                        $finalName     = $product->name . " (" . ($sub['name'] ?? '') . ")";
+                        $finalCode     = $sub['code'];
+                        break 2;
+                    }
+                }
+            }
+
+            if (!$targetVariant) {
+                return response()->json(['success' => false, 'message' => 'Varian tidak ditemukan.'], 404);
+            }
+        }
+
+        $stockInDb = (int) $this->getAvailableStock($productId, $outletId, $finalCode);
+        $totalBookedGlobal = Chart::all()->sum(function($cart) use ($productId, $finalCode) {
+            $sum = 0;
+            foreach ($cart->items ?? [] as $ci) {
+                if ($ci['product_id'] == $productId && ($ci['code'] ?? '') == $finalCode) {
+                    $sum += (int)$ci['qty'];
+                }
+            }
+            return $sum;
+        });
+
+        $itemKey = $variantCode ? "{$productId}_{$variantCode}" : "{$productId}";
+
+        $search = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
+        $cartRecord = Chart::firstOrNew($search);
+        $items = $cartRecord->items ?? [];
+
+        $qtyInMyCart = isset($items[$itemKey]) ? (int) $items[$itemKey]['qty'] : 0;
+
+        $virtualStock = $stockInDb - ($totalBookedGlobal - $qtyInMyCart);
+
+        if ($qtyInput > $virtualStock) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stok tidak mencukupi! Sisa tersedia: ' . max(0, $virtualStock)
+            ], 422);
+        }
+
+        if (isset($items[$itemKey])) {
+            $items[$itemKey]['qty'] += $qtyInput;
+        } else {
+            $items[$itemKey] = [
+                'product_id' => (int) $product->id,
+                'code'       => $finalCode,
+                'name'       => $finalName,
+                'qty'        => $qtyInput,
+                'price'      => $finalPrice,
+                'variant_code' => $variantCode
+            ];
+        }
+
+        $items[$itemKey]['subtotal'] = $items[$itemKey]['qty'] * $items[$itemKey]['price'];
+
+        $cartRecord->items = $items;
+        $cartRecord->save();
+
+        if (method_exists($this, 'broadcastStock')) {
+            $this->broadcastStock($productId, $finalCode);
+        }
+
+        $variantModel = ProductVariant::where('product_id', $productId)->first();
+        $groupedData = $variantModel ? $variantModel->getGroupedTiers($outletId) : null;
+
+        return response()->json([
+            'success' => true,
+            'cart_count' => count($items),
+            'variants' => $groupedData ? $groupedData['combinations'] : [],
+            'message' => $qtyInput > 0 ? 'Berhasil ditambahkan ke keranjang' : 'Stok disinkronkan'
+        ]);
+    }
+
     public function renderDropdown()
     {
         $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];

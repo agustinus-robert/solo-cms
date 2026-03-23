@@ -42,7 +42,7 @@
                                             <img src="{{ asset('uploads/'.$product->location.'/'.$product->image_name) }}" class="img-fluid w-100 rounded-top" alt="">
                                             <div class="product-new">New</div>
                                             <div class="product-details">
-                                                <a href="#"><i class="fa fa-eye fa-1x"></i></a>
+                                                <a href="{{ route('web::web.shop.show', $product->id) }}"><i class="fa fa-eye fa-1x"></i></a>
                                             </div>
                                         </div>
                                         <div class="text-center rounded-bottom p-4">
