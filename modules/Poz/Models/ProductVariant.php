@@ -77,8 +77,6 @@ class ProductVariant extends Model
         $variants = is_string($rawData) ? json_decode($rawData, true) : $rawData;
         if (empty($variants) || !is_array($variants)) return null;
 
-        $hasTier = collect($variants)->contains(fn($item) => isset($item['tier_1_id']));
-        if (!$hasTier) return null;
 
         $tierTransactionIds = collect($variants)
             ->flatMap(fn($item) => [$item['tier_1_id'] ?? null, $item['tier_2_id'] ?? null])
@@ -101,7 +99,7 @@ class ProductVariant extends Model
 
         foreach (['tier_1', 'tier_2'] as $key) {
             $ids = $activeVariants->pluck($key . '_id')->filter()->unique();
-            if ($ids->isNotEmpty()) {
+            if ($ids->isNotEmpty() && $ids->first() !== null) {
                 $sampleId = $ids->first();
                 $transaction = $tierTransactions[$sampleId] ?? null;
                 $parentLabel = ($transaction && $transaction->tiers) ? $transaction->tiers->name : 'Pilihan';
@@ -142,6 +140,7 @@ class ProductVariant extends Model
                 'qty'   => $finalAvailable < 0 ? 0 : $finalAvailable,
                 't1'    => $item['tier_1_id'] ?? null,
                 't2'    => $item['tier_2_id'] ?? null,
+                'type'  => $item['variant_type'] ?? 'standard' // Buat tanda
             ];
         })->values();
 

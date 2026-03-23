@@ -56,7 +56,7 @@
 
                 <button id="btn-add-to-cart"
                     class="btn btn-primary border border-secondary rounded-pill px-4 py-2 text-white"
-                    {{ $groupedData ? 'disabled' : '' }}>
+                    {{ (!empty($groupedData['labels'])) ? 'disabled' : '' }}>
                     <i class="fa fa-shopping-bag me-2"></i> Add to cart
                 </button>
             </div>
@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const combinations = @json($groupedData['combinations'] ?? []);
-    const isVariantRequired = @json($groupedData ? true : false);
-    const productDefaultStock = parseInt("{{ $product->stock ?? 0 }}");
+    const isVariantRequired = @json(!empty($groupedData['labels']));
+    let productDefaultStock = parseInt("{{ $product->stock ?? 0 }}");
 
     const btnAddToCart = document.getElementById('btn-add-to-cart');
     const displayPrice = document.getElementById('display-price');
@@ -245,9 +245,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    if (!isVariantRequired) {
-        checkStockStatus(productDefaultStock);
+    if (!isVariantRequired && combinations.length > 0) {
+        activeCombination = combinations[0];
+        productDefaultStock = parseInt(activeCombination.qty);
+
+        displayPrice.innerText = formatRupiah(activeCombination.price);
+        displayStock.innerText = activeCombination.qty + ' items';
+        displaySku.innerText = activeCombination.code;
     }
+
+    checkStockStatus(productDefaultStock);
 
     document.querySelectorAll('.btn-variant-option').forEach(button => {
         button.addEventListener('click', function () {
