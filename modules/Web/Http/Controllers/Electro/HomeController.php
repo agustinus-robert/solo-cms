@@ -54,18 +54,18 @@ class HomeController extends Controller{
             //     'order' => 5,
             //     'data'  => []
             // ],
-            $this->prefix.'.section6-product-end' => [
-                'order' => 6,
-                'data'  => [
-                    'products' => Product::get()
-                ]
-            ],
-            $this->prefix.'.section7-bestseller' => [
-                'order' => 7,
-                'data'  => [
-                    'products' => Product::get()
-                ]
-            ],
+            // $this->prefix.'.section6-product-end' => [
+            //     'order' => 6,
+            //     'data'  => [
+            //         'products' => Product::get()
+            //     ]
+            // ],
+            // $this->prefix.'.section7-bestseller' => [
+            //     'order' => 7,
+            //     'data'  => [
+            //         'products' => Product::get()
+            //     ]
+            // ],
         ];
 
         $this->setSections($allSections);
