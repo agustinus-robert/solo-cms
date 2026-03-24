@@ -2,34 +2,29 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const shopContainer = document.getElementById('shop-container');
+        const clearWrapper = document.getElementById('clear-filter-wrapper');
 
-        // Fungsi sakti untuk menggabungkan semua filter yang ada di UI
         function getCombinedUrl() {
             const baseUrl = window.location.pathname;
             const params = new URLSearchParams();
 
-            // 1. Ambil Keyword dari Search Form
-            const searchInput = document.querySelector('#shop-search-form input[name="q"]');
-            if (searchInput && searchInput.value) params.set('q', searchInput.value);
+            const q = document.querySelector('input[name="q"]')?.value;
+            if (q) params.set('q', q);
 
-            // 2. Ambil Harga dari Filter Form
-            const priceInput = document.querySelector('#shop-filter-form input[name="max_price"]');
-            if (priceInput && priceInput.value > 0) params.set('max_price', priceInput.value);
-
-            // 3. Ambil Kategori Aktif (cari link kategori yang punya class fw-bold / text-primary)
-            const activeCategory = document.querySelector('.ajax-filter.fw-bold');
-            if (activeCategory) {
-                const catUrl = new URL(activeCategory.href);
-                const catId = catUrl.searchParams.get('category');
+            const price = document.querySelector('input[name="max_price"]')?.value;
+            if (price && price > 0) params.set('max_price', price);
+            const activeCatLink = document.querySelector('.categories-item a.fw-bold');
+            if (activeCatLink) {
+                const catId = new URL(activeCatLink.href).searchParams.get('category');
                 if (catId) params.set('category', catId);
+            } else {
+                const currentCat = new URLSearchParams(window.location.search).get('category');
+                if (currentCat) params.set('category', currentCat);
             }
 
-            // 4. Ambil Sort dari Select
             const sortSelect = document.getElementById('sort-select');
             if (sortSelect) {
-                // Karena value option kamu adalah URL lengkap, kita ambil query 'sort'-nya saja
-                const sortUrl = new URL(sortSelect.value);
-                const sortVal = sortUrl.searchParams.get('sort');
+                const sortVal = new URL(sortSelect.value).searchParams.get('sort');
                 if (sortVal) params.set('sort', sortVal);
             }
 
@@ -51,39 +46,53 @@
 
                 window.history.pushState({ path: url }, '', url);
 
+                updateClearFilterUI(url);
+
                 if (typeof WOW !== 'undefined') new WOW().init();
                 shopContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                console.error('Error Robert:', error);
+                console.error('Error:', error);
                 shopContainer.style.opacity = '1';
             }
         }
 
-        // Listener Klik Kategori & Pagination
+        function updateClearFilterUI(url) {
+            if (!clearWrapper) return;
+            const params = new URL(url, window.location.origin).searchParams;
+            const hasFilter = params.has('category') || params.has('q') || (params.has('max_price') && params.get('max_price') > 0);
+
+            if (hasFilter) {
+                clearWrapper.innerHTML = `
+                    <div class="clear-filter mt-3">
+                        <a href="${window.location.pathname}" class="btn btn-sm btn-danger w-100 ajax-filter">
+                            <i class="fas fa-times me-2"></i> Clear All Filters
+                        </a>
+                    </div>`;
+            } else {
+                clearWrapper.innerHTML = '';
+            }
+        }
+
         document.addEventListener('click', function(e) {
             const link = e.target.closest('.ajax-filter, .pagination a');
             if (link) {
                 e.preventDefault();
 
-                // Jika klik "Clear Filter", langsung ke URL bersih
                 if (link.classList.contains('btn-danger')) {
-                    updateShop(link.href);
+                    updateShop(window.location.pathname);
                     return;
                 }
 
-                // Jika klik kategori, kita update dulu visualnya baru gabungkan URL
-                if (link.classList.contains('ajax-filter') && !link.classList.contains('btn-danger')) {
-                    document.querySelectorAll('.ajax-filter').forEach(el => el.classList.remove('fw-bold', 'text-primary'));
+                if (link.closest('.categories-item')) {
+                    document.querySelectorAll('.categories-item a').forEach(a => a.classList.remove('fw-bold', 'text-primary'));
                     link.classList.add('fw-bold', 'text-primary');
                     updateShop(getCombinedUrl());
                 } else {
-                    // Untuk pagination, biarkan pakai link.href asli agar page tidak lari
                     updateShop(link.href);
                 }
             }
         });
 
-        // Listener Form Submit (Search & Price)
         document.addEventListener('submit', function(e) {
             const form = e.target.closest('#shop-filter-form, #shop-search-form');
             if (form) {
@@ -92,12 +101,11 @@
             }
         });
 
-        // Listener Sort
         const sortSelect = document.getElementById('sort-select');
         if (sortSelect) {
             sortSelect.addEventListener('change', function() {
                 updateShop(getCombinedUrl());
-            });
+            } );
         }
 
         window.addEventListener('popstate', () => updateShop(window.location.href));

@@ -35,21 +35,21 @@
                     </form>
                 </div>
 
-                @if(request()->anyFilled(['category', 'q', 'max_price']))
-                <div class="clear-filter">
-                    <a href="{{ request()->url() }}" class="btn btn-sm btn-danger w-100 ajax-filter">
-                        <i class="fas fa-times me-2"></i> Clear All Filters
-                    </a>
+                <div id="clear-filter-wrapper">
+                    @if(request()->anyFilled(['category', 'q', 'max_price']))
+                        <div class="clear-filter">
+                            <a href="{{ request()->url() }}" class="btn btn-sm btn-danger w-100 ajax-filter">
+                                <i class="fas fa-times me-2"></i> Clear All Filters
+                            </a>
+                        </div>
+                    @endif
                 </div>
-                @endif
-
             </div>
 
             <div class="col-lg-9 wow" data-wow-delay="0.1s">
                 <div class="row g-4 mb-4">
                     <div class="col-xl-7">
                         <form id="shop-search-form" action="{{ request()->url() }}" method="GET">
-                            {{-- Simpan kategori dan harga saat search --}}
                             @if(request('category')) <input type="hidden" name="category" value="{{ request('category') }}"> @endif
                             @if(request('max_price')) <input type="hidden" name="max_price" value="{{ request('max_price') }}"> @endif
 
