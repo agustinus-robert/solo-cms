@@ -4,6 +4,7 @@ namespace Modules\Web\Http\Controllers\Electro;
 
 use Illuminate\Http\Request;
 use Modules\Poz\Models\Product;
+use Modules\Poz\Models\Category;
 use Modules\Web\Http\Controllers\Controller;
 
 class ShopController extends Controller{
@@ -20,7 +21,38 @@ class ShopController extends Controller{
         $this->prefix = 'web::'.$this->themeConfig['caller'].'.shop';
     }
 
-    public function index(){
+    public function index(Request $request){
+        $categories = Category::withCount('products')->get();
+        $query = Product::with(['category']);
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('q')) {
+            $query->where('name', 'ILIKE', '%' . $request->q . '%');
+        }
+
+        if ($request->filled('max_price') && $request->max_price > 0) {
+            $query->where('wholesale', '<=', $request->max_price);
+        }
+
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'low': $query->orderBy('wholesale', 'asc'); break;
+            case 'high': $query->orderBy('wholesale', 'desc'); break;
+            default: $query->latest(); break;
+        }
+
+        $products = $query->paginate(9)->withQueryString();
+        $featured = Product::latest()->limit(3)->get();
+
+        if ($request->ajax()) {
+            return view($this->prefix.'.partials.product-list', [
+                'products' => $products
+            ])->render();
+        }
+
         $allSections = [
             $this->prefix.'.section1-carousel' => [
                 'order' => 1,
@@ -47,7 +79,9 @@ class ShopController extends Controller{
             $this->prefix.'.section4-shop' => [
                 'order' => 4,
                 'data'  => [
-                    'products' => Product::paginate(6)
+                    'products'   => $query->paginate(9)->withQueryString(),
+                    'categories' => $categories,
+                    'featured'   => $featured,
                 ]
             ],
         ];

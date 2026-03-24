@@ -11,7 +11,11 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('variant')->find($id);
-        $groupedData = $product->variant->first()->getGroupedTiers();
+        $firstVariant = $product->variant->first();
+        $groupedData = $firstVariant ? $firstVariant->getGroupedTiers() : [
+            'labels' => [],
+            'combinations' => []
+        ];
         $canEdit = false;
 
         $relatedProducts = Product::where('category_id', $product->category_id)

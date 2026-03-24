@@ -333,11 +333,8 @@ class CartController extends Controller
                 return $sum;
             });
 
-            // 🔥 Samakan logic key: di addOnDetail kamu pakai "productId_variantCode"
             $itemKey = "{$productId}_{$vCode}";
             $qtyInMyCart = isset($myItems[$itemKey]) ? (int) $myItems[$itemKey]['qty'] : 0;
-
-            // Note: $comp['qty'] dari getGroupedTiers biasanya sudah dbStock
             $comp['qty'] = max(0, (int)$comp['qty'] - ($totalBooked - $qtyInMyCart));
         }
 
