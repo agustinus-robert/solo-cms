@@ -9,7 +9,7 @@
                     </div>
                     <div>
                         <h4 class="text-white">Address</h4>
-                        <p class="mb-2">123 Street New York.USA</p>
+                        <p class="mb-2">Solo Surakarta</p>
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
                     </div>
                     <div>
                         <h4 class="text-white">Mail Us</h4>
-                        <p class="mb-2">info@example.com</p>
+                        <p class="mb-2">shop5solo@gmail.com</p>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                     </div>
                     <div>
                         <h4 class="text-white">Telephone</h4>
-                        <p class="mb-2">(+012) 3456 7890</p>
+                        <p class="mb-2">(+65) 3456 7890</p>
                     </div>
                 </div>
             </div>
@@ -44,8 +44,8 @@
                         <i class="fab fa-firefox-browser fa-2x text-primary"></i>
                     </div>
                     <div>
-                        <h4 class="text-white">Yoursite@ex.com</h4>
-                        <p class="mb-2">(+012) 3456 7890</p>
+                        <h4 class="text-white">shop@ex.com</h4>
+                        <p class="mb-2">(+65) 3456 7890</p>
                     </div>
                 </div>
             </div>
@@ -58,10 +58,14 @@
                         <p class="mb-3">Dolor amet sit justo amet elitr clita ipsum elitr est.Lorem ipsum dolor sit
                             amet, consectetur adipiscing elit consectetur adipiscing elit.</p>
                         <div class="position-relative mx-auto rounded-pill">
-                            <input class="form-control rounded-pill w-100 py-3 ps-4 pe-5" type="text"
+                            <input id="subscribeEmail" class="form-control rounded-pill w-100 py-3 ps-4 pe-5"
+                                type="email"
                                 placeholder="Enter your email">
-                            <button type="button"
-                                class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">SignUp</button>
+                            <a href="mailto:robert@example.com"
+                            onclick="this.href='mailto:robert@example.com?body=' + document.getElementById('subscribeEmail').value"
+                            class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">
+                            <i class="fas fa-envelope me-2"></i> Mail Me
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -118,12 +122,8 @@
                     reserved.</span>
             </div>
             <div class="col-md-6 text-center text-md-end text-white">
-
-                <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
-                <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
-                <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
-                Designed By <a class="border-bottom text-white" href="https://htmlcodex.com">HTML Codex</a>.
-                Distributed By <a class="border-bottom text-white" href="https://themewagon.com">ThemeWagon</a>
+                Designed By <a class="border-bottom text-white" href="https://htmlcodex.com">Backend2</a>.
+                Distributed By <a class="border-bottom text-white" href="https://themewagon.com">Surakarta</a>
             </div>
         </div>
     </div>
