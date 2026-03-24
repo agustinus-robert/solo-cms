@@ -72,21 +72,33 @@
                     </a>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-6 text-center">
+           <div class="col-md-4 col-lg-6 text-center">
                 <div class="position-relative ps-4">
-                    <div class="d-flex border rounded-pill">
-                        <input class="form-control border-0 rounded-pill w-100 py-3" type="text"
-                            data-bs-target="#dropdownToggle123" placeholder="Search Looking For?">
-                        <select class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
-                            <option value="All Category">All Category</option>
-                            <option value="Pest Control-2">Category 1</option>
-                            <option value="Pest Control-3">Category 2</option>
-                            <option value="Pest Control-4">Category 3</option>
-                            <option value="Pest Control-5">Category 4</option>
-                        </select>
-                        <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i
-                                class="fas fa-search"></i></button>
-                    </div>
+                    <form action="{{ route('web::web.shop') }}" method="GET">
+                        <div class="d-flex border rounded-pill bg-white">
+                            <input class="form-control border-0 rounded-pill w-100 py-3"
+                                type="text"
+                                name="q"
+                                value="{{ request('q') }}"
+                                placeholder="Cari Produk yang anda butuhkan?">
+
+                            <select name="category" class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
+                                <option value="">All Category</option>
+                                @php
+                                    $globalCategories = \Modules\Poz\Models\Category::all();
+                                @endphp
+                                @foreach($globalCategories as $cat)
+                                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <div class="col-md-4 col-lg-3 text-center text-lg-end">
