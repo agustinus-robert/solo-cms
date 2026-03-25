@@ -24,6 +24,7 @@ class Product extends Model
         'type',
         'alert_qty',
         'code',
+        'slug',
         'name',
         'barcode',
         'brand_id',

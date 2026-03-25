@@ -14,8 +14,6 @@ class ReferenceDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        DB::unprepared(file_get_contents(__DIR__.'/../Migrations/references.sql'));
-
         $this->command->info('Seeding RajaOngkir Provinces...');
         DB::unprepared(file_get_contents(__DIR__.'/sql/rajongkir_province.sql'));
 

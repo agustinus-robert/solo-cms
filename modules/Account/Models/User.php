@@ -16,6 +16,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 use Modules\Academic\Models\Student;
 use Modules\HRMS\Models\Employee;
@@ -33,7 +34,7 @@ use Modules\Academic\Models\StudentAchievement;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Metable, Restorable, Userstamps, TwoFactorAuthenticatable, HasApiTokens, HasProfilePhoto, HasCompanyRole, UserRBACTrait, UserRepository;
+    use HasApiTokens, HasFactory, Notifiable, Metable, Restorable, Userstamps, TwoFactorAuthenticatable, HasApiTokens, HasProfilePhoto, HasCompanyRole, UserRBACTrait, UserRepository, HasRoles;
 
     /**
      * Define the meta table

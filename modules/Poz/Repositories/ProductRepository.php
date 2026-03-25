@@ -3,6 +3,7 @@
 namespace Modules\Poz\Repositories;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\Product;
 use Modules\Poz\Models\Purchase;
@@ -20,6 +21,7 @@ trait ProductRepository
         'type',
         'alert_qty',
         'code',
+        'slug',
         'name',
         'barcode',
         'brand_id',
@@ -48,6 +50,7 @@ trait ProductRepository
             $data['image_name'] = $data['document']->getFilename();
         }
 
+        $data['slug'] = Str::slug($data['name']);
         $product = new Product(Arr::only($data, $this->keys));
         if ($product->save()) {
             $outletId = $data['outlet'];
@@ -122,6 +125,7 @@ trait ProductRepository
         }
 
         $product = Product::find($id);
+        $data['slug'] = Str::slug($data['name']);
 
         if ($product->update(Arr::only($data, $this->keys))) {
             $outletId = $data['outlet'];

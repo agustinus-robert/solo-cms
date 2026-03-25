@@ -33,7 +33,7 @@
         "ralphjsmit/livewire-urls": "^1.4",
         "shetabit/visitor": "^4.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "spatie/laravel-permission": "^6.0",
+        "spatie/laravel-permission": "^6.25",
         "spatie/laravel-sitemap": "^7.0",
         "tightenco/ziggy": "^2.0",
         "webklex/laravel-pdfmerger": "^1.3",

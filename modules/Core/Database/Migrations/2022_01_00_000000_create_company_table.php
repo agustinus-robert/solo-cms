@@ -16,13 +16,11 @@ return new class extends Migration
     {
         Schema::create('cmp_roles', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedSmallInteger('grade_id');
             $table->string('kd');
             $table->string('name')->nullable();
             $table->boolean('is_visible')->default(true);
             $table->softDeletes();
             $table->timestamps();
-            $table->foreign('grade_id')->references('id')->on('ref_grades')->onUpdate('cascade')->onDelete('cascade');
             $table->unique('kd');
 
             $table->index('name');

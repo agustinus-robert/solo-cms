@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('type');
             $table->integer('alert_qty')->nullable();
             $table->string('code', 30)->nullable();
+            $table->text('slug')->nullable();
             $table->string('name', 100);
             $table->string('barcode', 50)->nullable();
             $table->foreignId('brand_id')->nullable()->constrained('ref_brands')->cascadeOnUpdate()->cascadeOnDelete();
@@ -105,19 +106,6 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('product_metas', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')
-                ->constrained('products')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-
-            $table->string('meta_key')->index();
-            $table->text('meta_value')->nullable();
-
-            $table->timestampsTz();
-        });
-
         Schema::create('product_galleries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
@@ -127,7 +115,6 @@ return new class extends Migration
             $table->softDeletesTz();
             $table->timestampsTz();
         });
-
 
         Schema::create('product_carts', function (Blueprint $table) {
             $table->id();
@@ -162,6 +149,37 @@ return new class extends Migration
             $table->text('description');
             $table->integer('rating')->default(5);
             $table->timestamps();
+        });
+
+        // Tabel Utama untuk Judul Journey (misal: "Proses Produksi Sepatu Kulit A")
+        Schema::create('product_histories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->string('title'); // Judul journey
+            $table->text('slug');
+            $table->text('description')->nullable();
+            $table->boolean('is_published')->default(true);
+            $table->timestampsTz();
+        });
+
+        // Tabel Detail Kronologis (Langkah-langkahnya)
+        Schema::create('product_history_steps', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_history_id')->constrained('product_histories')->cascadeOnDelete();
+
+            $table->string('step_name'); // Contoh: "Pemilihan Bahan", "Penjahitan"
+            $table->date('occurred_at'); // Tanggal kejadian/proses
+            $table->text('description')->nullable();
+
+            // Media & Metadata Dinamis
+            $table->string('image_path')->nullable();
+            $table->jsonb('metadata')->nullable(); // Untuk simpan data unik seperti: {"suhu": "30C", "lokasi": "Garut"}
+
+            $table->integer('order')->default(0); // Urutan kronologi
+            $table->timestampsTz();
+
+            // Index agar sorting kronologi di Postgre ngebut
+            $table->index(['product_history_id', 'order', 'occurred_at']);
         });
     }
 

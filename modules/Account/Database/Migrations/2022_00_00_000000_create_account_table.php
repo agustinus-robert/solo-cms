@@ -55,8 +55,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
 
             $table->string('name');
-            $table->string('phone')->nullable()->after('name');
-
             $table->string('phone', 20)->nullable();
             $table->string('pob')->nullable();
             $table->date('dob')->nullable();
@@ -64,12 +62,10 @@ return new class extends Migration
             $table->boolean('is_dead')->default(false);
 
             $table->string('avatar')->nullable();
-            $table->integer('country_id')->unsigned()->nullable();
             $table->timestamps();
 
             $table->primary('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('country_id')->references('id')->on('ref_countries')->onUpdate('cascade')->onDelete('set null');
 
             $table->index('name');
             $table->index('sex');
@@ -87,28 +83,29 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::table('user_address', function (Blueprint $table) {
-            $table->increments('id');
-            $table->dropPrimary(['user_id']);
+        Schema::create('user_address', function (Blueprint $table) {
+            $table->id();
 
-            $table->id()->first();
-            $table->string('label')->after('user_id')->nullable();
-            $table->string('receiver_name')->after('label')->nullable();
-            $table->string('phone')->after('receiver_name')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('label')->nullable();
+            $table->string('receiver_name')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->string('rt', 10)->nullable();
+            $table->string('rw', 10)->nullable();
+            $table->string('village')->nullable();
 
-            $table->text('address')->after('phone')->nullable();
-            $table->string('rt', 10)->after('address')->nullable();
-            $table->string('rw', 10)->after('rt')->nullable();
-            $table->string('village')->after('rw')->nullable();
-            $table->unsignedBigInteger('district_id')->after('village')->nullable();
-            $table->string('postal', 10)->after('district_id')->nullable();
-            $table->boolean('is_main')->default(false)->after('postal');
+            $table->unsignedBigInteger('province_id')->nullable();
+            $table->unsignedBigInteger('city_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
+
+            $table->string('postal', 10)->nullable();
+            $table->boolean('is_main')->default(false);
+            $table->timestamps();
 
             $table->foreign('province_id')->references('id')->on('ref_provinces')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('ref_cities')->onDelete('set null');
             $table->foreign('district_id')->references('id')->on('ref_districts')->onDelete('set null');
-
-            $table->index('user_id');
         });
 
         Schema::create('user_tokens', function (Blueprint $table) {
@@ -117,6 +114,16 @@ return new class extends Migration
             $table->text('token');
             $table->softDeletesTz();
             $table->timestampsTz();
+        });
+
+        Schema::create('menus', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('url');
+            $table->string('permission_name'); // Relasi ke permission Spatie
+            $table->boolean('is_active')->default(true);
+            $table->integer('order')->default(0);
+            $table->timestamps();
         });
     }
 
