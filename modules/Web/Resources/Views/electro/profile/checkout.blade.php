@@ -81,7 +81,7 @@
                     <div class="card border-0 shadow-sm p-4 position-relative overflow-hidden">
                         <div id="payment-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center {{ $address ? '' : '' }}" style="background: rgba(255,255,255,0.85); z-index: 10;">
                             <div class="text-center">
-                                <i class="fas fa-lock text-muted mb-2 h4"></i>
+                                <i class="bi bi-lock text-muted mb-2 h4"></i>
                                 <p class="text-dark small fw-bold mb-0">Pilih alamat & kurir dulu</p>
                             </div>
                         </div>
