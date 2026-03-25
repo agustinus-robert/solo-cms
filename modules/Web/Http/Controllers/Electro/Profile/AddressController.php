@@ -5,6 +5,9 @@ use Modules\Web\Http\Controllers\Global\Profile\BaseAddressController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Account\Models\UserAddress;
+use Modules\Reference\Models\Provinces;
+use Modules\Reference\Models\Cities;
+use Modules\Reference\Models\Districts;
 
 class AddressController extends BaseAddressController
 {
@@ -17,8 +20,11 @@ class AddressController extends BaseAddressController
             ->orderBy('is_main', 'desc')
             ->get();
         $canEdit = false;
+        $provinces = Provinces::orderBy('name', 'asc')->get();
+        $cities = Cities::orderBy('name', 'asc')->get();
+        $districts = Districts::orderBy('name', 'asc')->get();
 
-        return view("web::electro.profile.address", compact('user', 'addresses', 'canEdit'));
+        return view("web::electro.profile.address", compact('user', 'addresses', 'provinces', 'cities', 'districts', 'canEdit'));
     }
 
     public function store(Request $request)

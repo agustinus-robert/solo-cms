@@ -25,6 +25,9 @@ abstract class BaseAddressController extends Controller
             'rw'             => 'nullable|string|max:5',
             'village'        => 'nullable|string|max:100',
             'is_main'        => 'nullable|boolean',
+            'province_id'    => 'required',
+            'city_id'    => 'required',
+            'district_id' => 'required'
         ]);
 
         $user = Auth::user();

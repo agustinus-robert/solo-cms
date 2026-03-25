@@ -73,6 +73,30 @@
                         <input type="text" name="phone" id="in_phone" class="form-control" required>
                     </div>
                 </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-12">
+                        <label>Daerah Pengiriman</label>
+                    </div>
+
+                    <div class="col-4">
+                        <select name="province_id" id="in_province" class="form-select form-select-sm" required onchange="filterCities()">
+                            <option value="">Provinsi</option>
+                            @foreach($provinces as $prov) <option value="{{ $prov->id }}">{{ $prov->name }}</option> @endforeach
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select name="city_id" id="in_city" class="form-select form-select-sm" required onchange="filterDistricts()">
+                            <option value="">Kota/Kab</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select name="district_id" id="in_district" class="form-select form-select-sm" required>
+                            <option value="">Kecamatan</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="mb-2">
                     <label class="small fw-bold">Alamat</label>
                     <textarea name="address" id="in_address" class="form-control" rows="2" required></textarea>
@@ -95,14 +119,53 @@
 </div>
 
 <script>
+const allCities = @json($cities ?? []);
+const allDistricts = @json($districts ?? []);
+
+function filterCities(selectedCityId = null) {
+    const provinceId = document.getElementById('in_province').value;
+    const citySelect = document.getElementById('in_city');
+    const districtSelect = document.getElementById('in_district');
+
+    citySelect.innerHTML = '<option value="">Kota/Kab</option>';
+    districtSelect.innerHTML = '<option value="">Kecamatan</option>';
+
+    if (provinceId) {
+        const filtered = allCities.filter(c => c.province_id == provinceId);
+        filtered.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city.id;
+            opt.text = city.name;
+            if (selectedCityId && city.id == selectedCityId) opt.selected = true;
+            citySelect.add(opt);
+        });
+    }
+}
+
+function filterDistricts(selectedDistrictId = null) {
+    const cityId = document.getElementById('in_city').value;
+    const districtSelect = document.getElementById('in_district');
+
+    districtSelect.innerHTML = '<option value="">Kecamatan</option>';
+
+    if (cityId) {
+        const filtered = allDistricts.filter(d => d.city_id == cityId);
+        filtered.forEach(dist => {
+            const opt = document.createElement('option');
+            opt.value = dist.id;
+            opt.text = dist.name;
+            if (selectedDistrictId && dist.id == selectedDistrictId) opt.selected = true;
+            districtSelect.add(opt);
+        });
+    }
+}
+
 function openUpsertModal(data = null) {
     const form = document.getElementById('upsertForm');
     const methodField = document.getElementById('method_field');
     const modalElement = document.getElementById('upsertModal');
     let modal = bootstrap.Modal.getInstance(modalElement);
-    if (!modal) {
-        modal = new bootstrap.Modal(modalElement);
-    }
+    if (!modal) modal = new bootstrap.Modal(modalElement);
 
     if (data) {
         document.getElementById('modalTitle').innerText = 'Edit Alamat';
@@ -119,13 +182,17 @@ function openUpsertModal(data = null) {
         document.getElementById('in_village').value = data.village || '';
         document.getElementById('in_main').checked = !!data.is_main;
 
+        document.getElementById('in_province').value = data.province_id || '';
+        filterCities(data.city_id);
+        filterDistricts(data.district_id);
+
     } else {
         document.getElementById('modalTitle').innerText = 'Tambah Alamat';
-
         form.action = "{{ route('web::area.address.store') }}";
-
         methodField.innerHTML = '';
         form.reset();
+        document.getElementById('in_city').innerHTML = '<option value="">Kota/Kab</option>';
+        document.getElementById('in_district').innerHTML = '<option value="">Kecamatan</option>';
     }
 
     modal.show();

@@ -104,6 +104,10 @@ return new class extends Migration
             $table->string('postal', 10)->after('district_id')->nullable();
             $table->boolean('is_main')->default(false)->after('postal');
 
+            $table->foreign('province_id')->references('id')->on('ref_provinces')->onDelete('set null');
+            $table->foreign('city_id')->references('id')->on('ref_cities')->onDelete('set null');
+            $table->foreign('district_id')->references('id')->on('ref_districts')->onDelete('set null');
+
             $table->index('user_id');
         });
 

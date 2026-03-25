@@ -183,7 +183,6 @@
     </div>
 </div>
 
-{{-- MODAL RAJAONGKIR DISESUAIKAN KOMERCE --}}
 <div class="modal fade" id="modalShipping" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -207,7 +206,7 @@
                         <option value="">Pilih Kota</option>
                     </select>
                 </div>
-                {{-- TAMBAHAN: DISTRICT --}}
+
                 <div class="mb-3">
                     <label class="small fw-bold">Kecamatan (District)</label>
                     <select id="ship-district" class="form-select" disabled>
@@ -277,7 +276,6 @@
         if (modal) modal.hide();
     }
 
-    // LOAD KOTA
     document.getElementById('ship-province').addEventListener('change', async function() {
         const provinceId = this.value;
         const citySelect = document.getElementById('ship-city');
@@ -288,7 +286,6 @@
         districtSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
         districtSelect.disabled = true;
 
-        // Sembunyikan/Reset Kurir
         courierSelect.innerHTML = '<option value="">Pilih Kecamatan Dulu</option>';
         courierSelect.disabled = true;
 
@@ -300,7 +297,6 @@
         citySelect.disabled = false;
     });
 
-    // LOAD DISTRICT
     document.getElementById('ship-city').addEventListener('change', async function() {
         const cityId = this.value;
         const districtSelect = document.getElementById('ship-district');
@@ -317,12 +313,11 @@
         districtSelect.disabled = false;
     });
 
-    // KETIKA KECAMATAN DIPILIH, BARU MUNCULKAN OPSI KURIR
     document.getElementById('ship-district').addEventListener('change', function() {
         const courierSelect = document.getElementById('ship-courier');
         const container = document.getElementById('shipping-options');
 
-        container.innerHTML = ''; // Bersihkan list ongkir lama
+        container.innerHTML = '';
 
         if(this.value) {
             courierSelect.disabled = false;
@@ -371,7 +366,6 @@
         }
     }
 
-    // Pemicu hitung ongkir hanya saat kurir dipilih (setelah kecamatan fix)
     document.getElementById('ship-courier').addEventListener('change', getOngkir);
 
     function selectShipping(courier, service, cost) {
