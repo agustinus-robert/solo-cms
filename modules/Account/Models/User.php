@@ -34,8 +34,9 @@ use Modules\Academic\Models\StudentAchievement;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Metable, Restorable, Userstamps, TwoFactorAuthenticatable, HasApiTokens, HasProfilePhoto, HasCompanyRole, UserRBACTrait, UserRepository, HasRoles;
+    use HasApiTokens, HasRoles, HasFactory, Notifiable, Metable, Restorable, Userstamps, TwoFactorAuthenticatable, HasApiTokens, HasProfilePhoto, UserRBACTrait, UserRepository;
 
+    protected $guard_name = 'web';
     /**
      * Define the meta table
      */
