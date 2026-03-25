@@ -41,6 +41,7 @@
                         <input type="hidden" id="main-address-id" name="address_id" value="{{ $address->id ?? '' }}">
                         <textarea id="main-address-input" name="address" class="d-none" required>{{ $address->address ?? '' }}</textarea>
                         <input type="hidden" id="main-phone-input" name="phone" value="{{ $address->phone ?? '' }}">
+                        <input type="hidden" id="main-district" name="district" value="{{ $address->district_id }}">
 
                         <div class="row">
                             <div class="col-md-12 col-lg-6">
@@ -167,7 +168,7 @@
             <div class="modal-body p-4" style="max-height: 400px; overflow-y: auto;">
                 @forelse($addresses as $addr)
                     <div class="card mb-3 address-card border {{ $addr->is_main ? 'border-primary shadow-sm' : '' }}"
-                         onclick="selectAddress('{{ $addr->id }}', '{{ $addr->label }}', '{{ $addr->address }}', '{{ $addr->phone }}')"
+                         onclick="selectAddress('{{ $addr->id }}', '{{ $addr->label }}', '{{ $addr->address }}', '{{ $addr->phone }}', '{{ $addr->district_id }}')"
                          style="cursor: pointer;">
                         <div class="card-body p-3">
                             <span class="badge {{ $addr->is_main ? 'bg-primary' : 'bg-secondary' }} mb-2">{{ $addr->label }}</span>
@@ -257,7 +258,7 @@
         return 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
     }
 
-    function selectAddress(id, label, text, phone) {
+    function selectAddress(id, label, text, phone, district) {
         document.getElementById('selected-address-display').innerHTML = `
             <div class="d-flex align-items-center mb-1">
                 <span class="badge bg-primary me-2">${label}</span>
@@ -268,6 +269,7 @@
         document.getElementById('main-address-id').value = id;
         document.getElementById('main-address-input').value = text;
         document.getElementById('main-phone-input').value = phone;
+        document.getElementById('main-district').value = district;
 
         document.getElementById('shipping-overlay').classList.add('d-none');
         document.getElementById('btn-open-shipping').disabled = false;
@@ -338,7 +340,9 @@
     async function getOngkir() {
         const districtId = document.getElementById('ship-district').value;
         const courier = document.getElementById('ship-courier').value;
-        if(!districtId || !courier) return;
+        const origin = document.getElementById('main-district').value;
+
+        if(!districtId || !courier || !origin) return;
 
         const container = document.getElementById('shipping-options');
         container.innerHTML = '<p class="text-center small">Mencari ongkir...</p>';
@@ -346,7 +350,7 @@
         const res = await fetch(`/area/checkout/calculate-shipping`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ destination: districtId, courier: courier })
+            body: JSON.stringify({ destination: districtId, courier: courier, origin:origin })
         });
         const data = await res.json();
         container.innerHTML = '';

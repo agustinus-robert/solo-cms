@@ -31,7 +31,8 @@ trait ProductRepository
         'wholesale',
         'location',
         'description',
-        'image_name'
+        'image_name',
+        'weight'
     ];
 
     /**

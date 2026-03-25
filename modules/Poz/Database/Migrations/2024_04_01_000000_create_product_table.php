@@ -32,6 +32,7 @@ return new class extends Migration
             $table->text('location')->nullable();
             $table->text('image_name')->nullable();
             $table->decimal('wholesale', 20, 2);
+            $table->integer('weight')->comment('Berat dalam satuan gram');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

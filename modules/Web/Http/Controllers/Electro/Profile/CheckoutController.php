@@ -65,7 +65,7 @@ class CheckoutController extends Controller
         }
 
         $costs = $this->calculateShippingCost(
-            env('RAJAONGKIR_ORIGIN', 445),
+            $request->origin,
             $request->destination,
             $totalWeight,
             $request->courier

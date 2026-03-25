@@ -28,6 +28,10 @@
                 </select>
             </div>
             <div class="mb-3">
+                <label class="form-label small fw-bold">Berat Barang (Gram)</label>
+                <input type="number" class="form-control form-control-sm" wire:model="form.weight">
+            </div>
+            <div class="mb-3">
                 <label class="form-label small fw-bold text-primary">Tier (Varian)</label>
                 <select class="form-select form-select-sm" wire:model.live="form.tier_count">
                     <option value="1">Tier 1</option>

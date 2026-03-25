@@ -35,6 +35,7 @@ class Product extends Model
         'location',
         'image_name',
         'wholesale',
+        'weight',
         'created_by',
         'updated_by',
         'deleted_by',

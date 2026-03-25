@@ -52,7 +52,7 @@ class Product extends Component
             $this->form['alert_qty'] = $product->alert_qty;
             $this->form['wholesale'] = $product->wholesale;
             $this->form['description'] = $product->description;
-
+            $this->form['weight'] = $product->weight;
             $this->form['selling_method'] = $product->getMeta('selling_method', 1);
             $this->form['tier_count']     = $product->getMeta('tier_count', 1);
             $this->form['tier_name_1']    = $product->getMeta('tier_name_1');
