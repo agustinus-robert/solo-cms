@@ -14,9 +14,6 @@ use Modules\Account\Models\UserToken;
 
 class SignInController extends Controller
 {
-    /**
-     * Attempt to authenticate the request's credentials.
-     */
     public function store(StoreRequest $request)
     {
 
@@ -32,7 +29,6 @@ class SignInController extends Controller
             $getUserNameId = User::where('username', $request->transformed()['username'])->first();
             $getRoleId = UserRole::where('user_id', $getUserNameId->id)->first();
             if ($getRoleId->role_id > 1) {
-                //return redirect()->intended($request->get('next', route('portal::guest.dashboard.index')));
             } else {
                 return redirect()->intended($request->get('next', route('account::home')));
             }

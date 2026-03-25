@@ -283,7 +283,7 @@ class User extends Authenticatable
     public function getRedirectRoute(): string
     {
         return match ((int)$this->current_team_id) {
-            1, 2 => route('poz::dashboard'),
+            1, 2 => route('portal::dashboard.index'),
             default => route('login'),
         };
     }

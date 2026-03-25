@@ -29,18 +29,16 @@ class Adjustment extends Component
     public $shift = [];
     public $variants = [];
 
-    // Properti baru untuk kontrol jadwal
-    public $is_schedule = 'false'; // Diubah dari 'true' ke 'false' agar defaultnya tanpa jadwal
+    public $is_schedule = 'false';
 
     public function mount($action, Request $req)
     {
         $this->form['outlet'] = request()->query('outlet', auth()->user()->current_outlet_id);
         $this->action = $action;
-        $this->products = []; // Mulai kosong sebelum supplier dipilih
+        $this->products = [];
         $this->supplier = Supplier::whereNull('deleted_at')->get();
     }
 
-    // Trigger otomatis saat radio button berubah
     public function updatedIsSchedule()
     {
         if (!empty($this->form['supplier_id'])) {

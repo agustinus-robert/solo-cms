@@ -84,7 +84,7 @@
                             @else
                                 <option value="">{{ count($variants) == 0 ? '-- Tanpa Varian --' : 'Pilih Varian Produk' }}</option>
                                 @foreach ($variants as $v)
-                                    <option value="{{ $v['code'] }}">{{ $v['name'] }} (Stok: {{ $v['qty'] }})</option>
+                                    <option value="{{ $v['code'] }}">{{ $v['name'] }}</option>
                                 @endforeach
                             @endif
                         </select>
