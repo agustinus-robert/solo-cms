@@ -414,7 +414,8 @@ class CartController extends Controller
     {
         $identifier = Auth::check() ? ['user_id' => Auth::id()] : ['session_id' => session()->getId()];
         $cartRecord = Chart::where($identifier)->first();
-        $items = $cartRecord ? ($cartRecord->items ?? []) : [];
+
+        $items = $cartRecord ? (is_array($cartRecord->items) ? $cartRecord->items : json_decode($cartRecord->items, true)) : [];
 
         if (!empty($items)) {
             $productIds = array_column($items, 'product_id');
@@ -423,10 +424,10 @@ class CartController extends Controller
                 ->get()
                 ->keyBy('id');
 
-            foreach ($items as $key => &$item) {
+            foreach ($items as $key => $item) {
                 $pId = $item['product_id'];
-                $item['location'] = $productData[$pId]->location ?? null;
-                $item['image_name'] = $productData[$pId]->image_name ?? null;
+                $items[$key]['location'] = $productData[$pId]->location ?? null;
+                $items[$key]['image_name'] = $productData[$pId]->image_name ?? null;
             }
         }
 

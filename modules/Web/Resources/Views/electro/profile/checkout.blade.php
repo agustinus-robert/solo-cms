@@ -58,17 +58,36 @@
                         </div>
                     </div>
 
+                    <div class="card border-0 shadow-sm p-4 mb-4 position-relative overflow-hidden">
+                        <div id="shipping-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center {{ $address ? 'd-none' : '' }}" style="background: rgba(255,255,255,0.85); z-index: 10;">
+                            <div class="text-center">
+                                <p class="text-dark small fw-bold mb-0">Pilih alamat dulu</p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-dark font-weight-bold">Metode Pengiriman</h5>
+                            <button type="button" id="btn-open-shipping" class="btn btn-sm btn-outline-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalShipping" {{ !$address ? 'disabled' : '' }}>
+                                <i class="fas fa-truck me-1"></i> Pilih Kurir
+                            </button>
+                        </div>
+                        <div id="selected-shipping-display" class="border p-3 rounded bg-light">
+                            <div class="text-muted small italic">Belum ada kurir yang dipilih.</div>
+                        </div>
+                        <input type="hidden" name="shipping_cost" id="input-shipping-cost" value="0">
+                        <input type="hidden" name="courier_name" id="input-courier-name">
+                    </div>
+
                     <div class="card border-0 shadow-sm p-4 position-relative overflow-hidden">
-                        <div id="payment-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center {{ $address ? 'd-none' : '' }}" style="background: rgba(255,255,255,0.85); z-index: 10;">
+                        <div id="payment-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center {{ $address ? '' : '' }}" style="background: rgba(255,255,255,0.85); z-index: 10;">
                             <div class="text-center">
                                 <i class="fas fa-lock text-muted mb-2 h4"></i>
-                                <p class="text-dark small fw-bold mb-0">Pilih alamat pengiriman dulu</p>
+                                <p class="text-dark small fw-bold mb-0">Pilih alamat & kurir dulu</p>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0 text-dark font-weight-bold">Metode Pembayaran</h5>
-                            <button type="button" id="btn-open-payment" class="btn btn-sm btn-outline-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPayment" {{ !$address ? 'disabled' : '' }}>
+                            <button type="button" id="btn-open-payment" class="btn btn-sm btn-outline-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPayment" disabled>
                                 <i class="fas fa-credit-card me-1"></i> Pilih Bank
                             </button>
                         </div>
@@ -115,15 +134,20 @@
                                         <td colspan="2" class="pt-3 text-muted small">Subtotal</td>
                                         <td class="pt-3 text-end text-dark small fw-bold">Rp {{ number_format($totals['sub_total'], 0, ',', '.') }}</td>
                                     </tr>
+
+                                    <tr>
+                                        <td colspan="2" class="text-muted small">Ongkos Kirim</td>
+                                        <td class="text-end text-dark small fw-bold" id="display-shipping-cost">Rp 0</td>
+                                    </tr>
                                     <tr class="h5">
                                         <td colspan="2" class="pt-3 font-weight-bold text-dark">Total</td>
-                                        <td class="pt-3 text-end font-weight-bold text-primary">Rp {{ number_format($totals['grand_total'], 0, ',', '.') }}</td>
+                                        <td class="pt-3 text-end font-weight-bold text-primary" id="display-grand-total">Rp {{ number_format($totals['grand_total'], 0, ',', '.') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
 
-                        <button type="submit" id="btn-submit" class="btn btn-primary btn-lg py-3 px-4 text-uppercase w-100 font-weight-bold text-white shadow mt-3 {{ !$address ? 'disabled' : '' }}">
+                        <button type="submit" id="btn-submit" class="btn btn-primary btn-lg py-3 px-4 text-uppercase w-100 font-weight-bold text-white shadow mt-3 disabled">
                             Konfirmasi Pemesanan
                         </button>
                     </div>
@@ -159,6 +183,50 @@
     </div>
 </div>
 
+{{-- MODAL RAJAONGKIR DISESUAIKAN KOMERCE --}}
+<div class="modal fade" id="modalShipping" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title font-weight-bold">Pilih Pengiriman</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="small fw-bold">Provinsi</label>
+                    <select id="ship-province" class="form-select">
+                        <option value="">Pilih Provinsi</option>
+                        @foreach($provinces as $p)
+                            <option value="{{ $p['id'] }}">{{ $p['name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Kota</label>
+                    <select id="ship-city" class="form-select" disabled>
+                        <option value="">Pilih Kota</option>
+                    </select>
+                </div>
+                {{-- TAMBAHAN: DISTRICT --}}
+                <div class="mb-3">
+                    <label class="small fw-bold">Kecamatan (District)</label>
+                    <select id="ship-district" class="form-select" disabled>
+                        <option value="">Pilih Kecamatan</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Kurir</label>
+                    <select id="ship-courier" class="form-select" disabled>
+                        <option value="">Pilih Kurir</option>
+                    </select>
+                </div>
+                <hr>
+                <div id="shipping-options" class="list-group"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="modalPayment" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -184,6 +252,12 @@
 </div>
 
 <script>
+    const subtotalBase = {{ $totals['sub_total'] }};
+
+    function formatRupiah(n) {
+        return 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
+    }
+
     function selectAddress(id, label, text, phone) {
         document.getElementById('selected-address-display').innerHTML = `
             <div class="d-flex align-items-center mb-1">
@@ -195,10 +269,122 @@
         document.getElementById('main-address-id').value = id;
         document.getElementById('main-address-input').value = text;
         document.getElementById('main-phone-input').value = phone;
+
+        document.getElementById('shipping-overlay').classList.add('d-none');
+        document.getElementById('btn-open-shipping').disabled = false;
+
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalAddress'));
+        if (modal) modal.hide();
+    }
+
+    // LOAD KOTA
+    document.getElementById('ship-province').addEventListener('change', async function() {
+        const provinceId = this.value;
+        const citySelect = document.getElementById('ship-city');
+        const districtSelect = document.getElementById('ship-district');
+        const courierSelect = document.getElementById('ship-courier');
+
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+        districtSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        districtSelect.disabled = true;
+
+        // Sembunyikan/Reset Kurir
+        courierSelect.innerHTML = '<option value="">Pilih Kecamatan Dulu</option>';
+        courierSelect.disabled = true;
+
+        const res = await fetch(`/area/checkout/cities?province_id=${provinceId}`);
+        const cities = await res.json();
+
+        citySelect.innerHTML = '<option value="">Pilih Kota</option>';
+        cities.forEach(c => citySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        citySelect.disabled = false;
+    });
+
+    // LOAD DISTRICT
+    document.getElementById('ship-city').addEventListener('change', async function() {
+        const cityId = this.value;
+        const districtSelect = document.getElementById('ship-district');
+        const courierSelect = document.getElementById('ship-courier');
+
+        districtSelect.innerHTML = '<option value="">Loading...</option>';
+        courierSelect.disabled = true;
+
+        const res = await fetch(`/area/checkout/cities/districts?city_id=${cityId}`);
+        const districts = await res.json();
+
+        districtSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        districts.forEach(d => districtSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+        districtSelect.disabled = false;
+    });
+
+    // KETIKA KECAMATAN DIPILIH, BARU MUNCULKAN OPSI KURIR
+    document.getElementById('ship-district').addEventListener('change', function() {
+        const courierSelect = document.getElementById('ship-courier');
+        const container = document.getElementById('shipping-options');
+
+        container.innerHTML = ''; // Bersihkan list ongkir lama
+
+        if(this.value) {
+            courierSelect.disabled = false;
+            courierSelect.innerHTML = `
+                <option value="">-- Pilih Kurir --</option>
+                <option value="jne">JNE</option>
+                <option value="pos">POS</option>
+                <option value="tiki">TIKI</option>
+                <option value="sicepat">SiCepat</option>
+                <option value="jnt">J&T</option>
+            `;
+        } else {
+            courierSelect.disabled = true;
+            courierSelect.innerHTML = '<option value="">Pilih Kecamatan Dulu</option>';
+        }
+    });
+
+    async function getOngkir() {
+        const districtId = document.getElementById('ship-district').value;
+        const courier = document.getElementById('ship-courier').value;
+        if(!districtId || !courier) return;
+
+        const container = document.getElementById('shipping-options');
+        container.innerHTML = '<p class="text-center small">Mencari ongkir...</p>';
+
+        const res = await fetch(`/area/checkout/calculate-shipping`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ destination: districtId, courier: courier })
+        });
+        const data = await res.json();
+        container.innerHTML = '';
+
+        if (data && data.length > 0) {
+            data.forEach(c => {
+                container.innerHTML += `
+                    <button type="button" class="list-group-item list-group-item-action" onclick="selectShipping('${courier.toUpperCase()}', '${c.service}', ${c.cost})">
+                        <div class="d-flex justify-content-between">
+                            <span>${c.service} (${c.etd} hari)</span>
+                            <strong>${formatRupiah(c.cost)}</strong>
+                        </div>
+                    </button>`;
+            });
+        } else {
+            container.innerHTML = '<p class="text-center text-danger small">Kurir tidak tersedia.</p>';
+        }
+    }
+
+    // Pemicu hitung ongkir hanya saat kurir dipilih (setelah kecamatan fix)
+    document.getElementById('ship-courier').addEventListener('change', getOngkir);
+
+    function selectShipping(courier, service, cost) {
+        document.getElementById('selected-shipping-display').innerHTML = `<strong>${courier} - ${service}</strong> (${formatRupiah(cost)})`;
+        document.getElementById('input-shipping-cost').value = cost;
+        document.getElementById('input-courier-name').value = courier + ' ' + service;
+        document.getElementById('display-shipping-cost').innerText = formatRupiah(cost);
+        document.getElementById('display-grand-total').innerText = formatRupiah(subtotalBase + cost);
+
         document.getElementById('payment-overlay').classList.add('d-none');
         document.getElementById('btn-open-payment').disabled = false;
 
-        var modal = bootstrap.Modal.getInstance(document.getElementById('modalAddress'));
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalShipping'));
         if (modal) modal.hide();
     }
 
@@ -214,7 +400,6 @@
                 </div>
             </div>
         `;
-
         document.getElementById('input-payment-method').value = key;
         document.getElementById('btn-submit').classList.remove('disabled');
         document.getElementById('btn-submit').disabled = false;

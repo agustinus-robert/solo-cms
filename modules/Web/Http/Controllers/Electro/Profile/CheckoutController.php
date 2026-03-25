@@ -9,13 +9,14 @@ use Modules\Account\Models\UserAddress;
 use Modules\Poz\Models\SaleMidtransPayment;
 use Modules\Web\Traits\CheckoutTrait;
 use Modules\Web\Traits\MidtransTrait;
+use Modules\Web\Traits\RajaOngkirTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Poz\Models\Product;
 
 class CheckoutController extends Controller
 {
-    use CheckoutTrait, MidtransTrait;
+    use CheckoutTrait, MidtransTrait, RajaOngkirTrait;
 
    public function index()
     {
@@ -34,6 +35,7 @@ class CheckoutController extends Controller
             $address = $addresses->where('is_main', 1)->first() ?? $addresses->first();
         }
 
+        $provinces = $this->getRemoteProvinces();
         $totals = $this->calculateCheckoutTotals($cart->items, 0);
 
         $items = collect($cart->items)->map(function($item) {
@@ -42,7 +44,34 @@ class CheckoutController extends Controller
             return $item;
         });
 
-        return view('web::electro.profile.checkout', compact('items', 'totals', 'address', 'addresses', 'user', 'canEdit'));
+        return view('web::electro.profile.checkout', compact('items', 'totals', 'address', 'addresses', 'user', 'provinces', 'canEdit'));
+    }
+
+    public function getCities(Request $request) {
+        return response()->json($this->getRemoteCities($request->province_id));
+    }
+
+    public function getRemoteDistricts(Request $request)
+    {
+        return response()->json($this->getDistricts($request->city_id));
+    }
+
+    public function calculateShipping(Request $request) {
+        $cart = $this->getActiveCart();
+        $totalWeight = 5;
+        foreach ($cart->items as $item) {
+            $product = Product::find($item['product_id']);
+            $totalWeight += ($product->weight ?? 1000) * $item['qty'];
+        }
+
+        $costs = $this->calculateShippingCost(
+            env('RAJAONGKIR_ORIGIN', 445),
+            $request->destination,
+            $totalWeight,
+            $request->courier
+        );
+
+        return response()->json($costs);
     }
 
     public function store(Request $request)

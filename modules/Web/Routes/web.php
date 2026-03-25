@@ -39,7 +39,11 @@ Route::group(['middleware' => ['web']], function () {
     ], function () {
         Route::resource('customer', 'CustomerController');
         Route::resource('address', 'AddressController');
+        Route::get('checkout/cities', 'CheckoutController@getCities');
+        Route::get('checkout/cities/districts', 'CheckoutController@getRemoteDistricts');
+        Route::post('checkout/calculate-shipping', 'CheckoutController@calculateShipping');
         Route::resource('checkout', 'CheckoutController')->only('index', 'store');
+
         Route::get('finish/{reference}', 'FinishController@index')->name('finish.index');
         Route::get('wishlist', 'WishlistController@index')->name('wishlist.index');
         Route::post('wishlist/toggle', 'WishlistController@toggle')->name('wishlist.toggle');

@@ -90,10 +90,10 @@
                         <span class="fs-5 fw-bold text-primary">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     <div class="d-grid gap-2">
-                        <a href="{{ url('/checkout') }}" class="btn btn-primary btn-lg rounded-pill fw-bold {{ count($items) == 0 ? 'disabled' : '' }}">
+                        <a href="{{ route('web::area.checkout.index') }}" class="btn btn-primary btn-lg rounded-pill fw-bold {{ count($items) == 0 ? 'disabled' : '' }}">
                             Checkout Sekarang
                         </a>
-                        <a href="{{ url('/') }}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                        <a href="{{ route('web::web.shop') }}" class="btn btn-outline-secondary btn-lg rounded-pill">
                             Lanjut Belanja
                         </a>
                     </div>
