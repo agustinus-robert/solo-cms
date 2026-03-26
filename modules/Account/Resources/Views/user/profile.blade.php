@@ -1,52 +1,79 @@
 @extends('account::layouts.default')
 
-@section('title', 'Ubah profil | ')
+@section('title', 'Profil Saya | ')
 
 @section('content')
-	<div class="row justify-content-center">
-		<div class="col-xl-9">
-			<div class="d-flex align-items-center">
-				<a class="text-decoration-none" href="{{ request('next', route('account::index')) }}"><i class="mdi mdi-arrow-left-circle-outline mdi-36px"></i></a>
-				<div class="ms-4">
-					<h2 class="mb-1">Ubah profil</h2>
-					<div class="text-muted">Perubahan informasi dibawah akan diterapkan di semua Akun Anda</div>
-				</div>
-			</div>
-			<hr class="my-4">
+<div class="container-fluid">
+    <div class="mb-4">
+        <h4 class="font-weight-bold">Pengaturan Akun</h4>
+    </div>
 
-			<div class="col-12 p-2">
-				<div class="container">
-					@if (Session::has('success'))
-						<div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-							<div class="alert alert-success">
-								{!! Session::get('success') !!}
-							</div>
-						</div>
-					@endif 
+    @if(session('success'))
+        <div class="alert alert-success border-0 shadow-sm mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
 
-					@if (Session::has('danger'))
-						<div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-							<div class="alert-danger alert">
-								{!! Session::get('danger') !!}
-							</div>
-						</div>
-					@endif
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row justify-content-center">
-		<div class="col-xl-3 col-lg-4">
-			@include('x-account::User.list-group-account-menu')
-		</div>
-		<div class="col-xl-6 col-lg-8">
-			<div class="card mb-4">
-				<div class="card-body p-4">
-					<form class="form-block" action="{{ route('account::user.profile', ['next' => request('next')]) }}" method="POST"> @csrf @method('PUT')
-						@include('x-account::User.Profile.form', ['user' => Auth::user(), 'back' => true])
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-lg-4 text-center">
+            <div class="card shadow-sm border-0 p-4">
+                <img src="{{ $user->profile_avatar_path }}" class="rounded-circle img-thumbnail mb-3 mx-auto" style="width: 120px; height: 120px;">
+                <h5 class="font-weight-bold">{{ strtoupper($user->name) }}</h5>
+                <p class="text-muted small">{{ $user->email }}</p>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form action="{{ route('account::manage-profile.update', $user->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <h6 class="font-weight-bold mb-3">Informasi Dasar</h6>
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-bold">NAMA LENGKAP</label>
+                                <input type="text" name="name" class="form-control form-control-lg" value="{{ old('name', $user->name) }}" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-bold">USERNAME</label>
+                                <input type="text" name="username" class="form-control form-control-lg" value="{{ old('username', $user->username) }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold">ALAMAT EMAIL</label>
+                            <input type="email" name="email" class="form-control form-control-lg" value="{{ old('email', $user->email) }}" required>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="font-weight-bold mb-3 text-warning">Ganti Password (Kosongkan jika tidak diubah)</h6>
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold">PASSWORD LAMA</label>
+                            <input type="password" name="old_password" class="form-control form-control-lg @error('old_password') is-invalid @enderror">
+                            @error('old_password') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-bold">PASSWORD BARU</label>
+                                <input type="password" name="password" class="form-control form-control-lg">
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="small font-weight-bold">KONFIRMASI PASSWORD</label>
+                                <input type="password" name="password_confirmation" class="form-control form-control-lg">
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary px-5 font-weight-bold">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

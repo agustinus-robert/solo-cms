@@ -19,12 +19,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('/manage-role', 'RoleController');
     Route::resource('/manage-user', 'ManageUserController');
     Route::get('/account-dashboard', 'DashboardController@index')->name('account.dashboard');
+    Route::resource('/manage-profile', 'ProfileController');
+    Route::resource('/manage-audit-log', 'AuditLogController')->only('index');
+    Route::resource('/manage-session', 'LoginSessionController')->only('index');
     // Route::get('/role/permission', 'RolePermissionController')
 	// User page
 	Route::name('user.')->namespace('User')->group(function () {
 		// Account
-		Route::view('/profile', 'account::user.profile')->name('profile');
-		Route::put('/profile', 'ProfileController@update')->name('profile');
+
 
 		// Avatar
 		Route::view('/avatar', 'account::user.avatar')->name('avatar');

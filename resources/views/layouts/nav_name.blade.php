@@ -19,7 +19,7 @@
         @else
             <a class="dropdown-item" href="{{ route('portal::dashboard.index') }}"><i class="bx bxs-dashboard  font-size-16 me-1 align-middle"></i> <span key="t-profile">Dashboard</span></a>
         @endif
-        <a class="dropdown-item" href="{{ route('account::user.profile') }}"><i class="bx bx-user font-size-16 me-1 align-middle"></i> <span key="t-profile">Profile</span></a>
+        <a class="dropdown-item" href="{{ route('account::manage-profile.index') }}"><i class="bx bx-user font-size-16 me-1 align-middle"></i> <span key="t-profile">Profile</span></a>
         <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="bx bx-power-off font-size-16 text-danger me-1 align-middle"></i>
             <span key="t-logout">Logout</span>

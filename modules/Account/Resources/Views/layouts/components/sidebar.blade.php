@@ -25,41 +25,23 @@
     <li class="menu-title" key="t-menu">Kelola</li>
 
     <li class="nav-main-item">
-        <a class="nav-main-link active" href="{{ route('account::manage-role.index') }}">
+        <a class="nav-main-link active" href="{{ route('account::manage-profile.index') }}">
             <i class="nav-main-link-icon  bx bx-user-circle"></i>
             <span class="nav-main-link-name">Profil</span>
         </a>
     </li>
 
     <li class="nav-main-item">
-        <a class="nav-main-link active" href="{{ route('account::manage-role.index') }}">
+        <a class="nav-main-link active" href="{{ route('account::manage-audit-log.index') }}">
             <i class="nav-main-link-icon bx bx-run"></i>
             <span class="nav-main-link-name">Aktivitas</span>
         </a>
     </li>
 
     <li class="nav-main-item">
-        <a class="nav-main-link active" href="{{ route('account::manage-role.index') }}">
+        <a class="nav-main-link active" href="{{ route('account::manage-session.index') }}">
             <i class="nav-main-link-icon  bx bx-log-out-circle"></i>
             <span class="nav-main-link-name">Login History</span>
-        </a>
-    </li>
-
-    <li class="menu-title" key="t-menu">Backup dan Export Data</li>
-
-    <li class="nav-main-item">
-        <a class="nav-main-link active" href="{{ route('account::manage-role.index') }}">
-            <i class="nav-main-link-icon bx bxs-report"></i>
-            <span class="nav-main-link-name">Kelola</span>
-        </a>
-    </li>
-
-    <li class="menu-title" key="t-menu">Pengaturan Situs</li>
-
-    <li class="nav-main-item">
-        <a class="nav-main-link active" href="{{ route('account::manage-role.index') }}">
-            <i class="nav-main-link-icon bx bx-world"></i>
-            <span class="nav-main-link-name">Kelola</span>
         </a>
     </li>
 </ul>
