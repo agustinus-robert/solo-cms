@@ -42,6 +42,7 @@
                             <small><i class="fa fa-user me-2"></i> {{ Auth::user()->name }}</small>
                         </a>
                         <div class="dropdown-menu rounded shadow-sm border-0 dropdown-menu-end">
+                            <a href="{{ route('portal::dashboard.index') }}" class="dropdown-item"><i class="fa fa-desktop me-2"></i> Dashboard</a>
                             <a href="{{ route('web::area.customer.index') }}" class="dropdown-item"><i class="fa fa-id-card me-2"></i> Profile</a>
                             <a href="{{ route('web::area.wishlist.index') }}" class="dropdown-item"><i class="fa fa-heart me-2"></i> Wishlist</a>
                             <a href="{{ route('web::web.cart.detail') }}" class="dropdown-item"><i class="fa fa-shopping-cart me-2"></i> My Cart</a>
