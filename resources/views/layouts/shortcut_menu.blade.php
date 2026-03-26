@@ -1,3 +1,12 @@
+<div class="d-none d-lg-flex align-items-center ms-2">
+    <a href="{{ url('/') }}" class="btn btn-primary btn-sm rounded-pill d-flex align-items-center px-3" style="height: 34px; border-width: 1.5px;" title="Lihat Website">
+        <i class="bx bx-globe font-size-16 me-2"></i>
+        <span class="d-none d-xl-inline-block fw-medium">Ke Website Utama</span>
+    </a>
+
+    <div class="ms-3 me-2 border-start" style="height: 24px; border-color: rgba(0,0,0,0.1) !important; opacity: 0.5;"></div>
+</div>
+
 <div class="dropdown d-none d-lg-inline-block ms-1">
     <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="bx bx-customize"></i>
