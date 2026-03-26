@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/manage-profile', 'ProfileController');
     Route::resource('/manage-audit-log', 'AuditLogController')->only('index');
     Route::resource('/manage-session', 'LoginSessionController')->only('index');
+    Route::resource('/manage-outlet', 'OutletAssignmentController')->only('index', 'edit', 'update');
     // Route::get('/role/permission', 'RolePermissionController')
 	// User page
 	Route::name('user.')->namespace('User')->group(function () {

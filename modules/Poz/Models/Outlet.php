@@ -32,6 +32,6 @@ class Outlet extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_casier_outlet', 'outlet_id', 'user_id');
+        return $this->belongsToMany(User::class, 'user_casier_outlets', 'outlet_id', 'user_id');
     }
 }

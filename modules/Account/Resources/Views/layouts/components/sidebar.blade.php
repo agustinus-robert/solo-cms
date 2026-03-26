@@ -18,7 +18,14 @@
     <li class="nav-main-item">
         <a class="nav-main-link active" href="{{ route('account::manage-user.index') }}">
             <i class="nav-main-link-icon  bx bx-user"></i>
-            <span class="nav-main-link-name">Manajemen User</span>
+            <span class="nav-main-link-name">Pengaturan Pengguna</span>
+        </a>
+    </li>
+
+    <li class="nav-main-item">
+        <a class="nav-main-link active" href="{{ route('account::manage-outlet.index') }}">
+            <i class="nav-main-link-icon bx bxs-store "></i>
+            <span class="nav-main-link-name">Pengaturan Outlet</span>
         </a>
     </li>
 
