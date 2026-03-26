@@ -4,7 +4,6 @@
 
 @section('extra_css')
 <style>
-    /* Membuat header tabel tetap di atas saat scroll (Sticky Header) */
     .table-responsive {
         max-height: 600px;
         overflow-y: auto;
@@ -15,11 +14,11 @@
         z-index: 10;
         background-color: #343a40 !important;
     }
-    /* Mempercantik tampilan baris saat di-hover */
+
     tbody tr:hover {
         background-color: rgba(0,123,255,0.05) !important;
     }
-    /* Styling checkbox agar lebih besar dan mudah diklik */
+
     .form-check-input {
         cursor: pointer;
         transform: scale(1.2);
@@ -91,7 +90,6 @@
                                     @foreach($menus as $menu)
                                     <tr>
                                         <td class="text-center bg-light">
-                                            {{-- Shortcut Pilih Semua per baris --}}
                                             <input type="checkbox" class="select-all-row" title="Pilih Semua Aksi">
                                         </td>
                                         <td class="pl-3 align-middle">
@@ -101,12 +99,15 @@
                                         @foreach(['view', 'create', 'edit', 'delete'] as $action)
                                             @php $pName = $action . '_' . $menu; @endphp
                                             <td class="text-center align-middle">
-                                                <div class="form-check">
-                                                    <input type="checkbox"
-                                                           name="permissions[]"
-                                                           value="{{ $pName }}"
-                                                           class="form-check-input row-checkbox"
-                                                           {{ ($role->exists && $role->hasPermissionTo($pName)) ? 'checked' : '' }}>
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <div class="form-check m-0 p-0">
+                                                        <input type="checkbox"
+                                                            name="permissions[]"
+                                                            value="{{ $pName }}"
+                                                            class="form-check-input m-0 p-0 row-checkbox"
+                                                            style="position: relative; margin: 0 !important;" {{-- Paksa posisi relatif --}}
+                                                            {{ ($role->exists && $role->hasPermissionTo($pName)) ? 'checked' : '' }}>
+                                                    </div>
                                                 </div>
                                             </td>
                                         @endforeach
@@ -135,7 +136,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Logika untuk "Pilih Semua" per baris
         const selectAllRows = document.querySelectorAll('.select-all-row');
 
         selectAllRows.forEach(headerCheckbox => {

@@ -37,16 +37,13 @@
                                 </span>
                             </td>
                            <td class="text-center align-middle py-3">
-                                {{-- d-flex dengan gap-2 untuk memberi jarak otomatis antar elemen di dalamnya --}}
                                 <div class="d-flex justify-content-center align-items-center" style="gap: 10px;">
 
-                                    {{-- Tombol Edit --}}
                                     <a href="{{ route('account::manage-role.edit', $role->id) }}"
                                     class="btn btn-warning btn-sm text-white shadow-sm">
                                         <i class="fas fa-pencil-alt mr-1"></i> Edit
                                     </a>
 
-                                    {{-- Form Hapus --}}
                                     <form action="{{ route('account::manage-role.destroy', $role->id) }}"
                                         method="POST"
                                         class="m-0 p-0"
