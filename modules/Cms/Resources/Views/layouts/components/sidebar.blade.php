@@ -6,7 +6,7 @@
 <ul class="metismenu list-unstyled" id="side-menu">
     {{-- Utama Section --}}
     <li class="nav-main-item">
-        <a class="nav-main-link {{ request()->routeIs('poz::dashboard') ? 'active' : '' }}" href="{{ route('poz::dashboard') }}">
+        <a class="nav-main-link {{ request()->routeIs('cms::dashboard') ? 'active' : '' }}" href="{{ route('cms::dashboard') }}">
             <i class="nav-main-link-icon bx bxs-dashboard"></i>
             <span class="nav-main-link-name">Dashboard</span>
         </a>

@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            {{-- NAVBAR CMS --}}
+            @include('layouts.shortcut_menu')
             @include('cms::layouts.components.navbar')
 
         </div>
