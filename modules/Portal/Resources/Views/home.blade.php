@@ -34,38 +34,7 @@
             </div>
 
             <div class="d-flex">
-
-                <div class="dropdown d-none d-lg-inline-block ms-1">
-                    <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="bx bx-customize"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                        <div class="px-lg-2">
-
-                            <div class="row g-0">
-                                <div class="row no-gutters">
-                                    @if(count(outletList(Auth::user()->id)) > 0)
-                                        @foreach (outletList(Auth::user()->id) as $key => $value)
-                                            <div class="col">
-                                                <a class="dropdown-icon-item" href="{{ route('poz::dashboard') }}?outlet={{ $value->id }}">
-                                                    <i class="bx bx-building-house" style="font-size:24px;"></i>
-                                                    <span>{{ $value->name }}</span>
-                                                </a>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                            <div class="col">
-                                                <a class="dropdown-icon-item" href="javascript:void(0)">
-                                                    Tidak ada Outlet
-                                                </a>
-                                            </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                @include('layouts.shortcut_menu')
                 @include('layouts.nav_name')
             </div>
     </header>
@@ -83,12 +52,6 @@
                             </a>
                         </li>
 
-                        {{-- <li class="nav-item">
-                            <a class="nav-link arrow-none" href="{{ route('account::user.profile') }}" id="topnav-uielement" role="button">
-                                <i class="bx bx-user-pin me-2"></i>
-                                <span key="t-ui-elements"> Profil</span>
-                            </a>
-                        </li> --}}
 
                         <li class="nav-item">
                             <a class="nav-link arrow-none" href="{{ route('portal::outlet.manage-outlet.index') }}" id="topnav-uielement" role="button">

@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
 	Route::view('/home-member', 'account::home-member')->name('home-member');
     Route::resource('/manage-role', 'RoleController');
     Route::resource('/manage-user', 'ManageUserController');
+    Route::get('/account-dashboard', 'DashboardController@index')->name('account.dashboard');
     // Route::get('/role/permission', 'RolePermissionController')
 	// User page
 	Route::name('user.')->namespace('User')->group(function () {
