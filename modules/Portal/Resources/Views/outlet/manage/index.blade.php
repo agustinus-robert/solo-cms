@@ -69,13 +69,6 @@
                                     </li>
 
                                     <li class="nav-item">
-                                        <a class="nav-link arrow-none" href="javascript:void(0)" id="topnav-uielement" role="button">
-                                            <i class="bx bx-user-pin me-2"></i>
-                                            <span key="t-ui-elements"> Profil</span>
-                                        </a>
-                                    </li>
-
-                                    <li class="nav-item">
                                         <a class="nav-link arrow-none" href="{{ route('portal::outlet.manage-outlet.index') }}" id="topnav-uielement" role="button">
                                             <i class="bx bx-building-house me-2"></i>
                                             <span key="t-ui-elements"> Kelola Outlet</span>
@@ -88,30 +81,7 @@
                 </div>
 
                 <div class="dropdown d-none d-lg-inline-block ms-1">
-                    <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="bx bx-customize"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                        <div class="px-lg-2">
-                            <div class="row g-0">
-                                <div class="row no-gutters">
-                                    @foreach (outletList(Auth::user()->id) as $key => $value)
-                                        <div class="col">
-                                            <a class="dropdown-icon-item" href="{{ route('poz::dashboard') }}?outlet={{ $value->id }}">
-                                                <i class="bx bx-building-house" style="font-size:24px;"></i>
-                                                <span>{{ $value->name }}</span>
-                                            </a>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                {{-- <a class="fw-semibold" href="{{ route('portal::outlet.manage-outlet.create') }}">
-                                <i class="fa fa-fw fa-plus text-primary-light me-1"></i> Tambah Outlet
-                            </a> --}}
-                            </div>
-                        </div>
-                    </div>
-
+                    @include('layouts.shortcut_menu')
                     @include('layouts.nav_name')
 
                 </div>

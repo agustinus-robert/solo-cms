@@ -13,6 +13,13 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('cms::dashboard') }}">
+                        <i class="bx bxs-book-content" style='font-size:30px;'></i>
+                        <span>CMS</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun Saya</span>
