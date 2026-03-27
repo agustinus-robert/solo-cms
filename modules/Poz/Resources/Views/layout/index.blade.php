@@ -72,6 +72,8 @@
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
+                @include('layouts.component.alert-access')
+
                 @yield('content')
             </div>
         </div>

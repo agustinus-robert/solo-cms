@@ -37,13 +37,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::macro('resourcePermission', function ($uri, $controller, $menu) {
             return Route::resource($uri, $controller)->middleware([
-                'index'   => "can:view_{$menu}",
-                'show'    => "can:view_{$menu}",
-                'create'  => "can:create_{$menu}",
-                'store'   => "can:create_{$menu}",
-                'edit'    => "can:edit_{$menu}",
-                'update'  => "can:edit_{$menu}",
-                'destroy' => "can:delete_{$menu}",
+                'index'   => "check.permit:view_{$menu}",
+                'show'    => "check.permit:view_{$menu}",
+                'create'  => "check.permit:create_{$menu}",
+                'store'   => "check.permit:create_{$menu}",
+                'edit'    => "check.permit:edit_{$menu}",
+                'update'  => "check.permit:edit_{$menu}",
+                'destroy' => "check.permit:delete_{$menu}",
             ]);
         });
 

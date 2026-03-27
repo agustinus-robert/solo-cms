@@ -8,7 +8,6 @@
     <header id="page-topbar">
         <div class="navbar-header">
             <div class="d-flex">
-                <!-- LOGO -->
                 <div class="navbar-brand-box">
                     <a href="index.html" class="logo logo-dark">
                         <span class="logo-sm">
@@ -80,8 +79,8 @@
                     </div>
                 </div>
 
+                @include('layouts.shortcut_menu')
                 <div class="dropdown d-none d-lg-inline-block ms-1">
-                    @include('layouts.shortcut_menu')
                     @include('layouts.nav_name')
 
                 </div>

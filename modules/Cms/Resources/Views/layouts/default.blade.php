@@ -96,6 +96,7 @@
 
                 <x-alert-success />
                 <x-alert-danger />
+                @include('layouts.component.alert-access')
 
                 @yield('content')
 

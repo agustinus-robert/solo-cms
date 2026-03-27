@@ -11,6 +11,7 @@ class Kernel extends HttpKernel
         'TrackVisitors' => \App\Http\Middleware\TrackVisitors::class,
         'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
         'append.outlet' => \App\Http\Middleware\AppendOutletQuery::class,
+        'check.permit' => \App\Http\Middleware\EnsureUserHasPermission::class,
     ];
 
     /**
@@ -26,6 +27,7 @@ class Kernel extends HttpKernel
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         // \App\Http\Middleware\RateLimiterMiddleware::class,
+        \App\Http\Middleware\EnsureUserHasPermission::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
