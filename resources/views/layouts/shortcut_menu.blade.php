@@ -29,9 +29,16 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('portal::outlet.manage-outlet.index') }}">
+                        <i class="bx bx-store" style='font-size:30px;'></i>
+                        <span>Outlet</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
-                        <span>Akun Saya</span>
+                        <span>Setting & Akun</span>
                     </a>
                 </div>
             </div>
