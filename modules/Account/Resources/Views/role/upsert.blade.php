@@ -87,31 +87,39 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($menus as $menu)
+                                    @foreach($menus as $groupName => $items)
+                                    <tr class="bg-light">
+                                        <td colspan="6" class="py-2 px-3">
+                                            <h6 class="mb-0 text-dark font-weight-bold"><i class="fas fa-folder-open mr-2 text-warning"></i> {{ $groupName }}</h6>
+                                        </td>
+                                    </tr>
+
+                                    @foreach($items as $menuKey => $info)
                                     <tr>
-                                        <td class="text-center bg-light">
+                                        <td class="text-center align-middle">
                                             <input type="checkbox" class="select-all-row" title="Pilih Semua Aksi">
                                         </td>
                                         <td class="pl-3 align-middle">
-                                            <span class="menu-name font-weight-bold">{{ strtoupper(str_replace('_', ' ', $menu)) }}</span>
+                                            <div class="d-flex flex-column">
+                                                <span class="menu-name font-weight-bold text-primary">{{ $info['label'] }}</span>
+                                                <small class="text-muted" style="font-size: 0.75rem; line-height: 1.2;">{{ $info['desc'] }}</small>
+                                            </div>
                                         </td>
 
                                         @foreach(['view', 'create', 'edit', 'delete'] as $action)
-                                            @php $pName = $action . '_' . $menu; @endphp
+                                            @php $pName = $action . '_' . $menuKey; @endphp
                                             <td class="text-center align-middle">
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <div class="form-check m-0 p-0">
-                                                        <input type="checkbox"
-                                                            name="permissions[]"
-                                                            value="{{ $pName }}"
-                                                            class="form-check-input m-0 p-0 row-checkbox"
-                                                            style="position: relative; margin: 0 !important;" {{-- Paksa posisi relatif --}}
-                                                            {{ ($role->exists && $role->hasPermissionTo($pName)) ? 'checked' : '' }}>
-                                                    </div>
+                                                <div class="form-check m-0 p-0 d-flex justify-content-center">
+                                                    <input type="checkbox"
+                                                        name="permissions[]"
+                                                        value="{{ $pName }}"
+                                                        class="form-check-input row-checkbox"
+                                                        {{ ($role->exists && $role->hasPermissionTo($pName)) ? 'checked' : '' }}>
                                                 </div>
                                             </td>
                                         @endforeach
                                     </tr>
+                                    @endforeach
                                     @endforeach
                                 </tbody>
                             </table>

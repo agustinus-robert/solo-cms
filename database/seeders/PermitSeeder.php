@@ -19,7 +19,7 @@ class PermitSeeder extends Seeder
             'brand', 'taxrate', 'tier', 'unit', 'category', 'reporting',
             'promotion', 'purchase', 'quotation', 'return', 'sale', 'transfer',
             'role', 'user', 'posting', 'custom', 'postImage', 'postVideo',
-            'menu', 'order', 'category', 'categoryName', 'tags', 'quotation',
+            'menu', 'order', 'category', 'categoryName', 'tags',
             'warehouse', 'casier'
         ];
 

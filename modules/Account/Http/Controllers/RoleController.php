@@ -10,9 +10,27 @@ use Spatie\Permission\Models\Permission;
 class RoleController extends Controller
 {
     protected $menus = [
-        'outlet', 'product', 'adjustment', 'supplier', 'report', 'pos', 'brand',
-        'taxrate', 'tier', 'unit', 'category', 'reporting', 'promotion',
-        'purchase', 'quotation', 'return', 'sale', 'transfer'
+        'POS (Point of Sale)' => [
+            'outlet'     => ['label' => 'Outlet', 'desc' => 'Mengelola cabang atau lokasi toko.'],
+            'product'    => ['label' => 'Produk', 'desc' => 'Daftar barang, harga, dan stok.'],
+            'adjustment' => ['label' => 'Stok Opname', 'desc' => 'Penyesuaian jumlah stok manual.'],
+            'supplier'   => ['label' => 'Supplier', 'desc' => 'Daftar pemasok barang.'],
+            'pos'        => ['label' => 'Transaksi Kasir', 'desc' => 'Akses ke menu penjualan/kasir.'],
+            'brand'      => ['label' => 'Brand', 'desc' => 'Manajemen merk produk.'],
+            'unit'       => ['label' => 'Satuan', 'desc' => 'Satuan barang (Pcs, Box, Kg).'],
+            'category'   => ['label' => 'Kategori', 'desc' => 'Pengelompokan jenis produk.'],
+            'warehouse'  => ['label' => 'Gudang', 'desc' => 'Lokasi penyimpanan fisik barang.'],
+            'transfer'   => ['label' => 'Transfer Stok', 'desc' => 'Mutasi barang antar outlet/gudang.'],
+        ],
+        'Account & Security' => [
+            'role' => ['label' => 'Role Permission', 'desc' => 'Mengatur hak akses kelompok user.'],
+            'user' => ['label' => 'Manajemen User', 'desc' => 'Menambah atau memblokir staf.'],
+        ],
+        'Content Management (CMS)' => [
+            'posting' => ['label' => 'Artikel/Post', 'desc' => 'Membuat konten berita atau artikel.'],
+            'menu'    => ['label' => 'Navigasi Menu', 'desc' => 'Mengatur struktur menu website.'],
+            'order'   => ['label' => 'Pesanan Online', 'desc' => 'Mengatur urutan menu.'],
+        ]
     ];
 
     // 1. Tampilan Utama
