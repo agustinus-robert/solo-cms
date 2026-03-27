@@ -20,8 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::resourcePermission('/manage-user', 'ManageUserController', 'user');
     Route::resourcePermission('/manage-outlet', 'OutletAssignmentController', 'outlet')
         ->only(['index', 'edit', 'update']);
-    Route::resourcePermission('/manage-audit-log', 'AuditLogController', 'report')->only('index');
-    Route::resourcePermission('/manage-session', 'LoginSessionController', 'user')->only('index');
+    Route::resource('/manage-audit-log', 'AuditLogController')->only('index');
+    Route::resource('/manage-session', 'LoginSessionController')->only('index');
     Route::resource('/manage-profile', 'ProfileController');
 
     Route::name('user.')->namespace('User')->group(function () {
