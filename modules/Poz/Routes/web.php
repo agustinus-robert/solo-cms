@@ -11,21 +11,21 @@ Route::middleware('auth', IsSupplierMiddleware::class)->group(function () {
 
     Route::prefix('supplierz')->namespace('Supplierz')->name('supplierz.')->group(function () {
         Route::prefix('reporting')->namespace('Reporting')->name('reporting.')->group(function () {
-            Route::resource('/supplier/product_supplier_reporting', 'SupplierShiftController')->parameters(['prodsupreportings' => 'prodsupreporting'])->only('index');
+            Route::resourcePermission('/supplier/product_supplier_reporting', 'SupplierShiftController', 'supplier')->parameters(['prodsupreportings' => 'prodsupreporting'])->only('index');
             Route::get('/supplier/datatable_supplier_product', 'SupplierShiftController@getStockProducts')->name('reporting.supplier.product.datatables');
 
-            Route::resource('/supplier/product_reporting', 'ProductReportingController')->parameters(['productreportings' => 'productreporting'])->only('index');
+            Route::resourcePermission('/supplier/product_reporting', 'ProductReportingController', 'product')->parameters(['productreportings' => 'productreporting'])->only('index');
             Route::get('/supplier/datatable_report_product', 'ProductReportingController@getReportProducts')->name('reporting.product.datatables');
         });
 
         Route::get('quotation-send/{quotation}', 'QuotationController@send')->name('quotation.send');
-        Route::resource('quotation', 'QuotationController')->parameters(['quotations' => 'quotation']);
+        Route::resourcePermission('quotation', 'QuotationController', 'quotation')->parameters(['quotations' => 'quotation']);
         //datatables
         Route::get('datatable_adjustment', 'AdjustmentController@adjustmentTable')->name('adjustment.datatables');
         Route::get('datatable_quotation', 'QuotationController@quotationTable')->name('quotation.datatables');
 
         //Transaction
-        Route::resource('adjustment', 'AdjustmentController')
+        Route::resourcePermission('adjustment', 'AdjustmentController', 'adjustment')
         ->only(['index', 'create', 'store'])->parameters(['adjustments' => 'adjustment']);
     });
 });
@@ -71,48 +71,48 @@ Route::middleware('auth', 'append.outlet', IsPozMiddleware::class)->group(functi
     Route::get('/processing', 'ProcessingPosAdminController@processing')->name('processing');
 
     Route::prefix('reporting')->namespace('Reporting')->name('reporting.')->group(function () {
-        Route::resource('product_reporting', 'ProductReportingController')->parameters(['prodreportings' => 'prodreporting'])->only('index');
-        Route::resource('product_supplier_reporting', 'SupplierShiftController')->parameters(['prodsupreportings' => 'prodsupreporting'])->only('index');
+        Route::resourcePermission('product_reporting', 'ProductReportingController', 'product')->parameters(['prodreportings' => 'prodreporting'])->only('index');
+        Route::resourcePermission('product_supplier_reporting', 'SupplierShiftController', 'supplier')->parameters(['prodsupreportings' => 'prodsupreporting'])->only('index');
     });
 
     Route::prefix('master')->namespace('Master')->name('master.')->group(function () {
-        Route::resource('brand', 'BrandController')->parameters(['brands' => 'brand']);
-        Route::resource('category', 'CategoryController')->parameters(['categorys' => 'category']);
-        Route::resource('tax', 'TaxRateController')->parameters(['taxs' => 'tax']);
-        Route::resource('unit', 'UnitController')->parameters(['units' => 'unit']);
-        Route::resource('warehouse', 'WarehouseController')->parameters(['warehouses' => 'warehouse']);
-        Route::resource('outlet', 'OutletController')->parameters(['outlets' => 'outlet']);
-        Route::resource('casier', 'CasierController')->parameters(['casiers' => 'casier']);
-        Route::resource('supplier', 'SupplierController')->parameters(['suppliers' => 'supplier']);
-        Route::resource('tier', 'TierController')->parameters(['tiers' => 'tier']);
+        Route::resourcePermission('brand', 'BrandController', 'brand')->parameters(['brands' => 'brand']);
+        Route::resourcePermission('category', 'CategoryController', 'category')->parameters(['categorys' => 'category']);
+        Route::resourcePermission('tax', 'TaxRateController', 'taxrate')->parameters(['taxs' => 'tax']);
+        Route::resourcePermission('unit', 'UnitController', 'unit')->parameters(['units' => 'unit']);
+        Route::resourcePermission('warehouse', 'WarehouseController', 'warehouse')->parameters(['warehouses' => 'warehouse']);
+        Route::resourcePermission('outlet', 'OutletController', 'outlet')->parameters(['outlets' => 'outlet']);
+        Route::resourcePermission('casier', 'CasierController', 'casier')->parameters(['casiers' => 'casier']);
+        Route::resourcePermission('supplier', 'SupplierController', 'supplier')->parameters(['suppliers' => 'supplier']);
+        Route::resourcePermission('tier', 'TierController', 'tier')->parameters(['tiers' => 'tier']);
     });
 
     Route::prefix('schedule')->namespace('Schedule')->name('schedule.')->group(function(){
-        Route::resource('supplier_schedule', 'SupplierScheduleController')->parameters(['suppliers_schedules' => 'suppliers_schedules']);
+        Route::resourcePermission('supplier_schedule', 'SupplierScheduleController', 'supplier')->parameters(['suppliers_schedules' => 'suppliers_schedules']);
     });
 
     Route::prefix('transaction')->namespace('Transaction')->name('transaction.')->group(function () {
-        Route::resource('product', 'ProductController')->parameters(['products' => 'product']);
-        Route::resource('product-promotion', 'PromotionController')->parameters(['product-promotions' => 'product-promotion'])
+        Route::resourcePermission('product', 'ProductController', 'product')->parameters(['products' => 'product']);
+        Route::resourcePermission('product-promotion', 'PromotionController', 'promotion')->parameters(['product-promotions' => 'product-promotion'])
         ->except(['show']);
-        Route::resource('product-variant', 'ProductVariantController')->parameters(['product-variants' => 'product-variant'])->only([
+        Route::resourcePermission('product-variant', 'ProductVariantController', 'product')->parameters(['product-variants' => 'product-variant'])->only([
             'show', 'store'
         ]);
 
-        Route::resource('sale', 'SaleController')->parameters(['sales' => 'sale']);
-        Route::resource('qutation', 'QutationController')
+        Route::resourcePermission('sale', 'SaleController', 'sale')->parameters(['sales' => 'sale']);
+        Route::resourcePermission('qutation', 'QutationController', 'quotation')
             ->only(['index', 'show', 'update'])
             ->parameters(['qutations' => 'qutation']);
 
-        Route::resource('tier-variant', 'TierVariantController')->parameters(['tier-variants' => 'tier-variant']);
-        Route::resource('purchase', 'PurchaseController')->parameters(['purchases' => 'purchase']);
-        Route::resource('return', 'ReturnController')->parameters(['returns' => 'return']);
-        Route::resource('adjustment', 'AdjustmentController')->parameters(['adjustments' => 'adjustment']);
+        Route::resourcePermission('tier-variant', 'TierVariantController', 'tier')->parameters(['tier-variants' => 'tier-variant']);
+        Route::resourcePermission('purchase', 'PurchaseController', 'purchase')->parameters(['purchases' => 'purchase']);
+        Route::resourcePermission('return', 'ReturnController', 'return')->parameters(['returns' => 'return']);
+        Route::resourcePermission('adjustment', 'AdjustmentController', 'adjustment')->parameters(['adjustments' => 'adjustment']);
         Route::get('sale-pos-invoice/{sale_id}', 'SaleController@invoice')->name('sale.pos-invoice');
         Route::get('purchase_status/{purchase_id}/', 'PurchaseController@change_status')->name('purchase.purchase_status');
         Route::get('purchase-invoice/{purchase_id}', 'PurchaseController@invoice')->name('purchase.invoice');
-        Route::resource('pos-sale', 'PosSaleController')->parameters(['pos-sales' => 'pos-sale']);
-        Route::resource('transfer', 'TransferController')->parameters(['transfers' => 'transfer']);
+        Route::resourcePermission('pos-sale', 'PosSaleController', 'sale')->parameters(['pos-sales' => 'pos-sale']);
+        Route::resourcePermission('transfer', 'TransferController', 'transfer')->parameters(['transfers' => 'transfer']);
         Route::get('transfer_status/{transfer_id}/', 'TransferController@change_status')->name('transfer.purchase_status');
         Route::get('transfer-invoice/{transfer_id}', 'TransferController@invoice')->name('transfer.invoice');
         Route::post('cash-registers/update', 'CashRegisterController@update')->name('cash-registers.update');

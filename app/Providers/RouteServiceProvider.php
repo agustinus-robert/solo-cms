@@ -35,6 +35,18 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Route::macro('resourcePermission', function ($uri, $controller, $menu) {
+            return Route::resource($uri, $controller)->middleware([
+                'index'   => "can:view_{$menu}",
+                'show'    => "can:view_{$menu}",
+                'create'  => "can:create_{$menu}",
+                'store'   => "can:create_{$menu}",
+                'edit'    => "can:edit_{$menu}",
+                'update'  => "can:edit_{$menu}",
+                'destroy' => "can:delete_{$menu}",
+            ]);
+        });
+
         $this->configureRateLimiting();
 
         $this->routes(function () {

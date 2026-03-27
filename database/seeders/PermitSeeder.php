@@ -17,7 +17,10 @@ class PermitSeeder extends Seeder
         $menus = [
             'outlet', 'product', 'adjustment', 'supplier', 'report', 'pos',
             'brand', 'taxrate', 'tier', 'unit', 'category', 'reporting',
-            'promotion', 'purchase', 'quotation', 'return', 'sale', 'transfer'
+            'promotion', 'purchase', 'quotation', 'return', 'sale', 'transfer',
+            'role', 'user', 'posting', 'custom', 'postImage', 'postVideo',
+            'menu', 'order', 'category', 'categoryName', 'tags', 'quotation',
+            'warehouse', 'casier'
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];
