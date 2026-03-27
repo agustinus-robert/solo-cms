@@ -12,6 +12,30 @@
         </a>
     </li>
 
+    <li class="menu-title" key="t-menu">Builder</li>
+
+    {{-- <li class="nav-main-item">
+        <a class="nav-main-link {{ request()->routeIs('cms::builder.category.index') ? 'active' : '' }}" href="{{ route('cms::builder.category.index') }}">
+            <i class="nav-main-link-icon bx bx-windows"></i>
+            <span class="nav-main-link-name">Menu Category</span>
+        </a>
+    </li> --}}
+
+    <li class="nav-main-item">
+        <a class="nav-main-link {{ request()->routeIs('cms::builder.menu.index') ? 'active' : '' }}" href="{{ route('cms::builder.menu.index') }}">
+            <i class="nav-main-link-icon bx bxs-food-menu"></i>
+            <span class="nav-main-link-name">Menu Build</span>
+        </a>
+    </li>
+
+    <li class="nav-main-item">
+        <a class="nav-main-link {{ request()->routeIs('cms::builder.order.index') ? 'active' : '' }}" href="{{ route('cms::builder.order.index') }}">
+            <i class="nav-main-link-icon bx bx-sort-a-z"></i>
+            <span class="nav-main-link-name">Menu Order</span>
+        </a>
+    </li>
+
+
     <li class="menu-title" key="t-menu">Menu Dinamis</li>
 
     @if(!empty($kount_menu))
