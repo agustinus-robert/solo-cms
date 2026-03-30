@@ -47,19 +47,14 @@ class InsuranceDatabaseSeeder extends Seeder
             ]
         ];
 
-        $grades = [4, 5];
-
-        foreach ($grades as $grade) {
-            foreach ($insurances as $name => $meta) {
-                CompanyInsurance::create([
-                    'kd'    => Str::slug($name) . '-' . $grade,
-                    'name'  => $name,
-                    'grade_id' => $grade,
-                    'meta'  => [
-                        'conditions' => $meta
-                    ],
-                ]);
-            }
+        foreach ($insurances as $name => $meta) {
+            CompanyInsurance::create([
+                'kd'    => Str::slug($name),
+                'name'  => $name,
+                'meta'  => [
+                    'conditions' => $meta
+                ],
+            ]);
         }
 
 

@@ -19,8 +19,6 @@ class ApprovalController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyPayrollSetting::class);
-
         return view('core::company.salaries.approvals.index', [
             'slips' => CompanySalaryTemplate::all(),
             'settings' => CompanyPayrollSetting::paginate($request->get('limit', 10)),

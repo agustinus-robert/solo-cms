@@ -21,8 +21,6 @@ class MomentController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyMoment::class);
-
         $moments = CompanyMoment::whenYear($request->get('year', date('Y')))
             ->search($request->get('search'))
             ->paginate($request->get('limit', 10));
@@ -37,7 +35,6 @@ class MomentController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyMoment::class);
         $religions = ReligionEnum::cases();
         $types = MomentTypeEnum::cases();
         return view('core::company.moments.form', compact('types', 'religions'));
@@ -59,7 +56,6 @@ class MomentController extends Controller
      */
     public function show(CompanyMoment $moment)
     {
-        $this->authorize('update', $moment);
         $religions = ReligionEnum::cases();
         $types = MomentTypeEnum::cases();
         return view('core::company.moments.form', compact('moment', 'types', 'religions'));
@@ -81,7 +77,6 @@ class MomentController extends Controller
      */
     public function destroy(CompanyMoment $moment)
     {
-        $this->authorize('destroy', $moment);
         if ($moment = $this->destroyCompanyMoment($moment)) {
             return redirect()->next()->with('success', 'Hari libur <strong>' . $moment->name . '</strong> telah berhasil dihapus.');
         }

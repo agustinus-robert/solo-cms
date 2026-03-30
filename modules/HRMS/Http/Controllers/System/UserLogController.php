@@ -1,0 +1,41 @@
+<?php
+
+namespace Modules\HRMS\Http\Controllers\System;
+
+use Hash;
+use Illuminate\Http\Request;
+use Modules\Account\Models\User;
+use Modules\Account\Models\UserLog;
+use Modules\Core\Http\Requests\System\User\StoreRequest;
+use Modules\Core\Http\Controllers\Controller;
+
+class UserLogController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $user = User::find($request->get('user'));
+
+        $logs = UserLog::with('user')
+                     ->latest()
+                     ->search($request->get('search'))
+                     ->whenUserId($request->get('user'))
+                     ->paginate($request->get('limit', 10));
+
+        return view('core::system.user-logs.index', compact('logs', 'user'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(UserLog $log)
+    {
+        $this->authorize('destroy', $log);
+        if ($log->delete()) {
+            return redirect()->next()->with('success', 'Log <strong>#'.$log->id.'</strong> berhasil dihapus');
+        }
+        return redirect()->fail();
+    }
+}

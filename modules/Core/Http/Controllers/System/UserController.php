@@ -19,8 +19,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', User::class);
-
         $users = User::with('roles', 'meta', 'teacher')
             ->whereHas('teacher')
             ->search($request->get('search'))
@@ -51,7 +49,6 @@ class UserController extends Controller
      */
     public function show(Request $request, User $user)
     {
-        $this->authorize('update', $user);
         $roles = CompanyRole::get();
 
         return in_array($request->get('page', 'profile'), ['profile', 'username', 'email', 'phone', 'role'])
@@ -64,7 +61,6 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $this->authorize('destroy', $user);
         if ($user = $this->removeUser($user)) {
             return redirect()->next()->with('success', 'Pengguna <strong>' . $user->name . ' (' . $user->username . ')</strong> berhasil dihapus');
         }
@@ -76,7 +72,6 @@ class UserController extends Controller
      */
     public function restore(User $user)
     {
-        $this->authorize('restore', $user);
         if ($user = $this->restoreUser($user)) {
             return redirect()->next()->with('success', 'Pengguna <strong>' . $user->name . ' (' . $user->username . ')</strong> berhasil dipulihkan');
         }
@@ -88,7 +83,6 @@ class UserController extends Controller
      */
     public function kill(User $user)
     {
-        $this->authorize('restore', $user);
         if ($user = $this->killUser($user)) {
             return redirect()->next()->with('success', 'Pengguna <strong>' . $user->name . ' (' . $user->username . ')</strong> berhasil dihapus permanen dari sistem');
         }
@@ -100,7 +94,6 @@ class UserController extends Controller
      */
     public function repass(User $user)
     {
-        $this->authorize('update', $user);
         if ($password = $this->resetPasswordUser($user)) {
             return redirect()->next()->with('success', 'Sandi pengguna <strong>' . $user->name . ' (' . $user->username . ')</strong> berhasil diperbarui menjadi <strong>' . $password . '</strong>');
         }
@@ -112,8 +105,6 @@ class UserController extends Controller
      */
     public function login(Request $request, User $user)
     {
-        $this->authorize('cross-login', $user);
-
         if (!Hash::check($request->input('password'), $request->user()->password))
             return redirect()->fail('Mohon maaf, sandi yang Anda masukkan salah, silakan ulangi kembali!');
 

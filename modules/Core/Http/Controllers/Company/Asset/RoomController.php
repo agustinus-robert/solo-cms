@@ -22,8 +22,6 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyBuildingRoom::class);
-
         return view('core::company.assets.rooms.index', [
             'rooms' => $this->getCompanyBuildingRooms($request),
         ]);
@@ -55,8 +53,6 @@ class RoomController extends Controller
      */
     public function show(CompanyBuildingRoom $room)
     {
-        $this->authorize('update', $room);
-
         return view('core::company.assets.rooms.edit', [
             'room'      => $room,
             'buildings' => CompanyBuilding::get(),
@@ -80,8 +76,6 @@ class RoomController extends Controller
      */
     public function destroy(CompanyBuildingRoom $room)
     {
-        $this->authorize('destroy', $room);
-
         if ($room = $this->destroyCompanyBuildingRoom($room)) {
 
             return redirect()->next()->with('success', 'Ruang dengan nama <strong>' . $room->name . '</strong> telah berhasil dihapus.');
@@ -94,8 +88,6 @@ class RoomController extends Controller
      */
     public function restore(CompanyBuildingRoom $room)
     {
-        $this->authorize('restore', $room);
-
         if ($room = $this->restoreCompanyBuildingRoom($room)) {
 
             return redirect()->next()->with('success', 'Ruang dengan nama <strong>' . $room->name . '</strong> telah berhasil dipulihkan.');

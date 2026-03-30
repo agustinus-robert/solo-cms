@@ -80,22 +80,18 @@ class LeaveDatabaseSeeder extends Seeder
             ]
         ];
 
-        $grades = [4, 5];
 
-        foreach ($grades as $grade) {
-            foreach ($leave_categories as $ctg) {
-                $category = CompanyLeaveCategory::create([
-                    'name'  => $ctg['name'],
-                    'meta'  => $ctg['meta'] ?? null,
-                    'grade_id' => $grade,
-                ]);
 
-                if (isset($ctg['children'])) {
-                    foreach ($ctg['children'] as $_ctg) {
-                        $_ctg['parent_id'] = $category->id;
-                        $_ctg['grade_id']     = $grade;
-                        CompanyLeaveCategory::create($_ctg);
-                    }
+        foreach ($leave_categories as $ctg) {
+            $category = CompanyLeaveCategory::create([
+                'name'  => $ctg['name'],
+                'meta'  => $ctg['meta'] ?? null,
+            ]);
+
+            if (isset($ctg['children'])) {
+                foreach ($ctg['children'] as $_ctg) {
+                    $_ctg['parent_id'] = $category->id;
+                    CompanyLeaveCategory::create($_ctg);
                 }
             }
         }

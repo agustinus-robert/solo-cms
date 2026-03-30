@@ -18,8 +18,6 @@ class BuildingController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyBuilding::class);
-
         return view('core::company.assets.buildings.index', [
             'buildings' => $this->getCompanyBuildings($request),
         ]);
@@ -49,8 +47,6 @@ class BuildingController extends Controller
      */
     public function show(CompanyBuilding $building)
     {
-        $this->authorize('update', $building);
-
         return view('core::company.assets.buildings.edit', [
             'building'  => $building,
         ]);
@@ -73,8 +69,6 @@ class BuildingController extends Controller
      */
     public function destroy(CompanyBuilding $building)
     {
-        $this->authorize('destroy', $building);
-
         if($building = $this->destroyCompanyBuilding($building)) {
 
             return redirect()->next()->with('success', 'Gedung dengan nama <strong>'.$building->name.'</strong> telah berhasil dihapus.');
@@ -87,8 +81,6 @@ class BuildingController extends Controller
      */
     public function restore(CompanyBuilding $building)
     {
-        $this->authorize('restore', $building);
-
         if($building = $this->restoreCompanyBuilding($building)) {
 
             return redirect()->next()->with('success', 'Gedung dengan nama <strong>'.$building->name.'</strong> telah berhasil dipulihkan.');

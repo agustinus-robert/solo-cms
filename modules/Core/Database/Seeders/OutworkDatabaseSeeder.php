@@ -14,7 +14,6 @@ class OutworkDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $grades = [4, 5];
         $outworks = [
             'Pelatihan/kursus' => [
                 ['description' => 'Dalam negeri', 'price' => 17500, 'meta' => ['in_working_hours_price' => 14000]],
@@ -46,16 +45,14 @@ class OutworkDatabaseSeeder extends Seeder
             ]
         ];
 
-        foreach ($grades as $grade_id) {
-            foreach ($outworks as $name => $_o) {
-                foreach ($_o as $outwork) {
-                    CompanyOutworkCategory::create(
-                        array_merge(
-                            compact('name', 'grade_id'),
-                            $outwork
-                        )
-                    );
-                }
+        foreach ($outworks as $name => $_o) {
+            foreach ($_o as $outwork) {
+                CompanyOutworkCategory::create(
+                    array_merge(
+                        compact('name'),
+                        $outwork
+                    )
+                );
             }
         }
     }

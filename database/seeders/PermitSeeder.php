@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use Modules\Cms\Models\CmsLiveEditorsAccess;
 use Illuminate\Database\Seeder;
 use Modules\Account\Models\User;
 use Spatie\Permission\Models\Role;
@@ -58,6 +59,12 @@ class PermitSeeder extends Seeder
         );
 
         $admin->syncRoles([$adminRole]);
+
+        CmsLiveEditorsAccess::updateOrCreate(
+            ['user_id' => $admin->id],
+            ['status' => 1]
+        );
+
         $staff = User::firstOrCreate(
             ['email' => 'outlet@mail.com'],
             [

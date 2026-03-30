@@ -19,8 +19,6 @@ class ManageController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyInsurance::class);
-
         return view('core::company.insurances.manages.index', [
             'insurances' => CompanyInsurance::with('prices')->paginate($request->get('limit', 10)),
         ]);
@@ -42,7 +40,6 @@ class ManageController extends Controller
      */
     public function show(CompanySalaryCategory $category)
     {
-        $this->authorize('update', $category);
         return view('core::company.salaries.categories.show', [
             'category'  => $category,
             'slips'     => CompanySalarySlip::all()
@@ -66,8 +63,6 @@ class ManageController extends Controller
      */
     public function destroy(CompanySalaryCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if ($category = $this->destroyCompanySalaryCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $category->name . '</strong> telah berhasil dihapus.');
@@ -80,8 +75,6 @@ class ManageController extends Controller
      */
     public function restore(CompanySalaryCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if ($category = $this->restoreCompanySalaryCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $category->name . '</strong> telah berhasil dipulihkan.');

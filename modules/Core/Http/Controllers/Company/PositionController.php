@@ -20,8 +20,6 @@ class PositionController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyPosition::class);
-
         $departments = CompanyDepartment::all();
 
         $positions = CompanyPosition::with('department')
@@ -42,8 +40,6 @@ class PositionController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyPosition::class);
-
         $roles = CompanyRole::get();
         $departments = CompanyDepartment::get();
         $positions = CompanyPosition::with('department')
@@ -70,8 +66,6 @@ class PositionController extends Controller
      */
     public function show(CompanyPosition $position)
     {
-        $this->authorize('update', $position);
-
         $position = $position->load('children', 'parents', 'meta');
 
         $roles = CompanyRole::get();
@@ -100,8 +94,6 @@ class PositionController extends Controller
      */
     public function destroy(CompanyPosition $position)
     {
-        $this->authorize('destroy', $position);
-
         if ($position = $this->destroyCompanyPosition($position)) {
 
             return redirect()->next()->with('success', 'Jabatan <strong>' . $position->name . ' (' . $position->kd . ')</strong> telah berhasil dihapus.');
@@ -115,8 +107,6 @@ class PositionController extends Controller
      */
     public function restore(CompanyPosition $position)
     {
-        $this->authorize('restore', $position);
-
         if ($position = $this->restoreCompanyPosition($position)) {
 
             return redirect()->next()->with('success', 'Jabatan <strong>' . $position->name . ' (' . $position->kd . ')</strong> telah berhasil dipulihkan.');

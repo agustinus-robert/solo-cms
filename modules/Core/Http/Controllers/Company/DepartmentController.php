@@ -18,8 +18,6 @@ class DepartmentController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyDepartment::class);
-
         $departments = CompanyDepartment::withCount('positions')
             ->whenTrashed($request->get('trash'))
             ->search($request->get('search'))
@@ -35,8 +33,6 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyDepartment::class);
-
         $departments = CompanyDepartment::get();
 
         return view('core::company.departments.form', compact('departments'));
@@ -60,8 +56,6 @@ class DepartmentController extends Controller
      */
     public function show(CompanyDepartment $department)
     {
-        $this->authorize('update', $department);
-
         $departments = CompanyDepartment::get();
 
         return view('core::company.departments.form', compact('departments', 'department'));
@@ -86,8 +80,6 @@ class DepartmentController extends Controller
      */
     public function destroy(CompanyDepartment $department)
     {
-        $this->authorize('destroy', $department);
-
         if ($department = $this->destroyCompanyDepartment($department)) {
 
             return redirect()->next()->with('success', 'Departemen dengan nama <strong>' . $department->name . ' (' . $department->kd . ')</strong> telah berhasil dihapus.');
@@ -101,8 +93,6 @@ class DepartmentController extends Controller
      */
     public function restore(CompanyDepartment $department)
     {
-        $this->authorize('restore', $department);
-
         if ($department = $this->restoreCompanyDepartment($department)) {
 
             return redirect()->next()->with('success', 'Departemen dengan nama <strong>' . $department->name . ' (' . $department->kd . ')</strong> telah berhasil dipulihkan.');

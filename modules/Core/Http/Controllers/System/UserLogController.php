@@ -16,8 +16,6 @@ class UserLogController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', UserLog::class);
-
         $user = User::find($request->get('user'));
 
         $logs = UserLog::with('user')
@@ -35,7 +33,6 @@ class UserLogController extends Controller
      */
     public function destroy(UserLog $log)
     {
-        $this->authorize('destroy', $log);
         if ($log->delete()) {
             return redirect()->next()->with('success', 'Log <strong>#'.$log->id.'</strong> berhasil dihapus');
         }

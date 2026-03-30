@@ -14,8 +14,6 @@ class LoanDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $grades = [4, 5];
-
         $loans = [
             [
                 'name' => 'Bunga Pinjaman',
@@ -32,11 +30,8 @@ class LoanDatabaseSeeder extends Seeder
             ],
         ];
 
-        foreach ($grades as $grade_id) {
-            foreach ($loans as $loan) {
-                $loan['grade_id'] = $grade_id;
-                CompanyLoanCategory::create($loan);
-            }
+        foreach ($loans as $loan) {
+            CompanyLoanCategory::create($loan);
         }
     }
 }

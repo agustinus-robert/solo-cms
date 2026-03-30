@@ -14,8 +14,6 @@ class VacationDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $grades = [4, 5];
-
         $vacation_categories = [
             [
                 'name' => 'Cuti Tahunan (12 hari)',
@@ -54,15 +52,13 @@ class VacationDatabaseSeeder extends Seeder
             ],
         ];
 
-        foreach ($grades as $grade_id) {
-            foreach ($vacation_categories as $ctg) {
-                CompanyVacationCategory::create([
-                    'name'     => $ctg['name'],
-                    'type'     => $ctg['type'],
-                    'meta'     => $ctg['meta'],
-                    'grade_id' => $grade_id,
-                ]);
-            }
+
+        foreach ($vacation_categories as $ctg) {
+            CompanyVacationCategory::create([
+                'name'     => $ctg['name'],
+                'type'     => $ctg['type'],
+                'meta'     => $ctg['meta']
+            ]);
         }
     }
 }

@@ -166,33 +166,6 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Tunjangan Panitia PAT',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'editable' => true,
-                            'description' => 'per jam',
-                            'as_pph' => true,
-                            'as_multiplier' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::PAT]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
                         'name' => 'Sosial',
                         'currency' => true,
                         'meta' => [
@@ -323,84 +296,6 @@ class SlipDatabaseSeeder extends Seeder
                                             ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
                                             ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
                                             ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Piket',
-                        'currency' => false,
-                        'allowance' => 3,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per hari',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::TEACHERDUTY]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'UKM',
-                        'currency' => false,
-                        'allowance' => 3,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per jam',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::UKM]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Guru Pengawas',
-                        'currency' => false,
-                        'allowance' => 3,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per jam',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::TEACHERINVIGILATOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
                                         ],
                                         'action' => 'sum',
                                         'action_column' => 'result->amount_total'
@@ -1102,34 +997,26 @@ class SlipDatabaseSeeder extends Seeder
             ]
         ];
 
-        // slip 1, 2, dll
-        $grades = [4, 5];
-        
-        foreach($grades as $grade){
-            foreach ($slips as $_slip => $_cs) {
-                $slip = CompanySalarySlip::create([
-                    'name' => $_slip,
-                    'az' => CompanySalarySlip::count() + 1,
-                    'grade_id' => $grade
+        foreach ($slips as $_slip => $_cs) {
+            $slip = CompanySalarySlip::create([
+                'name' => $_slip,
+                'az' => CompanySalarySlip::count() + 1,
+            ]);
+
+            // pendapatan upah, dll
+            foreach ($_cs as $_c => $salaries) {
+                $category = $slip->categories()->create([
+                    'name' => $_c,
+                    'az' => $slip->categories()->count() + 1,
                 ]);
-                
-                // pendapatan upah, dll
-                foreach ($_cs as $_c => $salaries) {
-                    $category = $slip->categories()->create([
-                        'name' => $_c,
-                        'az' => $slip->categories()->count() + 1,
-                        'grade_id' => $grade
+                // gp, dll
+                foreach ($salaries as $s => $salary) {
+                    $data = CompanySalarySlipComponent::create([
+                        ...$salary,
+                        'kd' => isset($salary['kd']) ? $salary['kd'] : ($_c == 'Potongan' ? 'potongan-' : '') . Str::slug($salary['name'].'-'),
+                        'slip_id' => $slip->id,
+                        'ctg_id' => $category->id
                     ]);
-                    // gp, dll
-                    foreach ($salaries as $s => $salary) {
-                        $data = CompanySalarySlipComponent::create([
-                            ...$salary,
-                            'kd' => isset($salary['kd']) ? $salary['kd']. '-'.$grade : ($_c == 'Potongan' ? 'potongan-' : '') . Str::slug($salary['name'].'-'). $grade,
-                            'slip_id' => $slip->id,
-                            'ctg_id' => $category->id,
-                            'grade_id' => $grade
-                        ]);
-                    }
                 }
             }
         }

@@ -29,7 +29,6 @@ class DepartementDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $grades = [4, 5];
         $departments = [
             ['kd' => 'kepala_sekolah', 'name' => 'Kepala Sekolah'],
             ['kd' => 'administrasi', 'name' => 'Administrasi'],
@@ -45,9 +44,7 @@ class DepartementDatabaseSeeder extends Seeder
         $positions = [
             ['kd' => 'pengasuh', 'name' => 'Pengasuh', 'dept_id' => 1, 'level' => 1, 'type' => PositionTypeEnum::PENGASUH],
             ['kd' => 'pengurus', 'name' => 'Pengurus', 'dept_id' => 1, 'level' => 2, 'type' => PositionTypeEnum::PENGURUS],
-            // Kepala Sekolah
             ['kd' => 'kepala_sekolah', 'name' => 'Kepala Sekolah', 'dept_id' => 1, 'level' => 1, 'type' => PositionTypeEnum::KEPALASEKOLAH],
-            // Administrasi
             ['kd' => 'humas', 'name' => 'Humas', 'dept_id' => 2, 'level' => 2, 'type' => PositionTypeEnum::HUMAS, 'parent_ids' => [1]],
             ['kd' => 'tata_usaha', 'name' => 'Tata Usaha', 'dept_id' => 2, 'level' => 2, 'type' => PositionTypeEnum::TATAUSAHA, 'parent_ids' => [1]],
             ['kd' => 'keuangan', 'name' => 'Keuangan', 'dept' => 2, 'level' => 2, 'type' => PositionTypeEnum::KEUANGAN, 'parent_ids' => [1]],
@@ -74,13 +71,10 @@ class DepartementDatabaseSeeder extends Seeder
         ];
 
         foreach ($departments as $department) {
-            foreach ($grades as $grade) {
-                CompanyDepartment::create([
-                    'kd' => $department['kd'].'-'.$grade,
-                    'name' => $department['name'],
-                    'grade_id' => $grade
-                ]);
-            }
+            CompanyDepartment::create([
+                'kd' => $department['kd'],
+                'name' => $department['name'],
+            ]);
         }
 
         foreach ($positions as $position) {
@@ -88,14 +82,10 @@ class DepartementDatabaseSeeder extends Seeder
                 'cmp_id', 'kd', 'name', 'dept_id', 'level', 'type', 'is_visible', 'permissions'
             ]));
 
-            //if (isset($position['is_visible'])) {
-                foreach ($grades as $grade) {
-                    $_r = CompanyRole::create([
-                        'kd' => $position['kd'].'-'.$grade,
-                        'name' => $position['name'],
-                        'grade_id' => $grade
-                    ]);
-                }
+                $_r = CompanyRole::create([
+                    'kd' => $position['kd'],
+                    'name' => $position['name'],
+                ]);
 
                 switch ($_r->kd) {
                     case 'kepala_sekolah':

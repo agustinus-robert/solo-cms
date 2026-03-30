@@ -15,7 +15,6 @@ class PtkpDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $grades = [4, 5];
         $taxPtkpClassification = [
             'TER Kategori A' => [
                 [
@@ -73,17 +72,14 @@ class PtkpDatabaseSeeder extends Seeder
             ]
         ];
 
-        foreach ($grades as $grade_id) {
-            foreach ($taxPtkpClassification as $name => $_o) {
-                foreach ($_o as $ptkps) {
-                    CompanyPtkp::create([
-                        'sex'      => $ptkps['sex'],
-                        'mariage'  => $ptkps['mariage'],
-                        'child'    => $ptkps['child'],
-                        'value'    => $ptkps['value'],
-                        'grade_id' => $grade_id,
-                    ]);
-                }
+        foreach ($taxPtkpClassification as $name => $_o) {
+            foreach ($_o as $ptkps) {
+                CompanyPtkp::create([
+                    'sex'      => $ptkps['sex'],
+                    'mariage'  => $ptkps['mariage'],
+                    'child'    => $ptkps['child'],
+                    'value'    => $ptkps['value']
+                ]);
             }
         }
     }

@@ -20,8 +20,6 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyRole::class);
-
         $roles = CompanyRole::with('permissions')
             ->withCount('users')
             ->whenTrashed($request->get('trash'))
@@ -38,8 +36,6 @@ class RoleController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyRole::class);
-
         $roles = CompanyRole::withoutTrashed()->get();
 
         return view('core::company.roles.create', compact('roles'));
@@ -63,8 +59,6 @@ class RoleController extends Controller
      */
     public function show(CompanyRole $role)
     {
-        $this->authorize('update', $role);
-
         $role->loadCount('users');
         $permissions = Permission::all();
 
@@ -102,8 +96,6 @@ class RoleController extends Controller
      */
     public function destroy(CompanyRole $role)
     {
-        $this->authorize('destroy', $role);
-
         if ($role = $this->destroyCompanyRole($role)) {
 
             return redirect()->next()->with('success', 'Peran <strong>' . $role->name . ' (' . $role->kd . ')</strong> telah berhasil dihapus.');
