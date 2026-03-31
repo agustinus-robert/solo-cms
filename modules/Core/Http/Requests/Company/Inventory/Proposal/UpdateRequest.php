@@ -15,14 +15,6 @@ class UpdateRequest extends StoreRequest
     public $placeable;
 
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('update', $this->proposal);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()

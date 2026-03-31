@@ -26,7 +26,6 @@ trait CompanyPositionRepository
             if (isset($data['children'])) {
                 $position->children()->sync($data['children']);
             }
-            Auth::user()->log('membuat jabatan baru dengan nama ' . $position->name . ' <strong>[ID: ' . $position->id . ']</strong>', CompanyPosition::class, $position->id);
             return $position;
         }
         return false;
@@ -42,7 +41,6 @@ trait CompanyPositionRepository
             $position->parents()->sync($data['parents'] ?? []);
             $position->children()->sync($data['children'] ?? []);
 
-            Auth::user()->log('memperbarui jabatan ' . $position->name . ' <strong>[ID: ' . $position->id . ']</strong>', CompanyPosition::class, $position->id);
             return $position;
         }
         return false;
@@ -54,7 +52,6 @@ trait CompanyPositionRepository
     public function destroyCompanyPosition(CompanyPosition $position)
     {
         if (!$position->trashed() && $position->delete()) {
-            Auth::user()->log('menghapus jabatan ' . $position->name . ' <strong>[ID: ' . $position->id . ']</strong>', CompanyPosition::class, $position->id);
             return $position;
         }
         return false;
@@ -66,7 +63,6 @@ trait CompanyPositionRepository
     public function restoreCompanyPosition(CompanyPosition $position)
     {
         if ($position->trashed() && $position->restore()) {
-            Auth::user()->log('memulihkan jabatan ' . $position->name . ' <strong>[ID: ' . $position->id . ']</strong>', CompanyPosition::class, $position->id);
             return $position;
         }
         return false;

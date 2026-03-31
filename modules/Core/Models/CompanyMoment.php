@@ -5,10 +5,11 @@ namespace Modules\Core\Models;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Enums\MomentTypeEnum;
 use App\Models\Traits\Searchable\Searchable;
+use App\Traits\HasAuditLog;
 
 class CompanyMoment extends Model
 {
-    use Searchable;
+    use Searchable, HasAuditLog;
 
     /**
      * The table associated with the model.

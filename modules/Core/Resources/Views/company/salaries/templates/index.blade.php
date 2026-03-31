@@ -47,7 +47,7 @@
                                                 </form>
                                             @endcan
                                         @else
-                                            @can('update_slip_component')
+                                            @can('edit_slip_component')
                                                 <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.salaries.templates.show', ['template' => $template->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                             @endcan
                                             @can('kill_slip_component')
@@ -82,7 +82,7 @@
             <div class="card border-0">
                 <div class="card-body">Menu lainnya</div>
                 <div class="list-group list-group-flush border-top border-light">
-                    @can('store_slip_component')
+                    @can('create_slip_template')
                         <a class="list-group-item list-group-item-action text-dark" href="{{ route('core::company.salaries.templates.create') }}"><i class="mdi mdi-plus"></i> Tambah template</a>
                         <a class="list-group-item list-group-item-action text-dark" href="{{ route('core::company.salaries.templates.sync') }}"><i class="mdi mdi-sync"></i> Sync default template</a>
                     @endcan

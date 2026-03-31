@@ -51,7 +51,7 @@
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_slip_category')
+                                                @can('edit_slip_category')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.salaries.categories.show', ['category' => $category->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
                                                 @can('kill_slip_category')
@@ -86,7 +86,7 @@
                 </div>
                 <div><i class="mdi mdi-file-tree-outline mdi-48px text-light"></i></div>
             </div>
-            @can('store_slip_category')
+            @can('create_slip_category')
                 <div class="card border-0">
                     <div class="card-body"><i class="mdi mdi-plus"></i> Tambah kategori gaji baru</div>
                     <div class="card-body border-top">

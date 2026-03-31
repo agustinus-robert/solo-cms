@@ -14,10 +14,9 @@ trait CompanyInsuranceRepository
      */
     public function storeCompanyInsurance(array $data)
     {
-        $insurance = new CompanyInsurance(array_merge(
+        $insurance = new CompanyInsurance(
             Arr::only($data, ['kd', 'name', 'meta']),
-            ['grade_id' => userGrades()]
-        ));
+        );
 
         if ($insurance->save()) {
             Auth::user()->log('membuat asuransi baru ' . $insurance->name . ' <strong>[ID: ' . $insurance->id . ']</strong>', CompanyInsurance::class, $insurance->id);
@@ -31,11 +30,10 @@ trait CompanyInsuranceRepository
      */
     public function updateCompanyInsurance(CompanyInsurance $insurance, array $data)
     {
-        $insurance = $insurance->fill(array_merge(
+        $insurance = $insurance->fill(
            Arr::only($data, ['kd', 'name', 'meta']),
-            ['grade_id' => userGrades()]
-        ));
-        
+        );
+
         if ($insurance->save()) {
             Auth::user()->log('memperbarui asuransi ' . $insurance->name . ' <strong>[ID: ' . $insurance->id . ']</strong>', CompanyInsurance::class, $insurance->id);
             return $insurance;

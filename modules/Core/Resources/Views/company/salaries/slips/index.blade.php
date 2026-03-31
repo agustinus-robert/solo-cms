@@ -41,13 +41,13 @@
                                     </div>
                                     <div class="col-6 text-end">
                                         @if ($slip->trashed())
-                                            @can('restore', $slip)
+                                            @can('restore_slip')
                                                 <form class="form-block form-confirm d-inline" action="{{ route('core::company.salaries.slips.restore', ['slip' => $slip->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
                                                     <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
                                                 </form>
                                             @endcan
                                         @else
-                                            @can('update_slip')
+                                            @can('edit_slip')
                                                 <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.salaries.slips.show', ['slip' => $slip->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                             @endcan
                                             @can('kill_slip')
@@ -79,7 +79,7 @@
                 </div>
                 <div><i class="mdi mdi-file-tree-outline mdi-48px text-light"></i></div>
             </div>
-            @can('store_slip')
+            @can('create_slip')
                 <div class="card border-0">
                     <div class="card-body"><i class="mdi mdi-plus"></i> Tambah slip baru</div>
                     <div class="card-body border-top">

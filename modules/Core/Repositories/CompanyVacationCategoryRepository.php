@@ -20,13 +20,11 @@ trait CompanyVacationCategoryRepository
      */
     public function storeCompanyVacationCategory(array $data)
     {
-        $category = new CompanyVacationCategory(array_merge(
+        $category = new CompanyVacationCategory(
            Arr::only($data, $this->keys),
-            ['grade_id' => userGrades()]
-        ));
+        );
 
         if($category->save()) {
-            Auth::user()->log('membuat kategori cuti baru dengan nama '.$category->name.' <strong>[ID: '.$category->id.']</strong>', CompanyVacationCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -36,14 +34,12 @@ trait CompanyVacationCategoryRepository
      * Update the current resource.
      */
     public function updateCompanyVacationCategory(CompanyVacationCategory $category, array $data)
-    {        
-        $category = $category->fill(array_merge(
+    {
+        $category = $category->fill(
            Arr::only($data, $this->keys),
-            ['grade_id' => userGrades()]
-        ));
-        
+        );
+
         if($category->save()) {
-            Auth::user()->log('memperbarui kategori cuti '.$category->name.' <strong>[ID: '.$category->id.']</strong>', CompanyVacationCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -55,7 +51,6 @@ trait CompanyVacationCategoryRepository
     public function destroyCompanyVacationCategory(CompanyVacationCategory $category)
     {
         if(!$category->trashed() && $category->delete()) {
-            Auth::user()->log('menghapus kategori cuti '.$category->name.' <strong>[ID: '.$category->id.']</strong>', CompanyVacationCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -67,7 +62,6 @@ trait CompanyVacationCategoryRepository
     public function restoreCompanyVacationCategory(CompanyVacationCategory $category)
     {
         if($category->trashed() && $category->restore()) {
-            Auth::user()->log('memulihkan kategori cuti '.$category->name.' <strong>[ID: '.$category->id.']</strong>', CompanyVacationCategory::class, $category->id);
             return $category;
         }
         return false;

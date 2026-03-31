@@ -104,6 +104,7 @@ class MomentController extends Controller
                 'meta' => NULL
             ]);
         }
+
         if ($holiday) {
             return redirect()->next()->with('success', 'Data hari libur berhasil ditambahkan, terima kasih.');
         }

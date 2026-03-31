@@ -22,7 +22,6 @@ trait CompanyMomentRepository
     {
         $moment = new CompanyMoment(Arr::only($data, $this->keys));
         if($moment->save()) {
-            Auth::user()->log('membuat hari libur baru dengan nama '.$moment->name.' <strong>[ID: '.$moment->id.']</strong>', CompanyMoment::class, $moment->id);
             return $moment;
         }
         return false;
@@ -32,10 +31,9 @@ trait CompanyMomentRepository
      * Update the current resource.
      */
     public function updateCompanyMoment(CompanyMoment $moment, array $data)
-    {        
+    {
         $moment = $moment->fill(Arr::only($data, $this->keys));
         if($moment->save()) {
-            Auth::user()->log('memperbarui hari libur '.$moment->name.' <strong>[ID: '.$moment->id.']</strong>', CompanyMoment::class, $moment->id);
             return $moment;
         }
         return false;
@@ -47,7 +45,6 @@ trait CompanyMomentRepository
     public function destroyCompanyMoment(CompanyMoment $moment)
     {
         if($moment->delete()) {
-            Auth::user()->log('menghapus permanen hari libur '.$moment->name.' <strong>[ID: '.$moment->id.']</strong>', CompanyMoment::class, $moment->id);
             return $moment;
         }
         return false;

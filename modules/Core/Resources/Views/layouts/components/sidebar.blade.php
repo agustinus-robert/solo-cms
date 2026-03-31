@@ -65,17 +65,6 @@
 
         <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
-                <i class="bx bx-group"></i>
-                <span key="t-users">Pengguna</span>
-            </a>
-            <ul class="sub-menu" aria-expanded="false">
-                <li><a href="{{ route('core::system.users.index') }}">Kelola Pengguna</a></li>
-                <li><a href="{{ route('core::system.user-logs.index') }}">Log</a></li>
-            </ul>
-        </li>
-
-        <li>
-            <a href="javascript: void(0);" class="has-arrow waves-effect">
                 <i class="bx bx-cog"></i>
                 <span key="t-settings">Pengaturan</span>
             </a>

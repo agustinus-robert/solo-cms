@@ -20,7 +20,7 @@ trait CompanyRoleRepository
      */
     public function storeCompanyRole(array $data)
     {
-        $role = new CompanyRole(array_merge(Arr::only($data, $this->keys), ['grade_id' => userGrades()]));
+        $role = new CompanyRole(Arr::only($data, $this->keys));
         if($role->save()) {
             Auth::user()->log('membuat peran baru '.$role->name.' <strong>[ID: '.$role->id.']</strong>', CompanyRole::class, $role->id);
             return $role;
@@ -32,8 +32,8 @@ trait CompanyRoleRepository
      * Update the current resource.
      */
     public function updateCompanyRole(CompanyRole $role, array $data)
-    {        
-        $role = $role->fill(array_merge(Arr::only($data, $this->keys), ['grade_id' => userGrades()]));
+    {
+        $role = $role->fill(Arr::only($data, $this->keys));
         if($role->save()) {
             Auth::user()->log('memperbarui peran '.$role->name.' <strong>[ID: '.$role->id.']</strong>', CompanyRole::class, $role->id);
             return $role;
@@ -45,7 +45,7 @@ trait CompanyRoleRepository
      * Sync many-to-many relationships the current resource.
      */
     public function syncCompanyRolePermissions(CompanyRole $role, array $data)
-    {        
+    {
         if($role->permissions()->sync($data['permissions'] ?? [])) {
             Auth::user()->log('memperbarui hak akses peran '.$role->name.' <strong>[ID: '.$role->id.']</strong>', CompanyRole::class, $role->id);
             return $role;

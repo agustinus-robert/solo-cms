@@ -22,12 +22,11 @@ trait CompanySalarySlipComponentRepository
      */
     public function storeCompanySalarySlipComponent(array $data)
     {
-        $component = new CompanySalarySlipComponent(array_merge(
-            Arr::only($data, ['kd', 'slip_id', 'ctg_id', 'name', 'unit', 'operate']), 
-        ['grade_id' => userGrades()]));
+        $component = new CompanySalarySlipComponent(
+            Arr::only($data, ['kd', 'slip_id', 'ctg_id', 'name', 'unit', 'operate']),
+        );
 
         if ($component->save()) {
-            Auth::user()->log('membuat komponen gaji baru ' . $component->name . ' <strong>[ID: ' . $component->id . ']</strong>', CompanySalarySlipComponent::class, $component->id);
             return $component;
         }
         return false;
@@ -38,12 +37,11 @@ trait CompanySalarySlipComponentRepository
      */
     public function updateCompanySalarySlipComponent(CompanySalarySlipComponent $component, array $data)
     {
-        $component = $component->fill(array_merge(
-            Arr::only($data, ['kd', 'slip_id', 'ctg_id', 'name', 'unit', 'operate']), 
-        ['grade_id' => userGrades()]));
-        
+        $component = $component->fill(
+            Arr::only($data, ['kd', 'slip_id', 'ctg_id', 'name', 'unit', 'operate']),
+        );
+
         if ($component->save()) {
-            Auth::user()->log('memperbarui komponen gaji ' . $component->name . ' <strong>[ID: ' . $component->id . ']</strong>', CompanySalarySlipComponent::class, $component->id);
             return $component;
         }
         return false;
@@ -55,7 +53,6 @@ trait CompanySalarySlipComponentRepository
     public function destroyCompanySalarySlipComponent(CompanySalarySlipComponent $component)
     {
         if (!$component->trashed() && $component->delete()) {
-            Auth::user()->log('menghapus komponen gaji ' . $component->name . ' <strong>[ID: ' . $component->id . ']</strong>', CompanySalarySlipComponent::class, $component->id);
             return $component;
         }
         return false;
@@ -67,7 +64,6 @@ trait CompanySalarySlipComponentRepository
     public function restoreCompanySalarySlipComponent(CompanySalarySlipComponent $component)
     {
         if ($component->trashed() && $component->restore()) {
-            Auth::user()->log('memulihkan komponen gaji ' . $component->name . ' <strong>[ID: ' . $component->id . ']</strong>', CompanySalary::class, $component->id);
             return $component;
         }
         return false;

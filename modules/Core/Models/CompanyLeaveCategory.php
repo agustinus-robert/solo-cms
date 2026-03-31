@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\Searchable\Searchable;
 use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\HasGradeFromSession;
+use App\Traits\HasAuditLog;
 
 class CompanyLeaveCategory extends Model
 {
-    use Searchable, Restorable, HasGradeFromSession;
+    use Searchable, Restorable, HasGradeFromSession, HasAuditLog;
 
     /**
      * The table associated with the model.

@@ -13,10 +13,8 @@ trait CompanySalaryTemplateRepository
      */
     public function storeCompanySalaryTemplate(array $data, User $user)
     {
-        $grade = ['grade_id' => userGrades()];
-        $template = new CompanySalaryTemplate(array_merge($data, $grade));
+        $template = new CompanySalaryTemplate($data);
         if ($template->save()) {
-            $user->log('membuat template gaji baru ' . $template->name . ' <strong>[ID: ' . $template->id . ']</strong>', CompanySalaryTemplate::class, $template->id);
             return $template;
         }
         return false;
@@ -27,10 +25,8 @@ trait CompanySalaryTemplateRepository
      */
     public function updateCompanySalaryTemplate(CompanySalaryTemplate $template, array $data, User $user)
     {
-        $grade = ['grade_id' => userGrades()];
-        $template = $template->fill(array_merge($data, $grade));
+        $template = $template->fill($data);
         if ($template->save()) {
-            $user->log('memperbarui template gaji ' . $template->name . ' <strong>[ID: ' . $template->id . ']</strong>', CompanySalaryTemplate::class, $template->id);
             return $template;
         }
         return false;
@@ -42,7 +38,6 @@ trait CompanySalaryTemplateRepository
     public function destroyCompanySalaryTemplate(CompanySalaryTemplate $template, User $user)
     {
         if (!$template->trashed() && $template->delete()) {
-            $user->log('menghapus template gaji ' . $template->name . ' <strong>[ID: ' . $template->id . ']</strong>', CompanySalaryTemplate::class, $template->id);
             return $template;
         }
         return false;
@@ -54,7 +49,6 @@ trait CompanySalaryTemplateRepository
     public function restoreCompanySalaryTemplate(CompanySalaryTemplate $template, User $user)
     {
         if ($template->trashed() && $template->restore()) {
-            $user->log('memulihkan template gaji ' . $template->name . ' <strong>[ID: ' . $template->id . ']</strong>', CompanySalaryTemplate::class, $template->id);
             return $template;
         }
         return false;

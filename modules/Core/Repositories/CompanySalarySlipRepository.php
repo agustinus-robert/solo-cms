@@ -21,9 +21,8 @@ trait CompanySalarySlipRepository
      */
     public function storeCompanySalarySlip(array $data)
     {
-        $slip = new CompanySalarySlip(array_merge(Arr::only($data, ['az', 'name']), ['grade_id' => userGrades()]));
+        $slip = new CompanySalarySlip(Arr::only($data, ['az', 'name']));
         if ($slip->save()) {
-            Auth::user()->log('membuat slip gaji baru ' . $slip->name . ' <strong>[ID: ' . $slip->id . ']</strong>', CompanySalarySlip::class, $slip->id);
             return $slip;
         }
         return false;
@@ -34,9 +33,8 @@ trait CompanySalarySlipRepository
      */
     public function updateCompanySalarySlip(CompanySalarySlip $slip, array $data)
     {
-        $slip = $slip->fill(array_merge(Arr::only($data, ['az', 'name']), ['grade_id' => userGrades()]));
+        $slip = $slip->fill(Arr::only($data, ['az', 'name']));
         if ($slip->save()) {
-            Auth::user()->log('memperbarui slip gaji ' . $slip->name . ' <strong>[ID: ' . $slip->id . ']</strong>', CompanySalarySlip::class, $slip->id);
             return $slip;
         }
         return false;
@@ -48,7 +46,6 @@ trait CompanySalarySlipRepository
     public function destroyCompanySalarySlip(CompanySalarySlip $slip)
     {
         if (!$slip->trashed() && $slip->delete()) {
-            Auth::user()->log('menghapus slip gaji ' . $slip->name . ' <strong>[ID: ' . $slip->id . ']</strong>', CompanySalarySlip::class, $slip->id);
             return $slip;
         }
         return false;
@@ -60,7 +57,6 @@ trait CompanySalarySlipRepository
     public function restoreCompanySalarySlip(CompanySalarySlip $slip)
     {
         if ($slip->trashed() && $slip->restore()) {
-            Auth::user()->log('memulihkan slip gaji ' . $slip->name . ' <strong>[ID: ' . $slip->id . ']</strong>', CompanySalarySlip::class, $slip->id);
             return $slip;
         }
         return false;

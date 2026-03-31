@@ -10,14 +10,6 @@ use Modules\Core\Enums\ReimbursementMethodEnum;
 class StoreRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('store', CompanyReimbursementCategory::class);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()

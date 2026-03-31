@@ -63,7 +63,9 @@
                             <select class="form-select @error('default_applied_role') is-invalid @enderror" name="default_applied_role">
                                 <option value="">-- Pilih --</option>
                                 @foreach($roles as $_role)
-                                    <option value="{{ $_role->id }}" @selected(old('default_applied_role') == $_role->id)>{{ $_role->name }}</option>
+                                    <option value="{{ $_role->id }}" @selected(old('default_applied_role') == $_role->id)>
+                                        {{ $_role->name }}
+                                    </option>
                                 @endforeach
                             </select>
                             <small class="text-muted d-block mt-1">Peran ini (termasuk hak akses) diterapkan ke pengguna yang menggunakan jabatan ini</small>

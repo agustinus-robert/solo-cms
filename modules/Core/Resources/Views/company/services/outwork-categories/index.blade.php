@@ -70,7 +70,7 @@
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_outwork_category')
+                                                @can('edit_outwork_category')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.services.outwork-categories.show', ['category' => $category->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
                                                 @can('destroy_outwork_category')
@@ -115,7 +115,7 @@
             <div class="card border-0">
                 <div class="card-body">Menu lainnya</div>
                 <div class="list-group list-group-flush border-top border-light">
-                    @can('store_outwork_category')
+                    @can('create_outwork_category')
                         <a class="list-group-item list-group-item-action" href="{{ route('core::company.services.outwork-categories.create', ['next' => url()->current()]) }}"><i class="mdi mdi-plus"></i> Buat kategori baru</a>
                     @endcan
                     <a class="list-group-item list-group-item-action text-danger" href="{{ route('core::company.services.outwork-categories.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat kategori yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>

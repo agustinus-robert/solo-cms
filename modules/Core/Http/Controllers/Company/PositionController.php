@@ -10,6 +10,7 @@ use Modules\Core\Http\Requests\Company\Position\StoreRequest;
 use Modules\Core\Http\Requests\Company\Position\UpdateRequest;
 use Modules\Core\Http\Controllers\Controller;
 use Modules\Core\Repositories\CompanyPositionRepository;
+use Spatie\Permission\Models\Role;
 
 class PositionController extends Controller
 {
@@ -39,7 +40,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        $roles = CompanyRole::all();
+        $roles = Role::where('guard_name', 'web')->get();
         $departments = CompanyDepartment::all();
         $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
 
@@ -65,7 +66,7 @@ class PositionController extends Controller
     {
         $position = $position->load('children', 'parents', 'meta');
 
-        $roles = CompanyRole::all();
+        $roles = Role::where('guard_name', 'web')->get();
         $departments = CompanyDepartment::all();
         $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
 

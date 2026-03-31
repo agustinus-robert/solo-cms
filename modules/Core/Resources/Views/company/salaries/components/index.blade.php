@@ -56,7 +56,7 @@
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_slip_component')
+                                                @can('edit_slip_component')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.salaries.components.show', ['component' => $component->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
                                                 @can('kill_slip_component')
@@ -91,7 +91,7 @@
                 </div>
                 <div><i class="mdi mdi-file-tree-outline mdi-48px text-light"></i></div>
             </div>
-            @can('store_slip_component')
+            @can('create_slip_component')
                 <div class="card border-0">
                     <div class="card-body"><i class="mdi mdi-plus"></i> Tambah komponen gaji baru</div>
                     <div class="card-body border-top">

@@ -8,14 +8,6 @@ use Modules\Core\Models\CompanyPosition;
 class UpdateRequest extends StoreRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('update', $this->position);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()

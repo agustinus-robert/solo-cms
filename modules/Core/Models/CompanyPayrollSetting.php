@@ -7,11 +7,11 @@ use App\Models\Traits\Cacheable\Cacheable;
 use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Enums\PayrollSettingEnum;
-use App\Models\Traits\HasGradeFromSession;
+use App\Traits\HasAuditLog;
 
 class CompanyPayrollSetting extends Model
 {
-    use Cacheable, Searchable, Restorable, HasGradeFromSession;
+    use Cacheable, Searchable, Restorable, HasAuditLog;
 
     /**
      * The table associated with the model.
@@ -22,7 +22,7 @@ class CompanyPayrollSetting extends Model
      * fillable column
      */
     protected $fillable = [
-        'key', 'az', 'meta', 'grade_id'
+        'key', 'az', 'meta'
     ];
 
     /**

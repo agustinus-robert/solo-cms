@@ -23,10 +23,9 @@ trait CompanyStudentLeaveCategoryRepository
      */
     public function storeCompanyLeaveCategory(array $data)
     {
-        $category = new CompanyStudentLeaveCategory(array_merge(
+        $category = new CompanyStudentLeaveCategory(
            Arr::only($data, $this->keys),
-            ['grade_id' => userGrades()]
-        ));
+        );
 
         if ($category->save()) {
             Auth::user()->log('membuat kategori izin baru dengan nama ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanyStudentLeaveCategory::class, $category->id);
@@ -40,11 +39,10 @@ trait CompanyStudentLeaveCategoryRepository
      */
     public function updateCompanyLeaveCategory(CompanyStudentLeaveCategory $category, array $data)
     {
-        $category = $category->fill(array_merge(
+        $category = $category->fill(
            Arr::only($data, $this->keys),
-            ['grade_id' => userGrades()]
-        ));
-        
+        );
+
         if ($category->save()) {
             Auth::user()->log('memperbarui kategori izin ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanyStudentLeaveCategory::class, $category->id);
             return $category;

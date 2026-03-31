@@ -81,7 +81,7 @@
                     <a class="list-group-item list-group-item-action text-danger" href="{{ route('core::company.salaries.configs.index', ['next' => url()->current(), 'trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can"></i> Tampilkan setting {{ request('trash') ? 'tidak' : '' }} dihapus!</a>
                 </div>
             </div>
-            @can('store_slip_component')
+            @can('create_slip_component')
                 <a class="btn btn-outline-primary w-100 text-primary d-flex align-items-center bg-white py-3 text-start" style="cursor: pointer;" href="{{ route('core::company.salaries.configs.create', ['next' => url()->current()]) }}">
                     <i class="mdi mdi-plus-outline me-3"></i>
                     <div>Tambah pengaturan <br> <small class="text-muted">Klik di sini untuk menambah pengaturan!</small></div>

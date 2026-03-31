@@ -14,14 +14,10 @@ trait CompanySalarySlipSettingRepository
     public function storePayrollConfig(array $data, User $user)
     {
         $setting = new CompanyPayrollSetting(
-            array_merge(
-                Arr::only($data, ['key', 'az', 'meta']),
-                ['grade_id' => userGrades()]
-            )
+            Arr::only($data, ['key', 'az', 'meta']),
         );
-        
+
         if ($setting->save()) {
-            $user->log('membuat pengaturan gaji baru <strong>[ID: ' . $setting->id . ']</strong>', CompanyPayrollSetting::class, $setting->id);
             return $setting;
         }
         return false;
@@ -33,7 +29,6 @@ trait CompanySalarySlipSettingRepository
     public function destroyPayrollConfig(CompanyPayrollSetting $setting, User $user)
     {
         if (!$setting->trashed() && $setting->delete()) {
-            $user->log('menghapus kategori gaji ' . $setting->name . ' <strong>[ID: ' . $setting->id . ']</strong>', CompanyPayrollSetting::class, $setting->id);
             return $setting;
         }
         return false;

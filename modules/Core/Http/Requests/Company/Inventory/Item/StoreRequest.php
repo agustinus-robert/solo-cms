@@ -14,14 +14,6 @@ class StoreRequest extends FormRequest
     public $placeable;
 
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('store', CompanyInventory::class);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()
@@ -88,7 +80,7 @@ class StoreRequest extends FormRequest
             }
         }
 
-        for ($i = 0; $i < $this->input('count') ; $i++) { 
+        for ($i = 0; $i < $this->input('count') ; $i++) {
             $inventories[] = [
                 ...$this->only('name', 'category', 'brand', 'condition', 'placeable_id', 'user_id', 'pic_id', 'proposal_id', 'quantity', 'bought_at'),
                 'kd'                => time() * 1000 + $i,

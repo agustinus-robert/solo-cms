@@ -5,11 +5,11 @@ namespace Modules\Core\Models;
 use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Traits\HasGradeFromSession;
+use App\Traits\HasAuditLog;
 
 class CompanySalarySlip extends Model
 {
-    use Searchable, Restorable, HasGradeFromSession;
+    use Searchable, Restorable, HasAuditLog;
 
     /**
      * The table associated with the model.

@@ -98,7 +98,7 @@
             <div class="card border-0">
                 <div class="card-body">Menu lainnya</div>
                 <div class="list-group list-group-flush border-top border-light">
-                    @can('store_departement')
+                    @can('create_leave_category')
                         <a class="list-group-item list-group-item-action" href="{{ route('core::company.services.leave-categories.create', ['next' => url()->current()]) }}"><i class="mdi mdi-plus"></i> Buat kategori baru</a>
                     @endcan
                     <a class="list-group-item list-group-item-action text-danger" href="{{ route('core::company.services.leave-categories.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat kategori yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>

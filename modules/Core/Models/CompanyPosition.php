@@ -75,6 +75,16 @@ class CompanyPosition extends Model
             ->orderBy('level');
     }
 
+    public function children()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'cmp_position_trees',
+            'parent_id',
+            'position_id'
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | SCOPE

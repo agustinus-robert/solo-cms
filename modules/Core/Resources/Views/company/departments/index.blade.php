@@ -56,16 +56,16 @@
                                         <td>{{ $department->created_at->diffForHumans() }}</td>
                                         <td class="py-2 text-end" nowrap>
                                             @if ($department->trashed())
-                                                @can('restore_departement')
+                                                @can('restore_department')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.departments.restore', ['department' => $department->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
                                                         <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_departement')
+                                                @can('edit_department')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.departments.show', ['department' => $department->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
-                                                @can('kill_departement')
+                                                @can('destroy_department')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.departments.destroy', ['department' => $department->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
@@ -78,7 +78,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store_departement')
+                                                @can('create_department')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('core::company.departments.create', ['next' => url()->current()]) }}"><i class="mdi mdi-plus"></i> Buat departemen baru</a>
                                                     </div>
@@ -107,7 +107,7 @@
             <div class="card border-0">
                 <div class="card-body">Menu lainnya</div>
                 <div class="list-group list-group-flush border-top border-light">
-                    @can('store_departement')
+                    @can('create_department')
                         <a class="list-group-item list-group-item-action" href="{{ route('core::company.departments.create', ['next' => url()->current()]) }}"><i class="mdi mdi-plus"></i> Buat divisi baru</a>
                     @endcan
                     <a class="list-group-item list-group-item-action text-danger" href="{{ route('core::company.departments.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat divisi yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>

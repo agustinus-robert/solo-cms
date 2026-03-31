@@ -5,12 +5,12 @@ namespace Modules\Core\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
-use App\Models\References\Grade;
+use App\Traits\HasAuditLog;
 use App\Models\Traits\HasGradeFromSession;
 
 class CompanyDepartment extends Model
 {
-    use Restorable, Searchable, HasGradeFromSession;
+    use Restorable, Searchable, HasGradeFromSession, HasAuditLog;
 
     /**
      * The table associated with the model.
@@ -21,7 +21,7 @@ class CompanyDepartment extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'kd', 'name', 'description', 'parent_id', 'is_visible', 'grade_id'
+        'kd', 'name', 'description', 'parent_id', 'is_visible'
     ];
 
     /**

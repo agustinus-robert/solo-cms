@@ -24,14 +24,10 @@ trait CompanySalarySlipCategoryRepository
     public function storeCompanySalarySlipCategory(array $data)
     {
         $category = new CompanySalarySlipCategory(
-            array_merge(
-                Arr::only($data, ['slip_id', 'az', 'name']),
-                ['grade_id' => userGrades()]
-            )
+            Arr::only($data, ['slip_id', 'az', 'name'])
         );
 
         if ($category->save()) {
-            Auth::user()->log('membuat kategori gaji baru ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanySalarySlipCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -43,14 +39,10 @@ trait CompanySalarySlipCategoryRepository
     public function updateCompanySalarySlipCategory(CompanySalarySlipCategory $category, array $data)
     {
         $category = $category->fill(
-            array_merge(
-                Arr::only($data, ['slip_id', 'az', 'name']),
-                ['grade_id' => userGrades()]
-            )
+            Arr::only($data, ['slip_id', 'az', 'name']),
         );
-        
+
         if ($category->save()) {
-            Auth::user()->log('memperbarui kategori gaji ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanySalarySlipCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -62,7 +54,6 @@ trait CompanySalarySlipCategoryRepository
     public function destroyCompanySalarySlipCategory(CompanySalarySlipCategory $category)
     {
         if (!$category->trashed() && $category->delete()) {
-            Auth::user()->log('menghapus kategori gaji ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanySalarySlipCategory::class, $category->id);
             return $category;
         }
         return false;
@@ -74,7 +65,6 @@ trait CompanySalarySlipCategoryRepository
     public function restoreCompanySalarySlipCategory(CompanySalarySlipCategory $category)
     {
         if ($category->trashed() && $category->restore()) {
-            Auth::user()->log('memulihkan kategori gaji ' . $category->name . ' <strong>[ID: ' . $category->id . ']</strong>', CompanySalarySlipCategory::class, $category->id);
             return $category;
         }
         return false;

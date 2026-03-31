@@ -61,6 +61,8 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
             Route::post('loans', 'LoanController@store')->name('loans.store');
             Route::get('loans/{loan}', 'LoanController@show')->name('loans.show');
             Route::put('loans/{loan}', 'LoanController@update')->name('loans.update');
+
+
             Route::patch('loans/{loan}/paid', 'LoanController@togglePaid')->name('loans.paid');
             Route::put('/loans/{loan}/restore', 'LoanController@restore')->name('loans.restore');
             Route::delete('loans/{loan}', 'LoanController@destroy')->name('loans.destroy');
