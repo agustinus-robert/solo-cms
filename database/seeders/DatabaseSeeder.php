@@ -18,14 +18,14 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            \Modules\Core\Database\Seeders\MomentDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\ContractDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\VacationDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\LeaveDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\InsuranceDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\OutworkDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\SlipDatabaseSeeder::class,
-            \Modules\Core\Database\Seeders\LoanDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\MomentDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\ContractDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\VacationDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\LeaveDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\InsuranceDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\OutworkDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\SlipDatabaseSeeder::class,
+            // \Modules\Core\Database\Seeders\LoanDatabaseSeeder::class,
             OnlyDataSeeder::class,
             PermitSeeder::class
         ]);

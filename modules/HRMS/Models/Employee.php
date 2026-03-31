@@ -17,8 +17,6 @@ class Employee extends Model
 {
     use Metable, Userstamps, Restorable, Searchable, EmployeeTrait;
 
-    protected $connection = 'mysql';
-
     /**
      * The table associated with the model.
      */
@@ -555,9 +553,9 @@ class Employee extends Model
     {
         return $query->whereHas('contract.position', function ($query) use ($dept_id) {
             $query->whereHas('position', function ($childQuery) use ($dept_id) {
-                
+
                 $type = $dept_id == 7 ? PositionTypeEnum::TEACHERJAKARTA : PositionTypeEnum::TEACHER;
-                
+
                 $childQuery->where('cmp_positions.type', $type);
 
                 if ($dept_id) {
