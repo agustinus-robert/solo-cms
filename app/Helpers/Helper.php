@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 if (!function_exists('cfg')) {
     /*
@@ -12,15 +13,6 @@ if (!function_exists('cfg')) {
     }
 }
 
-if (!function_exists('mapel')) {
-    /*
-     * Get config
-     */
-    function mapel($id)
-    {
-        return Modules\Academic\Models\AcademicSubject::find($id);
-    }
-}
 
 if (!function_exists('isLevelOne')) {
     /**
@@ -74,16 +66,16 @@ if (!function_exists('cfgupd') && function_exists('cfg')) {
     }
 }
 
-if (!function_exists('userGrades')) {
-    function userGrades()
+if (!function_exists('cutoff')) {
+    function cmp_cutoff($index)
     {
-        if (session()->has('selected_grade')) {
-            return session('selected_grade');
-        }
-
-        return auth()->user()->employee->grade_id ?? null;
+        return Carbon::parse(
+            array_reduce(setting('cmp_cutoff_date')[$index] ?? [], fn ($result, $time) => strtotime($time, $result ?? null))
+        );
     }
 }
+
+
 
 if (!function_exists('getGrade')) {
     /*

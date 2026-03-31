@@ -20,8 +20,6 @@ class RegistrationController extends Controller
      * */
     public function index(Request $request)
     {
-        $this->authorize('access', EmployeeInsurance::class);
-
         return view('finance::benefit.insurances.index', [
             'required_salary' => ($required_salary = CompanyInsurancePrice::pluck('price_factor_additional')->flatten()->unique()->filter()),
             'employees' => Employee::with(['user', 'position.position', 'insurances.price.insurance', 'salaryTemplate' => fn($item) => $item->whereHas('items.component', fn($component) => $component->whereIn('kd', $required_salary))])
@@ -35,8 +33,6 @@ class RegistrationController extends Controller
      */
     public function create(Request $request)
     {
-        $this->authorize('store', EmployeeInsurance::class);
-
         $employee = Employee::with(['salaryTemplate' => fn($template) => $template->hasPrimarySalary()->with('items.component')])->find($request->get('employee'));
 
         $refSal = setting('cmp_insurance_max_salary') ?? (config('modules.hrms.features.benefit.insurance.maxSalary') ?? 0);
@@ -53,8 +49,6 @@ class RegistrationController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('store', EmployeeInsurance::class);
-
         $employee = Employee::find($request->input('employee'));
 
         $insurances = [];
@@ -70,8 +64,6 @@ class RegistrationController extends Controller
 
     public function destroy(EmployeeInsurance $insurance)
     {
-        $this->authorize('destroy', $insurance);
-
         if ($data = $this->destroyInsurance($insurance)) {
             return redirect()->next()->with('success', 'Daftar asuransi <strong>' . $data->price->insurance->name . '</strong> karyawan atas nama <strong>' . $data->employee->user->name . '</strong> telah berhasil dihapus.');
         }
@@ -80,8 +72,6 @@ class RegistrationController extends Controller
 
     public function reset(Employee $employee)
     {
-        $this->authorize('destroy', $employee);
-
         if ($employee->insurances()->delete()) {
             return redirect()->next()->with('success', 'Daftar asuransi karyawan atas nama <strong>' . $employee->user->name . '</strong> telah berhasil dikosongkan.');
         }
@@ -90,8 +80,6 @@ class RegistrationController extends Controller
 
     public function savemaxsalary(Request $request)
     {
-        $this->authorize('store', EmployeeInsurance::class);
-
         setting_set('cmp_insurance_max_salary', $request->input('max_salary'));
         setting_set('cmp_insurance_min_salary', $request->input('min_salary'));
 

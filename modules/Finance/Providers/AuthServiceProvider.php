@@ -15,13 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $policies = [
-        HRMSPolicy\EmployeeSalaryPolicy::class,
-        HRMSPolicy\EmployeeOvertimePolicy::class,
-        HRMSPolicy\EmployeeOutworkPolicy::class,
-        HRMSPolicy\EmployeeInsurancePolicy::class,
-        HRMSPolicy\EmployeeDataRecapitulationPolicy::class,
-    ];
+    protected $policies = [];
 
     /**
      * Register any authentication / authorization services.
@@ -30,9 +24,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Gate::define(
-            'finance::access',
-            fn (User $user) => count(array_filter(array_map(fn ($policy) => (new $policy())->access($user), $this->policies)))
-        );
+        Gate::define('finance::access', function ($user) {
+            return true;
+        });
     }
 }

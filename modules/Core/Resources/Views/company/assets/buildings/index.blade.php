@@ -25,27 +25,6 @@
                             </div>
                         </form>
                     </div>
-
-                    <div class="col-12 p-2">
-                        <div class="container">
-                            @if (Session::has('success'))
-                                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-                                    <div class="alert alert-success">
-                                        {!! Session::get('success') !!}
-                                    </div>
-                                </div>
-                            @endif 
-
-                            @if (Session::has('danger'))
-                                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 1500)" x-show="show">
-                                    <div class="alert-danger alert">
-                                        {!! Session::get('danger') !!}
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
                     <div class="table-responsive">
                         <table class="table">
                             <thead class="font-weight-bold">

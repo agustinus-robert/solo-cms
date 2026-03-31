@@ -15,8 +15,12 @@ class ContractDatabaseSeeder extends Seeder
     public function run()
     {
         $contracts = [
-            'honor' => 'SK Honorer',
-            'tetap' => 'SK Tetap'
+            'pkwtt' => 'PKWTT (Karyawan Tetap)',
+            'pkwt' => 'PKWT (Karyawan tidak tetap)',
+            'part-time' => 'Part Time (Paruh Waktu)',
+            'freelance' => 'Freelance',
+            'magang' => 'Magang',
+            'outsourching' => 'Outsourching'
         ];
 
         foreach ($contracts as $kd => $name) {

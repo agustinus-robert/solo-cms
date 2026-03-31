@@ -19,8 +19,6 @@ class VacationCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyVacationCategory::class);
-
         $categories = CompanyVacationCategory::whenTrashed($request->get('trash'))
                                         ->search($request->get('search'))
                                         ->paginate($request->get('limit', 10));
@@ -35,11 +33,9 @@ class VacationCategoryController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyVacationCategory::class);
-
         $types = VacationTypeEnum::cases();
 
-        return view('core::company.services.vacation-categories.form', compact('types'));
+        return view('core::company.services.vacation-categories.create', compact('types'));
     }
 
     /**
@@ -61,11 +57,9 @@ class VacationCategoryController extends Controller
      */
     public function show(CompanyVacationCategory $category)
     {
-        $this->authorize('update', $category);
-
         $types = VacationTypeEnum::cases();
 
-        return view('core::company.services.vacation-categories.form', compact('category', 'types'));
+        return view('core::company.services.vacation-categories.show', compact('category', 'types'));
     }
 
     /**
@@ -87,8 +81,6 @@ class VacationCategoryController extends Controller
      */
     public function destroy(CompanyVacationCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if($category = $this->destroyCompanyVacationCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori cuti dengan nama <strong>'.$category->name.'</strong> telah berhasil dihapus.');
@@ -103,8 +95,6 @@ class VacationCategoryController extends Controller
      */
     public function restore(CompanyVacationCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if($category = $this->restoreCompanyVacationCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori cuti dengan nama <strong>'.$category->name.'</strong> telah berhasil dipulihkan.');

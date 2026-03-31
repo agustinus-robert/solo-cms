@@ -22,8 +22,6 @@ class ComponentController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanySalarySlipComponent::class);
-
         return view('core::company.salaries.components.index', [
             'components'   => $this->getCompanySalarySlipComponent($request),
             'components_count'   => CompanySalarySlipComponent::count(),
@@ -49,7 +47,6 @@ class ComponentController extends Controller
      */
     public function show(CompanySalarySlipComponent $component)
     {
-        $this->authorize('update', $component);
         return view('core::company.salaries.components.show', [
             'salary'     => $component,
             'categories' => CompanySalarySlipCategory::get(),
@@ -76,8 +73,6 @@ class ComponentController extends Controller
      */
     public function destroy(CompanySalarySlipComponent $component)
     {
-        $this->authorize('destroy', $component);
-
         if ($salary = $this->destroyCompanySalarySlipComponent($component)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $salary->name . '</strong> telah berhasil dihapus.');
@@ -90,8 +85,6 @@ class ComponentController extends Controller
      */
     public function restore(CompanySalarySlipComponent $component)
     {
-        $this->authorize('restore', $component);
-
         if ($salary = $this->restoreCompanySalarySlipComponent($component)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $salary->name . '</strong> telah berhasil dipulihkan.');

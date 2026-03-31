@@ -1,172 +1,166 @@
-@extends('layouts.horizontal-layout')
+@extends('core::layouts.default')
 
 @section('title', 'Pengguna | ')
 @section('navtitle', 'Pengguna')
-@section('bodyclass', 'app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show')
 
-
-@push('nav')
-    @include('core::layouts.includes.navbar-core')
-@endpush
-
-@php
-    $trashed = null;
-    $columns = [
-        [
-            'label' => '',
-            'slot'  => fn($user) => "<div class='rounded-circle' style='background: url(\"{$user->profile_avatar_path}\") center center no-repeat; background-size: cover; width:32px; height:32px;'></div>",
-        ],
-        [
-            'label' => 'Nama',
-            'slot'  => function($user) {
-                if ($user->trashed() || !Auth::user()->can('show', $user)) {
-                    return "<span class='text-muted'>{$user->profile->name}</span>";
-                }
-                $name = !empty($user->name) ? $user->name : $user->profile->name;
-                $url  = route('core::system.users.show', ['user' => $user->id, 'page' => 'profile', 'next' => url()->current()]);
-                return "<a class='text-dark' href='{$url}'>{$name}</a>";
-            },
-        ],
-        [
-            'label' => 'Username',
-            'slot'  => fn($user) => $user->username,
-        ],
-        [
-            'label' => 'Peran',
-            'slot'  => fn($user) => $user->roles->isNotEmpty()
-                ? $user->roles->map(fn($role) => "<span class='badge bg-dark fw-normal'>{$role->name}</span>")->implode(' ')
-                : '-',
-            'class' => 'text-center',
-        ],
-        [
-            'label' => 'Aksi',
-            'slot'  => function($user) {
-                if ($user->isNot(Auth::user())) {
-                    // User sudah dihapus
-                    if ($user->trashed()) {
-                        if (Auth::user()->can('restore', $user)) {
-                            return view('components.partial-actions', [
-                                'item' => $user,
-                                'routes' => [
-                                    'restore' => 'core::system.users.restore',
-                                    'kill' => 'core::system.users.kill',
-                                ],
-                                'trashed' => true,
-                                'useModal' => false,
-                            ])->render();
-                        }
-                    } else {
-                        return view('components.partial-actions', [
-                            'item' => $user,
-                            'routes' => [
-                                'show' => 'core::system.users.show',
-                                'destroy' => 'core::system.users.destroy',
-                                'repass' => 'core::system.users.repass',
-                                'cross-login' => 'core::system.users.cross-login',
-                            ],
-                            'trashed' => false,
-                            'useModal' => false,
-                        ])->render();
-                    }
-                }
-                return ''; // Jika user sendiri atau tidak punya izin
-            },
-            'class' => 'text-end',
-        ],
-    ];
-@endphp
-
-@php
-    $extraMenus = [
-        [
-            'label' => request('trash') ? 'Lihat pengguna aktif' : 'Lihat pengguna dihapus',
-            'route' => route('core::system.users.index', ['trash' => !request('trash')]),
-            'icon' => request('trash') ? 'visibility' : 'delete',
-            'class' => request('trash') ? 'text-primary font-weight-bold' : 'text-danger'
-        ]
-    ];
-@endphp
-
-@push('additional-content')
-    <x-sidebar-card 
-        title="Menu Lainnya" 
-        icon="settings" 
-        :items="$extraMenus" 
-    />
-@endpush
-
-@section('body-content')
-    @include('components.navbar-admin')
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8">
-
-                <x-table
-                    :isSearch="true"
-                    type="material"
-                    :data="$users"
-                    :columns="$columns"
-                    title="Kelola Pengguna"
-                    searchRoute="{{ route('core::system.users.index', ['search' => request('search')]) }}"
-                    :trash="$trashed"
-                    :count="$users_count"
-                    countLabel="Jumlah Pengguna"
-                />
-            </div>
-
-            <div class="col-md-4">
-                @can('store', Modules\Account\Models\User::class)
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6>Tambah pengguna baru</h6>
-                        </div>
-
-                        <div class="card-body">
-                            <form class="form-block" action="{{ route('core::system.users.store', ['next' => url()->full()]) }}" method="post"> @csrf
-                                <x-input-group :isRow="true" required>
-                                    <x-label value="Nama lengkap" for="name" />
-                                    <x-col size="12">
-                                        <x-input
-                                            type="text"
-                                            name="name"
-                                            :value="old('name')"
-                                            required
-                                            @class(['is-invalid' => $errors->has('name')])
-                                        />
-                                        @error('name')
-                                            <small class="text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </x-col>
-                                </x-input-group>
-
-                                <x-input-group :isRow="true" required>
-                                    <x-label value="Username" for="username" />
-                                    <x-col size="12">
-                                        <x-input
-                                            type="text"
-                                            name="username"
-                                            :value="old('username')"
-                                            required
-                                            @class(['is-invalid' => $errors->has('username')])
-                                        />
-                                        @error('username')
-                                            <small class="text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </x-col>
-                                </x-input-group>
-
-                                <x-input-group :isRow="false">
-                                    <x-col size="12">
-                                        <x-btn variant="dark">
-                                            <i class="mdi mdi-check"></i> Simpan
-                                        </x-btn>
-                                    </x-col>
-                                </x-input-group>
-                            </form>
-                        </div>
+@section('content')
+    <div class="row">
+        <div class="col-md-8">
+            <section>
+                <div class="card border-0">
+                    <div class="card-body">
+                        <i class="mdi mdi-format-list-bulleted"></i> Daftar pengguna
                     </div>
-                @endcan
+                    <div class="card-body border-top border-light">
+                        <form class="form-block row gy-2 gx-2" action="{{ route('core::system.users.index') }}" method="get">
+                            <input name="trash" type="hidden" value="{{ request('trash') }}">
+                            <div class="flex-grow-1 col-auto">
+                                <input class="form-control" name="search" placeholder="Cari nama atau username ..." value="{{ request('search') }}" onkeyup="searchTable()" />
+                            </div>
+                            <div class="col-auto">
+                                <a class="btn btn-light" href="{{ route('core::system.users.index', request()->only('trashed', 'closed')) }}"><i class="mdi mdi-refresh"></i> <span class="d-sm-none">Reset</span></a>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-dark"><i class="mdi mdi-magnify"></i> Cari</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-hover mb-0 table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th></th>
+                                    <th>Nama</th>
+                                    <th>Username</th>
+                                    <th class="text-center">Peran</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($users as $user)
+                                    <tr @if ($user->trashed()) class="table-light text-muted" @endif>
+                                        <td>{{ $loop->iteration + $users->firstItem() - 1 }}</td>
+                                        <td width="10">
+                                            <div class="rounded-circle" style="background: url('{{ $user->profile_avatar_path }}') center center no-repeat; background-size: cover; width: 32px; height: 32px;"></div>
+                                        </td>
+                                        <td class="fw-bold" nowrap>
+                                            @if ($user->trashed() || !Auth::user()->can('show_user'))
+                                                <span class="text-muted">{{ $user->name }}</span>
+                                            @else
+                                                <a class="text-dark" href="{{ route('core::system.users.show', ['user' => $user->id, 'page' => 'profile', 'next' => url()->current()]) }}">{{ $user->name }}</a>
+                                            @endif
+                                        </td>
+                                        <td>{{ $user->username }}</td>
+                                        <td class="text-center">
+                                            @forelse($user->roles as $role)
+                                                <span class="badge bg-dark fw-normal">{{ $role->name }}</span>
+                                            @empty -
+                                            @endforelse
+                                        </td>
+                                        <td class="py-2 text-end" nowrap>
+                                            @if ($user->isnot(Auth::user()))
+                                                @if ($user->trashed())
+                                                    @can('restore_user')
+                                                        <form class="form-block form-confirm d-inline" action="{{ route('core::system.users.restore', ['user' => $user->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
+                                                            <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
+                                                        </form>
+                                                        <form class="form-block form-confirm d-inline" action="{{ route('core::system.users.kill', ['user' => $user->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
+                                                            <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus permanen"><i class="mdi mdi-trash-can-outline"></i></button>
+                                                        </form>
+                                                    @endcan
+                                                @else
+                                                    @can('show_user')
+                                                        <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('core::system.users.show', ['user' => $user->id, 'page' => 'profile', 'next' => url()->full()]) }}" method="post" data-bs-toggle="tooltip" title="Lihat detail"><i class="mdi mdi-eye-outline"></i></a>
+                                                    @endcan
+                                                    @can('destroy_user')
+                                                        <form class="form-block form-confirm d-inline" action="{{ route('core::system.users.destroy', ['user' => $user->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
+                                                            <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
+                                                        </form>
+                                                    @endcan
+                                                    @can(['cross-login', 'update'])
+                                                        <div class="dropstart d-inline">
+                                                            <button class="btn btn-soft-secondary text-dark rounded px-2 py-1" type="button" data-bs-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
+                                                            <ul class="dropdown-menu border-0 shadow">
+                                                                @can('cross-login')
+                                                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cross-login" data-user='{"id":"{{ $user->id }}","name":"{{ $user->name }}"}' style="cursor: pointer;"><i class="mdi mdi-login"></i> Login dengan akun ini</a></li>
+                                                                @endcan
+                                                                @can('update_user')
+                                                                    <li>
+                                                                        <form class="dropdown-item form-block form-confirm" action="{{ route('core::system.users.repass', ['user' => $user->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
+                                                                            <button class="btn btn-link text-dark p-0"><i class="mdi mdi-lock-open-outline"></i> Setel ulang sandi</button>
+                                                                        </form>
+                                                                    </li>
+                                                                @endcan
+                                                            </ul>
+                                                        </div>
+                                                    @endcan
+                                                @endif
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6">
+                                            @include('components.notfound')
+                                            @if (!request('trash'))
+                                                @can('store_user')
+                                                    <div class="mb-lg-5 mb-4 text-center">
+                                                        <a class="btn btn-soft-danger" onclick='document.querySelector(`[name="name"]`).focus()'><i class="mdi mdi-plus"></i> Tambah pengguna baru</a>
+                                                    </div>
+                                                @endcan
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-body">
+                        {{ $users->appends(request()->all())->links() }}
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-body d-flex justify-content-between align-items-center flex-row border-0 py-4">
+                <div>
+                    <div class="display-4">{{ $users_count }}</div>
+                    <div class="small fw-bold text-secondary text-uppercase">Jumlah pengguna</div>
+                </div>
+                <div><i class="mdi mdi-account-group-outline mdi-48px text-light"></i></div>
+            </div>
+            @can('store_user')
+                <div class="card border-0">
+                    <div class="card-body"><i class="mdi mdi-account-plus-outline"></i> Tambah pengguna baru</div>
+                    <div class="card-body border-top">
+                        <form class="form-block" action="{{ route('core::system.users.store', ['next' => url()->full()]) }}" method="post"> @csrf
+                            <div class="mb-3">
+                                <label class="form-label" for="name">Nama lengkap</label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="username">Username</label>
+                                <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required>
+                                @error('username')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div>
+                                <button class="btn btn-soft-danger"><i class="mdi mdi-check"></i> Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endcan
+            <div class="card border-0">
+                <div class="card-body">Menu lainnya</div>
+                <div class="list-group list-group-flush border-top border-light">
+                    <a class="list-group-item list-group-item-action text-danger" href="{{ route('core::system.users.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat pengguna yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>
+                </div>
             </div>
         </div>
     </div>

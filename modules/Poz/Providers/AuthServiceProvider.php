@@ -27,12 +27,6 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('poz::access', function ($user) {
             return true;
-            // $allowedPositions = [10, 11];
-
-            // return in_array(
-            //     $user->employee?->position?->position_id,
-            //     $allowedPositions
-            // );
         });
 
         Gate::define('supplier::access', function ($user) {

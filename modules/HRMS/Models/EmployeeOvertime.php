@@ -100,15 +100,13 @@ class EmployeeOvertime extends Model
      */
     public function scopeWhereExtractedDatesBetween($query, $start_at, $end_at)
     {
-        if (version_compare(config('database.connections.mysql.v'), '8.0.0', '>=')) {
-            return $query->join(DB::raw("JSON_TABLE(dates, '$[*]' COLUMNS(`_dates` DATE PATH '$.d')) AS _"), "{$this->table}.id", "{$this->table}.id")->whereBetween('_dates', [$start_at, $end_at]);
-        } else {
-            $length = EmployeeOvertime::selectRaw('MAX(JSON_LENGTH(dates)) as length')->value('length');
-            for ($i = 0; $i < $length; $i++) {
-                $query = $query->{$i == 0 ? "whereBetween" : "orWhereBetween"}("dates->[{$i}]->d", [$start_at, $end_at]);
-            }
-            return $query;
-        }
+        $table = $query->getModel()->getTable();
+
+        return $query->whereExists(function ($q) use ($start_at, $end_at, $table) {
+            $q->select(DB::raw('1'))
+                ->from(DB::raw("(SELECT id, jsonb_array_elements(dates::jsonb) AS elem FROM {$table}) AS js"))
+                ->whereRaw("js.elem->>'d' BETWEEN ? AND ?", [$start_at, $end_at]);
+        });
     }
 
     /**
@@ -132,11 +130,21 @@ class EmployeeOvertime extends Model
      */
     public function scopeWhenDatesBetween($query, $start_at = false, $end_at = false)
     {
-        return $query->where(
-            fn($subquery) => $subquery->when($start_at, fn($q) => $q->where(fn($s) => $s->whereRaw('dates->>"$[0].d" >= ?', $start_at)->orWhereJsonContains('dates', ['d' => $start_at])))
-                ->when($end_at, fn($q) => $q->where(fn($s) => $s->whereRaw('dates->>"$[0].d" <= ?', $end_at)->orWhereJsonContains('dates', ['d' => $end_at])))
-        );
+        $table = $query->getModel()->getTable();
+
+        return $query->where(function ($subquery) use ($start_at, $end_at, $table) {
+            if ($start_at || $end_at) {
+                $subquery->whereExists(function ($q) use ($start_at, $end_at, $table) {
+                    $q->select(DB::raw('1'))
+                        ->from(DB::raw("(SELECT id, jsonb_array_elements(dates::jsonb) AS elem FROM {$table}) AS js"))
+                        ->whereColumn('js.id', "{$table}.id")
+                        ->when($start_at, fn($q) => $q->whereRaw("(elem->>'d')::date >= ?", [$start_at]))
+                        ->when($end_at, fn($q) => $q->whereRaw("(elem->>'d')::date <= ?", [$end_at]));
+                });
+            }
+        });
     }
+
 
     /**
      * Scope when created at between.

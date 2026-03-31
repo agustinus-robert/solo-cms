@@ -51,7 +51,8 @@
                         <div class="row mb-3">
                             <label class="col-md-4 col-lg-3 col-form-label">Inputan waktu</label>
                             <div class="col-md-4">
-                                @foreach (['prepareable' => 'Persiapan kegiatan', 'fixed' => 'Tarif flat'] as $v => $description)
+                                <!-- 'prepareable' => 'Persiapan kegiatan',  -->
+                                @foreach (['fixed' => 'Tarif flat'] as $v => $description)
                                     <div class="form-check">
                                         <input class="form-check-input only_one" type="checkbox" id="meta{{ $v }}" value="1" name="meta[{{ $v }}]" @if (old('meta.$v') == 1) checked @endif>
                                         <label class="form-check-label" for="meta{{ $v }}"><code>{{ $v }}</code> <br> <small class="text-muted">{{ $description }}</small></label>

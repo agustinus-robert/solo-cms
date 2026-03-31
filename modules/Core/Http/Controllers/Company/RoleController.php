@@ -109,8 +109,6 @@ class RoleController extends Controller
      */
     public function restore(CompanyRole $role)
     {
-        $this->authorize('restore', $role);
-
         if ($role = $this->restoreCompanyRole($role)) {
 
             return redirect()->next()->with('success', 'Peran <strong>' . $role->name . ' (' . $role->kd . ')</strong> telah berhasil dipulihkan.');

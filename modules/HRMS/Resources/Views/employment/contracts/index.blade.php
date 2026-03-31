@@ -59,17 +59,17 @@
                                         </td>
                                         <td class="py-2 text-end" nowrap>
                                             @if ($contract->trashed())
-                                                @can('restore', $contract)
+                                                @can('restore-contract')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.contracts.restore', ['contract' => $contract->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
                                                         <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('show', $contract)
+                                                @can('show-contract')
                                                     <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::employment.contracts.show', ['contract' => $contract->id, 'next' => url()->full()]) }}" method="post" data-bs-toggle="tooltip" title="Lihat detail"><i class="mdi mdi-eye-outline"></i></a>
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('hrms::employment.contracts.edit', ['contract' => $contract->id, 'employee' => $contract->employee->id, 'next' => url()->full()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah perjanjian kerja"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
-                                                @can('destroy', $contract)
+                                                @can('destroy-contract')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.contracts.destroy', ['contract' => $contract->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
@@ -82,7 +82,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeContract::class)
+                                                @can('store-contract')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('hrms::employment.contracts.create', ['next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Buat perjanjian kerja baru</a>
                                                     </div>
@@ -111,7 +111,7 @@
             <div class="card border-0">
                 <div class="card-body">Menu lainnya</div>
                 <div class="list-group list-group-flush border-top border-light">
-                    @can('store', Modules\HRMS\Models\EmployeeContract::class)
+                    @can('store-contract')
                         <a class="list-group-item list-group-item-action" href="{{ route('hrms::employment.contracts.create', ['next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah perjanjian kerja baru</a>
                     @endcan
                     <a class="list-group-item list-group-item-action text-danger" href="{{ route('hrms::employment.contracts.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat perjanjian kerja yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>

@@ -21,8 +21,6 @@ class TemplateController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanySalarySlipComponent::class);
-
         return view('core::company.salaries.templates.index', [
             'templates'      => CompanySalaryTemplate::whenTrashed($request->get('trash'))->paginate($request->get('limit', 10)),
             'template_count' => CompanySalaryTemplate::count(),
@@ -35,7 +33,7 @@ class TemplateController extends Controller
     public function create()
     {
         $defaults = collect(setting('cmp_payroll_default_components'));
-        return view('core::company.salaries.templates.form', [
+        return view('core::company.salaries.templates.create', [
             'defaults' => $defaults,
             'slips' => CompanySalarySlip::with('categories.components')->get(),
             'items' => CompanySalarySlipComponent::get(),
@@ -70,8 +68,7 @@ class TemplateController extends Controller
      */
     public function show(CompanySalaryTemplate $template)
     {
-        $this->authorize('update', $template);
-        return view('core::company.salaries.templates.form', [
+        return view('core::company.salaries.templates.show', [
             'template'   => $template,
             'components' => collect($template['components']),
             'slips'      => CompanySalarySlip::with('categories.components')->get(),
@@ -96,8 +93,6 @@ class TemplateController extends Controller
      */
     public function destroy(CompanySalaryTemplate $template, Request $request)
     {
-        $this->authorize('destroy', $template);
-
         if ($template = $this->destroyCompanySalaryTemplate($template, $request->user())) {
 
             return redirect()->next()->with('success', 'Template gaji dengan nama <strong>' . $template->name . '</strong> telah berhasil dihapus.');
@@ -110,8 +105,6 @@ class TemplateController extends Controller
      */
     public function restore(CompanySalaryTemplate $template, Request $request)
     {
-        $this->authorize('restore', $template);
-
         if ($template = $this->restoreCompanySalaryTemplate($template, $request->user())) {
 
             return redirect()->next()->with('success', 'Template gaji dengan nama <strong>' . $template->name . '</strong> telah berhasil dipulihkan.');
@@ -123,16 +116,31 @@ class TemplateController extends Controller
     {
         $this->authorize('store', CompanySalaryTemplate::class);
         $componenet = setting('cmp_payroll_default_components');
+        $componenet13 = setting('cmp_payroll_default_postyear_components');
+        $componenetTHR = setting('cmp_payroll_default_feastday_components');
 
         $template = new CompanySalaryTemplate([
-            'kd' => 'gaji-bulan-'.userGrades(),
+            'kd' => 'gaji-bulan',
             'name' => 'Gaji Bulan',
             'components' => $componenet,
-            'meta' => null,
-            'grade_id' => userGrades()
+            'meta' => null
         ]);
 
-        if ($template->save()) {
+        $template2 = new CompanySalaryTemplate([
+            'kd' => 'template-slip-gaji-ke-13',
+            'name' => 'Template Slip Gaji ke-13',
+            'components' => $componenet13,
+            'meta' => null
+        ]);
+
+        $template3 = new CompanySalaryTemplate([
+            'kd' => 'template-thr',
+            'name' => 'Template THR',
+            'components' => $componenetTHR,
+            'meta' => null
+        ]);
+
+        if ($template->save() && $template2->save() && $template3->save()) {
             return redirect()->next()->with('success', 'Data template gaji telah berhasil disimpan.');
         }
         return redirect()->fail();

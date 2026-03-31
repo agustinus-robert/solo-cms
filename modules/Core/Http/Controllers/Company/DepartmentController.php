@@ -33,9 +33,9 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $departments = CompanyDepartment::get();
+        $departments = CompanyDepartment::all();
 
-        return view('core::company.departments.form', compact('departments'));
+        return view('core::company.departments.create', compact('departments'));
     }
 
     /**
@@ -56,10 +56,9 @@ class DepartmentController extends Controller
      */
     public function show(CompanyDepartment $department)
     {
-        $departments = CompanyDepartment::get();
+        $departments = CompanyDepartment::all();
 
-        return view('core::company.departments.form', compact('departments', 'department'));
-        // return view('core::company.departments.show', compact('departments', 'department'));
+        return view('core::company.departments.show', compact('departments', 'department'));
     }
 
     /**

@@ -18,7 +18,6 @@ class IncometaxController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', EmployeeSalary::class);
         $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');
         $end_at = Carbon::parse($request->get('end_at', cmp_cutoff(1)->format('Y-m-d')) . ' 23:59:59');
 
@@ -33,7 +32,6 @@ class IncometaxController extends Controller
 
     public function create(Request $request)
     {
-        $this->authorize('access', EmployeeSalary::class);
         $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');
         $end_at = Carbon::parse($request->get('end_at', cmp_cutoff(1)->format('Y-m-d')) . ' 23:59:59');
 

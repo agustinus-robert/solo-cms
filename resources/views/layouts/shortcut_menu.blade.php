@@ -36,6 +36,27 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('core::dashboard') }}">
+                        <i class="bx bxs-cog" style='font-size:30px;'></i>
+                        <span>Referensi</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('hrms::dashboard') }}">
+                        <i class="bx bx-briefcase" style='font-size:30px;'></i>
+                        <span>Kepegawaian</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('finance::dashboard') }}">
+                        <i class="bx bx-money" style='font-size:30px;'></i>
+                        <span>Keuangan</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Setting & Akun</span>

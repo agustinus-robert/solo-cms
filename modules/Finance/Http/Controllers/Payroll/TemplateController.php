@@ -27,8 +27,6 @@ class TemplateController extends Controller
      * */
     public function index(Request $request)
     {
-        $this->authorize('access', EmployeeSalaryTemplate::class);
-
         $year = $request->get('year', date('Y'));
         $religions = ReligionEnum::cases();
 
@@ -51,8 +49,6 @@ class TemplateController extends Controller
      */
     public function create(Request $request)
     {
-        $this->authorize('store', EmployeeSalaryTemplate::class);
-
         $employee = Employee::with(['salaryTemplates' => fn($t) => $t->with('items')->where('cmp_template_id', 1)->whereYear('start_at', now()->format('Y'))->whereYear('end_at', now()->format('Y')), 'contract'])->find($request->get('employee'));
         $activeTemplate = !empty($employee->salaryTemplates) ? $employee->salaryTemplates?->first() : null;
         $lastTemplate = $employee->lastSalaryTemplate ?? null;
@@ -82,7 +78,6 @@ class TemplateController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('store', EmployeeSalaryTemplate::class);
         if ($component = $this->storeEmployeeSalaryTemplate(Employee::find($request->input('employee')), $request->transformed()->toArray())) {
             return redirect()->next()->with(['success' => 'Data komponen gaji <strong>' . $component->employee->user->name . '</strong> telah berhasil dibuat.']);
         }
@@ -94,7 +89,6 @@ class TemplateController extends Controller
      */
     public function show(EmployeeSalaryTemplate $template, Request $request)
     {
-        $this->authorize('update', $template);
         $settings = CompanyPayrollSetting::whereAz(PayrollSettingEnum::FORMULA)->get();
         $cmptid = $settings->pluck('meta.component');
         $default_component = CompanySalarySlipComponent::with('category.slip')->whereJsonContains('meta->default_component', true)->first();
@@ -118,7 +112,6 @@ class TemplateController extends Controller
      */
     public function update(EmployeeSalaryTemplate $template, UpdateRequest $request)
     {
-        $this->authorize('store', EmployeeSalaryTemplate::class);
         if ($template = $this->updateEmployeeSalaryTemplate($template, $request->transformed()->toArray())) {
             return redirect()->next()->with(['success' => 'Data template gaji <strong>' . $template->employee->user->name . '</strong> telah berhasil dibuat.']);
         }
@@ -127,7 +120,6 @@ class TemplateController extends Controller
 
     public function destroy(EmployeeSalaryTemplate $template)
     {
-        $this->authorize('destroy', $template);
         if ($template = $this->destroyEmployeeSalaryTemplate($template)) {
             return redirect()->next()->with('success', 'Data template gaji <strong>' . $template->employee->user->name . '-' . $template->name . '</strong> telah berhasil dihapus.');
         }

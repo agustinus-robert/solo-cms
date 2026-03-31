@@ -19,8 +19,6 @@ class LoanCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyLoanCategory::class);
-
         $categories = CompanyLoanCategory::search($request->get('search'))
             ->whenTrashed($request->get('trash'))
             ->paginate($request->get('limit', 10));
@@ -35,7 +33,6 @@ class LoanCategoryController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyLoanCategory::class);
         $categories = CompanyLoanCategory::all();
         $types = LoanTypeEnum::cases();
 
@@ -58,8 +55,6 @@ class LoanCategoryController extends Controller
      */
     public function show(CompanyLoanCategory $category)
     {
-        $this->authorize('update', $category);
-
         $categories = CompanyLoanCategory::get();
         $types = LoanTypeEnum::cases();
 
@@ -82,8 +77,6 @@ class LoanCategoryController extends Controller
      */
     public function destroy(CompanyLoanCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if ($category = $this->destroyCompanyLoanCategory($category)) {
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>' . $category->name . '</strong> telah berhasil dihapus.');
         }
@@ -95,8 +88,6 @@ class LoanCategoryController extends Controller
      */
     public function restore(CompanyLoanCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if ($category = $this->restoreCompanyLoanCategory($category)) {
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>' . $category->name . '</strong> telah berhasil dipulihkan.');
         }

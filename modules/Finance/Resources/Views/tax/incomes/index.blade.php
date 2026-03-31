@@ -142,9 +142,9 @@
                     <i class="mdi mdi-cube-send me-3"></i>
                     <div>Rilis bukti potong PPh21 periode
                         @if ($start_at->isSameDay($end_at))
-                            {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $end_at->translatedFormat('d F Y') }}
                         @else
-                            {{ $start_at->formatLocalized('%d %b') }} s.d. {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $start_at->translatedFormat('d F Y') }} s.d. {{ $end_at->translatedFormat('d F Y') }}
                         @endif
                         <br> <small class="text-muted">Jika Kamu ingin merilis bukti potong PPh21 sesuai periode yang dipilih</small>
                     </div>

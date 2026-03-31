@@ -18,8 +18,6 @@ class OutworkCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyOutworkCategory::class);
-
         $categories = CompanyOutworkCategory::search($request->get('search'))
             ->whenTrashed($request->get('trash'))
             ->paginate($request->get('limit', 10));
@@ -34,10 +32,7 @@ class OutworkCategoryController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyOutworkCategory::class);
-        $category = [];
-
-        return view('core::company.services.outwork-categories.form', compact('category'));
+        return view('core::company.services.outwork-categories.create');
     }
 
     /**
@@ -56,11 +51,9 @@ class OutworkCategoryController extends Controller
      */
     public function show(CompanyOutworkCategory $category)
     {
-        $this->authorize('update', $category);
-
         $categories = CompanyOutworkCategory::get();
 
-        return view('core::company.services.outwork-categories.form', compact('categories', 'category'));
+        return view('core::company.services.outwork-categories.show', compact('categories', 'category'));
     }
 
     /**
@@ -79,8 +72,6 @@ class OutworkCategoryController extends Controller
      */
     public function destroy(CompanyOutworkCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if ($category = $this->destroyCompanyOutworkCategory($category)) {
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>' . $category->name . '</strong> telah berhasil dihapus.');
         }
@@ -92,8 +83,6 @@ class OutworkCategoryController extends Controller
      */
     public function restore(CompanyOutworkCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if ($category = $this->restoreCompanyOutworkCategory($category)) {
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>' . $category->name . '</strong> telah berhasil dipulihkan.');
         }

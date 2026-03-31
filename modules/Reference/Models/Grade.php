@@ -14,7 +14,7 @@ class Grade extends Model
      * The table associated with the model.
      */
     protected $table = "ref_grades";
-    
+
     /**
      * Indicates if the model should be timestamped.
      */

@@ -24,8 +24,6 @@ class FeastDayController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', EmployeeDataRecapitulation::class);
-
         $cutoff_at = Carbon::parse($request->get('cutoff_at', now()));
         $religions = ReligionEnum::cases();
 
@@ -48,8 +46,6 @@ class FeastDayController extends Controller
      */
     public function create(Employee $employee, Request $request)
     {
-        $this->authorize('store', EmployeeDataRecapitulation::class);
-
         $religion  = $employee->user->getMeta('profile_religion');
         $cutoff_at = Carbon::parse($request->get('cutoff_at', now()));
         $period    = $cutoff_at->clone();
@@ -62,7 +58,7 @@ class FeastDayController extends Controller
             return redirect()->back()
                 ->with('danger', 'Belum ada template gaji pada karyawan ini');
         }
-        
+
         $defaultTemplate = $cmpDefaultTemplate->components;
 
         if(is_null($defaultTemplate)){

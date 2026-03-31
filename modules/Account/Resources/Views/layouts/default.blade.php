@@ -8,7 +8,6 @@
     <header id="page-topbar">
         <div class="navbar-header">
             <div class="d-flex">
-                <!-- LOGO -->
                 <div class="navbar-brand-box">
                     <a href="index.html" class="logo logo-dark">
                         <span class="logo-sm">
@@ -55,36 +54,6 @@
                     </div>
                 </div>
 
-                {{-- <div class="dropdown d-none d-lg-inline-block ms-1">
-            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="bx bx-customize"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <div class="px-lg-2">
-                    <div class="row g-0">
-                        <div class="col">
-                            <a class="dropdown-icon-item" href="#">
-                                <img src="assets/images/brands/github.png" alt="Github">
-                                <span>GitHub</span>
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a class="dropdown-icon-item" href="#">
-                                <img src="assets/images/brands/bitbucket.png" alt="bitbucket">
-                                <span>Bitbucket</span>
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a class="dropdown-icon-item" href="#">
-                                <img src="assets/images/brands/dribbble.png" alt="dribbble">
-                                <span>Dribbble</span>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div> --}}
                 @include('layouts.component.notifications')
                 @include('layouts.shortcut_menu')
                 @include('layouts.nav_name')
@@ -109,16 +78,4 @@
             </div>
         </div>
     </div>
-
-    {{-- <div class="d-xl-flex min-vh-100 flex-row">
-        @include('hrms::layouts.components.sidebar')
-        <div class="content flex-grow-1">
-            @include('core::layouts.components.navbar')
-            <div class="container-fluid p-3">
-                <main class="animate__animated animate__fadeIn animate__faster">
-                    @yield('content')
-                </main>
-            </div>
-        </div>
-    </div> --}}
 @endsection

@@ -19,7 +19,6 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanySalarySlipCategory::class);
         return view('core::company.salaries.categories.index', [
             'categories' => $this->getCompanySalaryCategories($request),
             'slips'      => CompanySalarySlip::get(),
@@ -42,10 +41,9 @@ class CategoryController extends Controller
      */
     public function show(CompanySalarySlipCategory $category)
     {
-        $this->authorize('update', $category);
         return view('core::company.salaries.categories.show', [
             'category'  => $category,
-            'slips'     => CompanySalarySlip::get()
+            'slips'     => CompanySalarySlip::all()
         ]);
     }
 
@@ -66,8 +64,6 @@ class CategoryController extends Controller
      */
     public function destroy(CompanySalarySlipCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if ($category = $this->destroyCompanySalarySlipCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $category->name . '</strong> telah berhasil dihapus.');
@@ -80,8 +76,6 @@ class CategoryController extends Controller
      */
     public function restore(CompanySalarySlipCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if ($category = $this->restoreCompanySalarySlipCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori gaji dengan nama <strong>' . $category->name . '</strong> telah berhasil dipulihkan.');

@@ -30,19 +30,29 @@ return new class extends Migration
             $table->index('name');
         });
 
+        Schema::create('cmp_position_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('kd')->unique();
+            $table->string('name');
+            $table->string('category')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->json('meta')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('cmp_positions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('kd');
             $table->string('name')->nullable();
             $table->string('description')->nullable();
-            $table->unsignedTinyInteger('type')->nullable();
-            $table->unsignedTinyInteger('level')->nullable();
+            $table->unsignedTinyInteger('level');
             $table->unsignedSmallInteger('dept_id')->nullable();
             $table->boolean('is_visible')->default(true);
             $table->softDeletes();
             $table->timestamps();
 
             $table->unique('kd');
+            $table->foreignId('position_type_id')->nullable()->constrained('cmp_position_types')->nullOnDelete();
             $table->foreign('dept_id')->references('id')->on('cmp_depts')->onUpdate('cascade')->onDelete('set null');
 
             $table->index('name');

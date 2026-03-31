@@ -72,21 +72,21 @@
                                         </td>
                                         <td class="py-2 text-end" nowrap>
                                             @if ($employee->trashed())
-                                                @can('restore', $employee)
+                                                @can('restore_employee')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.employees.restore', ['employee' => $employee->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
                                                         <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('show', $employee)
+                                                @can('show_employee')
                                                     <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::employment.employees.show', ['employee' => $employee->id, 'page' => 'main', 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Lihat detail"><i class="mdi mdi-eye-outline"></i></a>
                                                 @endcan
-                                                @can('destroy', $employee)
+                                                @can('destroy_employee')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.employees.destroy', ['employee' => $employee->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
                                                 @endcan
-                                                @can('show', $employee)
+                                                @can('show_employee')
                                                     <div class="dropstart d-inline">
                                                         <button class="btn btn-soft-secondary text-dark rounded px-2 py-1" type="button" data-bs-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
                                                         <ul class="dropdown-menu border-0 shadow">
@@ -103,7 +103,7 @@
                                             <td colspan="6">
                                                 @include('components.notfound')
                                                 @if (!request('trash'))
-                                                    @can('store', Modules\HRMS\Models\Employee::class)
+                                                    @can('store_employee')
                                                         <div class="mb-lg-5 mb-4 text-center">
                                                             <a class="btn btn-soft-danger" href="{{ route('hrms::employment.employees.create', ['next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah karyawan baru</a>
                                                         </div>
@@ -132,7 +132,7 @@
                 <div class="card mb-4 border-0">
                     <div class="card-body">Menu lainnya</div>
                     <div class="list-group list-group-flush border-top border-light">
-                        @can('store', Modules\HRMS\Models\Employee::class)
+                        @can('create_employee')
                             <a class="list-group-item list-group-item-action" href="{{ route('hrms::employment.employees.create', ['next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah karyawan baru</a>
                         @endcan
                         <a class="list-group-item list-group-item-action text-danger" href="{{ route('hrms::employment.employees.index', ['trash' => !request('trash')]) }}"><i class="mdi mdi-trash-can-outline"></i> Lihat karyawan yang {{ request('trash') ? 'tidak' : '' }} dihapus</a>

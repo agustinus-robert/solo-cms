@@ -2,6 +2,7 @@
 
 namespace Modules\HRMS\Models;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\Restorable\Restorable;
@@ -152,11 +153,21 @@ class EmployeeOutwork extends Model
     /**
      * Scope when period.
      */
-    public function scopeWhenPeriod($query, $start_at = false, $end_at = false)
+    public function scopeWhenPeriod($query, $start, $end)
     {
-        return $query->where(
-            fn($subquery) => $subquery->whenDatesBetween($start_at, $end_at)->whenCreatedAtBetween($start_at, $end_at, true)
-        );
+        if ($start && $end) {
+            $start = $start instanceof Carbon ? $start : Carbon::parse($start);
+            $end = $end instanceof Carbon ? $end : Carbon::parse($end);
+
+            $query->whereRaw("
+                EXISTS (
+                    SELECT 1 FROM jsonb_array_elements(dates::jsonb) AS elem
+                    WHERE (elem->>'d')::date BETWEEN ? AND ?
+                )
+            ", [$start->toDateString(), $end->toDateString()]);
+        }
+
+        return $query;
     }
 
     /**

@@ -22,7 +22,9 @@
                     <select class="form-select @error('user_id') is-invalid @enderror" data-name="user_id" value="{{ old('user_id') }}" required>
                         <option value="">Pilih</option>
                         @foreach ($employees as $key => $employee)
-                            <option value="{{ $employee->user->id }}">{{ $employee->user->name }} ({{ $employee->position->position->name }})</option>
+                            @if(!empty($employee->contract->position))
+                                <option value="{{ $employee->user->id }}">{{ $employee->user->name }} ({{ $employee->contract->position->position->name }})</option>
+                            @endif
                         @endforeach
                     </select>
                     @error('user_id')

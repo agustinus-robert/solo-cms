@@ -18,8 +18,6 @@ class LeaveCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyLeaveCategory::class);
-
         $categories = CompanyLeaveCategory::with('parent')
                                         ->whenTrashed($request->get('trash'))
                                         ->search($request->get('search'))
@@ -35,11 +33,9 @@ class LeaveCategoryController extends Controller
      */
     public function create()
     {
-        $this->authorize('store', CompanyLeaveCategory::class);
-
         $categories = CompanyLeaveCategory::whereNull('parent_id')->get();
 
-        return view('core::company.services.leave-categories.form', compact('categories'));
+        return view('core::company.services.leave-categories.create', compact('categories'));
     }
 
     /**
@@ -61,11 +57,9 @@ class LeaveCategoryController extends Controller
      */
     public function show(CompanyLeaveCategory $category)
     {
-        $this->authorize('update', $category);
-
         $categories = CompanyLeaveCategory::whereNull('parent_id')->get();
 
-        return view('core::company.services.leave-categories.form', compact('categories', 'category'));
+        return view('core::company.services.leave-categories.show', compact('categories', 'category'));
     }
 
     /**
@@ -87,8 +81,6 @@ class LeaveCategoryController extends Controller
      */
     public function destroy(CompanyLeaveCategory $category)
     {
-        $this->authorize('destroy', $category);
-
         if($category = $this->destroyCompanyLeaveCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>'.$category->name.'</strong> telah berhasil dihapus.');
@@ -103,8 +95,6 @@ class LeaveCategoryController extends Controller
      */
     public function restore(CompanyLeaveCategory $category)
     {
-        $this->authorize('restore', $category);
-
         if($category = $this->restoreCompanyLeaveCategory($category)) {
 
             return redirect()->next()->with('success', 'Kategori izin dengan nama <strong>'.$category->name.'</strong> telah berhasil dipulihkan.');

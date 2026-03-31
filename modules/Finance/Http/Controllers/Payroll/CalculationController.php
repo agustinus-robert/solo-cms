@@ -26,8 +26,6 @@ class CalculationController extends Controller
      * */
     public function index(Request $request)
     {
-        $this->authorize('access', EmployeeSalary::class);
-
         $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');
         $end_at = Carbon::parse($request->get('end_at', cmp_cutoff(1)->format('Y-m-d')) . ' 23:59:59');
         $religions = ReligionEnum::cases();
@@ -50,8 +48,6 @@ class CalculationController extends Controller
      */
     public function create(Request $request)
     {
-        $this->authorize('store', EmployeeSalary::class);
-
         $start_at = Carbon::parse($request->get('start_at') . ' 00:00:00');
         $end_at = Carbon::parse($request->get('end_at') . ' 23:59:59');
         $components = CompanySalarySlipComponent::with('category.slip')->get();
@@ -126,8 +122,6 @@ class CalculationController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('store', EmployeeSalary::class);
-
         $employee = Employee::find($request->input('employee'));
 
         if ($employee->salaries()->updateOrCreate($request->transformed()->only('start_at', 'end_at'), $request->transformed()->toArray())) {
@@ -142,8 +136,6 @@ class CalculationController extends Controller
      */
     public function show(EmployeeSalary $salary)
     {
-        $this->authorize('show', $salary);
-
         $document = $salary->firstOrCreateDocument(
             $title = 'Slip ' . $salary->name . ' - ' . $salary->created_at->getTimestamp(),
             $path = 'employee/salaries/' . Str::random(36) . '.pdf'

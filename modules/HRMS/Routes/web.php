@@ -100,7 +100,7 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     //         Route::delete('registrations/{employee}/reset', 'RegistrationController@reset')->name('registrations.reset');
     //         Route::delete('registrations/{insurance}/destroy', 'RegistrationController@destroy')->name('registrations.destroy');
     //         Route::resource('registrations', 'RegistrationController')->parameters(['registrations' => 'employee'])->only('index', 'create', 'store');
-            
+
     //     });
     // });
 
@@ -116,7 +116,7 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
             Route::delete('registrations/{employee}/reset', 'RegistrationController@reset')->name('registrations.reset');
             Route::delete('registrations/{insurance}/destroy', 'RegistrationController@destroy')->name('registrations.destroy');
             Route::resource('registrations', 'RegistrationController')->parameters(['registrations' => 'employee'])->only('index', 'create', 'store');
- 
+
             Route::post('templates/default-salary', 'DefaultSalaryController@store')->name('templates.default-salary');
             Route::resource('templates', 'TemplateController')->parameters(['templates' => 'template']);
         });

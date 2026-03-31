@@ -26,8 +26,8 @@ class MomentController extends Controller
             ->paginate($request->get('limit', 10));
 
         $moments_count = CompanyMoment::whenYear(date('Y'))->count();
-
-        return view('core::company.moments.index', compact('moments', 'moments_count'));
+        $year = $request->get('year', date('Y'));
+        return view('core::company.moments.index', compact('moments', 'moments_count', 'year'));
     }
 
     /**
@@ -37,7 +37,7 @@ class MomentController extends Controller
     {
         $religions = ReligionEnum::cases();
         $types = MomentTypeEnum::cases();
-        return view('core::company.moments.form', compact('types', 'religions'));
+        return view('core::company.moments.create', compact('types', 'religions'));
     }
 
     /**
@@ -58,7 +58,7 @@ class MomentController extends Controller
     {
         $religions = ReligionEnum::cases();
         $types = MomentTypeEnum::cases();
-        return view('core::company.moments.form', compact('moment', 'types', 'religions'));
+        return view('core::company.moments.show', compact('moment', 'types', 'religions'));
     }
 
     /**
@@ -86,9 +86,12 @@ class MomentController extends Controller
     /**
      * Sync holidays from API.
      */
-    public function sync()
+    public function sync(Request $request)
     {
-        $endpoint = 'https://api-harilibur.vercel.app/api';
+        if (!empty($request->year)) {
+            $endpoint = 'https://api-harilibur.vercel.app/api?year=' . $request->year;
+        }
+
         $responses = Http::get($endpoint)->collect();
 
         foreach ($responses as $respons) {

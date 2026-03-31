@@ -21,10 +21,8 @@ class ConfigController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanyPayrollSetting::class);
-
         return view('core::company.salaries.configs.index', [
-            'slips' => CompanySalaryTemplate::get(),
+            'slips' => CompanySalaryTemplate::all(),
             'settings' => CompanyPayrollSetting::whenTrashed($request->get('trash'))->paginate($request->get('limit', 10)),
             'setting_count' => CompanyPayrollSetting::count(),
             'employees' => Employee::with('user', 'contract.position.position')->get()
@@ -36,8 +34,6 @@ class ConfigController extends Controller
      */
     public function create(Request $request)
     {
-        $this->authorize('store', CompanyPayrollSetting::class);
-
         $default_component = CompanySalarySlipComponent::whereJsonContains('meta->default_component', true)->first();
         $components = CompanySalarySlipComponent::with('slip')->where('operate', '!=', 0)->get();
         $types = PayrollSettingEnum::cases();

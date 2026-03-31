@@ -153,9 +153,9 @@
                     <i class="mdi mdi-email-alert-outline me-3"></i>
                     <div>Kirim notifikasi persetujuan gaji periode
                         @if ($start_at->isSameDay($end_at))
-                            {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $end_at->translatedFormat('d F Y') }}
                         @else
-                            {{ $start_at->formatLocalized('%d %b') }} s.d. {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $start_at->translatedFormat('d F Y') }} s.d. {{ $end_at->translatedFormat('d F Y') }}
                         @endif
                         ke Direktur
                         <br> <small class="text-muted">Jika Kamu ingin memberitahu Direktur untuk persetujuan tanda tangan gaji sesuai periode yang dipilih</small>
@@ -167,9 +167,9 @@
                     <i class="mdi mdi-cube-send me-3"></i>
                     <div>Rilis gaji periode
                         @if ($start_at->isSameDay($end_at))
-                            {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $end_at->translatedFormat('d F Y') }}
                         @else
-                            {{ $start_at->formatLocalized('%d %b') }} s.d. {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $start_at->translatedFormat('d F Y') }} s.d. {{ $end_at->translatedFormat('d F Y') }}
                         @endif
                         <br> <small class="text-muted">Jika Kamu ingin merilis gaji sesuai periode yang dipilih</small>
                     </div>
@@ -180,9 +180,9 @@
                     <i class="mdi mdi-bell-alert-outline me-3"></i>
                     <div>Kirim notifikasi penggajian periode
                         @if ($start_at->isSameDay($end_at))
-                            {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $end_at->translatedFormat('d F Y') }}
                         @else
-                            {{ $start_at->formatLocalized('%d %b') }} s.d. {{ $end_at->formatLocalized('%d %b %Y') }}
+                            {{ $start_at->translatedFormat('d F Y') }} s.d. {{ $end_at->translatedFormat('d F Y') }}
                         @endif untuk karyawan
                         <br> <small class="text-muted">Jika Kamu ingin memberitahu seluruh karyawan mengenai gaji yang sudah dirilis sesuai periode yang dipilih</small>
                     </div>

@@ -4,6 +4,8 @@ use App\Models\Traits\Metable\MetableSchema;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 return new class extends Migration
 {
@@ -14,6 +16,27 @@ return new class extends Migration
      */
     public function up()
     {
+        DB::unprepared("
+            CREATE TABLE ref_grades (
+              id SMALLINT PRIMARY KEY,
+              name VARCHAR(191) NOT NULL
+            );
+
+            INSERT INTO ref_grades (id, name) VALUES
+            (1, 'PAUD/SEDERAJAT'),
+            (2, 'TK/RA/SEDERAJAT'),
+            (3, 'SD/MI/SEDERAJAT'),
+            (4, 'SLTP/SMP/MTS/SEDERAJAT'),
+            (5, 'SLTA/SMA/MA/SEDERAJAT'),
+            (6, 'D1'),
+            (7, 'D2'),
+            (8, 'D3'),
+            (9, 'D4'),
+            (10, 'S1'),
+            (11, 'S2'),
+            (12, 'S3');
+        ");
+
         Schema::create('app_settings', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();

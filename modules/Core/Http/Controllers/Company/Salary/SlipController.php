@@ -18,8 +18,6 @@ class SlipController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('access', CompanySalarySlip::class);
-
         return view('core::company.salaries.slips.index', [
             'slips' => $this->getCompanySalarySlip($request),
             'slips_count' => CompanySalarySlip::count()
@@ -42,8 +40,6 @@ class SlipController extends Controller
      */
     public function show(CompanySalarySlip $slip)
     {
-        $this->authorize('update', $slip);
-
         return view('core::company.salaries.slips.show', [
             'slip'  => $slip
         ]);
@@ -67,8 +63,6 @@ class SlipController extends Controller
      */
     public function destroy(CompanySalarySlip $slip)
     {
-        $this->authorize('destroy', $slip);
-
         if ($slip = $this->destroyCompanySalarySlip($slip)) {
 
             return redirect()->next()->with('success', 'Departemen dengan nama <strong>' . $slip->name . '</strong> telah berhasil dihapus.');
@@ -82,8 +76,6 @@ class SlipController extends Controller
      */
     public function restore(CompanySalarySlip $slip)
     {
-        $this->authorize('restore', $slip);
-
         if ($slip = $this->restoreCompanySalarySlip($slip)) {
 
             return redirect()->next()->with('success', 'Departemen dengan nama <strong>' . $slip->name . '</strong> telah berhasil dipulihkan.');

@@ -4,222 +4,159 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
-use App\Models\Permission;
-use Modules\Account\Models\User;
-use Modules\Core\Enums\PositionTypeEnum;
-use Modules\Core\Models\CompanyRole;
 use Modules\Core\Models\CompanyDepartment;
 use Modules\Core\Models\CompanyPosition;
-use Modules\Docs\Models\Document;
-use Modules\Docs\Models\DocumentSignature;
-use Modules\HRMS\Models\EmployeeDataRecapitulation;
-use Modules\HRMS\Models\EmployeeRecapSubmission;
-use Modules\HRMS\Models\EmployeeScanLog;
-use Modules\HRMS\Models\EmployeeSchedule;
-use Modules\HRMS\Models\EmployeeScheduleSubmission;
-use Modules\Support\Models\SupportTicket;
-use Modules\Support\Models\SupportTicketComment;
+use Modules\Core\Models\CompanyPositionType;
 
 class DepartementDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
+        // ======================
+        // DEPARTMENTS
+        // ======================
         $departments = [
-            ['kd' => 'kepala_sekolah', 'name' => 'Kepala Sekolah'],
-            ['kd' => 'administrasi', 'name' => 'Administrasi'],
-            ['kd' => 'unit_usaha', 'name' => 'Unit usaha'],
-            ['kd' => 'admin', 'name' => 'Admin Umum'],
-            ['kd' => 'pondok', 'name' => 'Pondok'],
-            ['kd' => 'admin_pondok', 'name' => 'Admin Pondok'],
-            ['kd' => 'keamanan', 'name' => 'Keamanan'],
-            ['kd' => 'dapur', 'name' => 'Dapur']
-        ];
-
-
-        $positions = [
-            ['kd' => 'pengasuh', 'name' => 'Pengasuh', 'dept_id' => 1, 'level' => 1, 'type' => PositionTypeEnum::PENGASUH],
-            ['kd' => 'pengurus', 'name' => 'Pengurus', 'dept_id' => 1, 'level' => 2, 'type' => PositionTypeEnum::PENGURUS],
-            ['kd' => 'kepala_sekolah', 'name' => 'Kepala Sekolah', 'dept_id' => 1, 'level' => 1, 'type' => PositionTypeEnum::KEPALASEKOLAH],
-            ['kd' => 'humas', 'name' => 'Humas', 'dept_id' => 2, 'level' => 2, 'type' => PositionTypeEnum::HUMAS, 'parent_ids' => [1]],
-            ['kd' => 'tata_usaha', 'name' => 'Tata Usaha', 'dept_id' => 2, 'level' => 2, 'type' => PositionTypeEnum::TATAUSAHA, 'parent_ids' => [1]],
-            ['kd' => 'keuangan', 'name' => 'Keuangan', 'dept' => 2, 'level' => 2, 'type' => PositionTypeEnum::KEUANGAN, 'parent_ids' => [1]],
-            ['kd' => 'guru', 'name' => 'Guru', 'dept_id' => 2, 'level' => 4, 'type' => PositionTypeEnum::GURU, 'parent_ids' => [1, 2]],
-            ['kd' => 'guru_bk', 'name' => 'Guru BK', 'dept_id' => 2, 'level' => 3, 'type' => PositionTypeEnum::GURUBK, 'parent_ids' => [1, 2]],
-            ['kd' => 'murid', 'name' => 'Murid', 'dept_id' => 2, 'level' => 5, 'type' => PositionTypeEnum::MURID, 'parent_ids' => [1, 2, 3, 4, 5]],
-
-            // Unit Usaha
-            ['kd' => 'kasir_toko', 'name' => 'Kasir Toko', 'dept_id' => 3, 'level' => 2, 'type' => PositionTypeEnum::KASIRTOKO],
-            ['kd' => 'kasir_swalayan', 'name' => 'Kasir Swalayan', 'dept_id' => 3, 'level' => 2, 'type' => PositionTypeEnum::KASIRSWALAYAN],
-            ['kd' => 'supplier', 'name' => 'Supplier', 'dept_id' => 3, 'level' => 2, 'type' => PositionTypeEnum::SUPPLIER],
-
-            // Admin
-            ['kd' => 'admin', 'name' => 'Admin', 'dept_id' => 4, 'level' => 2, 'type' => PositionTypeEnum::ADMIN],
-
-            // Pondok Pesantren
-            ['kd' => 'ustadz', 'name' => 'Ustadz', 'dept_id' => 5, 'level' => 2, 'type' => PositionTypeEnum::USTADZ, 'parent_ids' => [1]],
-            ['kd' => 'ustadzah', 'name' => 'Ustadzah', 'dept_id' => 5, 'level' => 2, 'type' => PositionTypeEnum::USTADZAH, 'parent_ids' => [1]],
-
-            // extra
-            ['kd' => 'admin_pondok', 'name' => 'Admin Pondok', 'dept_id' => 6, 'level' => 2, 'type' => PositionTypeEnum::ADMINPONDOK],
-            ['kd' => 'keamanan', 'name' => 'Keamanan', 'dept_id' => 7, 'level' => 2, 'type' => PositionTypeEnum::KEAMANAN],
-            ['kd' => 'koki', 'name' => 'Koki', 'dept_id' => 8, 'level' => 2, 'type' => PositionTypeEnum::KOKI],
+            ['kd' => 'management', 'name' => 'Management'],
+            ['kd' => 'front_office', 'name' => 'Front Office'],
+            ['kd' => 'kitchen', 'name' => 'Kitchen / Dapur'],
+            ['kd' => 'service', 'name' => 'Service / Pelayanan'],
+            ['kd' => 'finance', 'name' => 'Keuangan'],
+            ['kd' => 'purchasing', 'name' => 'Purchasing / Gudang'],
+            ['kd' => 'hr', 'name' => 'HR / Admin'],
+            ['kd' => 'security', 'name' => 'Keamanan'],
         ];
 
         foreach ($departments as $department) {
-            CompanyDepartment::create([
-                'kd' => $department['kd'],
-                'name' => $department['name'],
-            ]);
+            CompanyDepartment::create($department);
         }
+
+        // ======================
+        // POSITION TYPES
+        // ======================
+        $types = [
+            ['kd' => 'owner', 'name' => 'Owner'],
+            ['kd' => 'management', 'name' => 'Management'],
+            ['kd' => 'staff', 'name' => 'Staff'],
+            ['kd' => 'support', 'name' => 'Support'],
+        ];
+
+        $typeMap = [];
+        foreach ($types as $type) {
+            $t = CompanyPositionType::create($type);
+            $typeMap[$type['kd']] = $t->id;
+        }
+
+        // ======================
+        // POSITIONS + LEVEL
+        // ======================
+        $positions = [
+            // LEVEL 1 (Top)
+            [
+                'kd' => 'owner',
+                'name' => 'Owner',
+                'dept_id' => 1,
+                'level' => 1,
+                'position_type_id' => $typeMap['owner'],
+            ],
+
+            // LEVEL 2
+            [
+                'kd' => 'manager',
+                'name' => 'Manager',
+                'dept_id' => 1,
+                'level' => 2,
+                'position_type_id' => $typeMap['management'],
+                'parent_ids' => [1], // owner
+            ],
+
+            [
+                'kd' => 'kasir',
+                'name' => 'Kasir',
+                'dept_id' => 2,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2], // manager
+            ],
+            [
+                'kd' => 'waiter',
+                'name' => 'Waiter / Waitress',
+                'dept_id' => 4,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2],
+            ],
+            [
+                'kd' => 'koki',
+                'name' => 'Koki',
+                'dept_id' => 3,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2],
+            ],
+            [
+                'kd' => 'admin',
+                'name' => 'Admin',
+                'dept_id' => 7,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2],
+            ],
+            [
+                'kd' => 'finance_staff',
+                'name' => 'Finance Staff',
+                'dept_id' => 5,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2],
+            ],
+            [
+                'kd' => 'purchasing_staff',
+                'name' => 'Purchasing Staff',
+                'dept_id' => 6,
+                'level' => 3,
+                'position_type_id' => $typeMap['staff'],
+                'parent_ids' => [2],
+            ],
+
+            // LEVEL 4 (Support / Helper)
+            [
+                'kd' => 'helper_kitchen',
+                'name' => 'Helper Kitchen',
+                'dept_id' => 3,
+                'level' => 4,
+                'position_type_id' => $typeMap['support'],
+                'parent_ids' => [5], // koki
+            ],
+            [
+                'kd' => 'cleaning_service',
+                'name' => 'Cleaning Service',
+                'dept_id' => 4,
+                'level' => 4,
+                'position_type_id' => $typeMap['support'],
+                'parent_ids' => [2],
+            ],
+            [
+                'kd' => 'security',
+                'name' => 'Security',
+                'dept_id' => 8,
+                'level' => 3,
+                'position_type_id' => $typeMap['support'],
+                'parent_ids' => [2],
+            ],
+        ];
 
         foreach ($positions as $position) {
             $_p = CompanyPosition::create(Arr::only($position, [
-                'cmp_id', 'kd', 'name', 'dept_id', 'level', 'type', 'is_visible', 'permissions'
+                'kd',
+                'name',
+                'dept_id',
+                'position_type_id',
+                'level'
             ]));
-
-                $_r = CompanyRole::create([
-                    'kd' => $position['kd'],
-                    'name' => $position['name'],
-                ]);
-
-                switch ($_r->kd) {
-                    case 'kepala_sekolah':
-                        $_r->permissions()->attach(
-                            Permission::whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'humas':
-                            $_r->permissions()->attach(
-                            Permission::whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'tata_usaha':
-                        $_r->permissions()->attach(
-                            Permission::whereNotIn('module', ['Account', 'HRMS', 'Administration', 'Core'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'guru':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Academic', 'Teacher'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'guru_bk':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Counseling'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'murid':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Academic'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    // Unit Usaha
-                    case 'kasir_swalayan':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Poz'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-                    case 'kasir_toko':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Poz'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-                    case 'supplier':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Poz'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    // Admin
-                    case 'admin':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Management', 'Core', 'Administration'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    // Pondok Pesantren
-                    case 'pengasuh':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Boarding'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'pengurus':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Boarding'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'ustadz':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Boarding'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-                    case 'ustadzah':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Boarding'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'admin_pondok':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account', 'Boarding'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'keamanan':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    case 'koki':
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-
-                    default:
-                        $_r->permissions()->attach(
-                            Permission::whereIn('module', ['Account'])
-                                ->whereNotIn('key', ['cross-login-users'])->pluck('id')
-                        );
-                        break;
-                }
-
-                $_p->setMeta('default_applied_role', $_r);
-           // }
 
             if (isset($position['parent_ids'])) {
                 $_p->parents()->sync($position['parent_ids']);
             }
         }
-
     }
 }

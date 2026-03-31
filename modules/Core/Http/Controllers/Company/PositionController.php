@@ -23,7 +23,6 @@ class PositionController extends Controller
         $departments = CompanyDepartment::all();
 
         $positions = CompanyPosition::with('department')
-            ->whereHas('department')
             ->withCount(['employeePositions' => fn($position) => $position->active()])
             ->whenDepartmentId($request->get('department'))
             ->whenTrashed($request->get('trash'))
@@ -40,13 +39,11 @@ class PositionController extends Controller
      */
     public function create()
     {
-        $roles = CompanyRole::get();
-        $departments = CompanyDepartment::get();
-        $positions = CompanyPosition::with('department')
-        ->whereHas('department')
-        ->get()->groupBy('department.name');
+        $roles = CompanyRole::all();
+        $departments = CompanyDepartment::all();
+        $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
 
-        return view('core::company.positions.form', compact('roles', 'positions', 'departments'));
+        return view('core::company.positions.create', compact('roles', 'positions', 'departments'));
     }
 
     /**
@@ -68,12 +65,11 @@ class PositionController extends Controller
     {
         $position = $position->load('children', 'parents', 'meta');
 
-        $roles = CompanyRole::get();
-        $departments = CompanyDepartment::get();
-        $positions = CompanyPosition::with('department')
-        ->whereHas('department')->get()->groupBy('department.name');
+        $roles = CompanyRole::all();
+        $departments = CompanyDepartment::all();
+        $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
 
-        return view('core::company.positions.form', compact('position', 'roles', 'departments', 'positions'));
+        return view('core::company.positions.show', compact('position', 'roles', 'departments', 'positions'));
     }
 
     /**

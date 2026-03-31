@@ -9,6 +9,8 @@ use Modules\Account\Repositories\UserRepository;
 use Modules\Core\Http\Requests\System\User\StoreRequest;
 use Modules\Core\Http\Controllers\Controller;
 use Modules\Core\Models\CompanyRole;
+use Modules\Account\Enums\MariageEnum;
+use Modules\HRMS\Models\EmployeeDocument;
 
 class UserController extends Controller
 {
@@ -19,16 +21,12 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with('roles', 'meta', 'teacher')
-            ->whereHas('teacher')
+        $users = User::with('roles', 'meta')
             ->search($request->get('search'))
             ->whenTrashed($request->get('trash'))
             ->paginate($request->get('limit', 10));
 
-        $users_count = User::where(function($q) {
-            $q->whereHas('teacher')
-            ->orWhereHas('student');
-        })->count();
+        $users_count = User::count();
 
         return view('core::system.users.index', compact('users', 'users_count'));
     }
@@ -49,10 +47,17 @@ class UserController extends Controller
      */
     public function show(Request $request, User $user)
     {
-        $roles = CompanyRole::get();
+        $roles = CompanyRole::all();
+        $mariages = MariageEnum::cases();
 
-        return in_array($request->get('page', 'profile'), ['profile', 'username', 'email', 'phone', 'role'])
-            ? view('core::system.users.show', compact('user', 'roles'))
+        $documents = EmployeeDocument::with(['employee.user'])
+        ->whereHas('employee', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->get();
+
+        return in_array($request->get('page', 'profile'), ['profile', 'username', 'email', 'phone', 'role', 'tax', 'document'])
+            ? view('core::system.users.show', compact('user', 'roles', 'mariages', 'documents'))
             : abort(404);
     }
 

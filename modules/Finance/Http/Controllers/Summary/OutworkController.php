@@ -41,7 +41,7 @@ class OutworkController extends Controller
     }
 
     /**
-     * Create resource    
+     * Create resource
      */
     public function create(Request $request)
     {
@@ -85,7 +85,7 @@ class OutworkController extends Controller
     }
 
     /**
-     * Store resource    
+     * Store resource
      */
     public function store(StoreRequest $request)
     {

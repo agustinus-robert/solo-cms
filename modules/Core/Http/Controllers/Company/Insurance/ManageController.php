@@ -40,6 +40,7 @@ class ManageController extends Controller
      */
     public function show(CompanySalaryCategory $category)
     {
+        $this->authorize('update', $category);
         return view('core::company.salaries.categories.show', [
             'category'  => $category,
             'slips'     => CompanySalarySlip::all()

@@ -112,12 +112,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::get('postyear', 'PostYearController@index')->name('postyear.index');
         Route::get('postyear/{employee}', 'PostYearController@create')->name('postyear.create');
         Route::post('postyear/{employee}', 'PostYearController@store')->name('postyear.store');
-
-        Route::resource('teachings', 'TeacherController')->only('index', 'show', 'create', 'store', 'destroy', 'update')->parameters(['teaching' => 'employee']);
-        Route::put('/submissionappr', 'TeacherController@submissionApprovals')->name('summary.permission');
-
-        Route::resource('coords', 'CoordinatorController')->only('index', 'show', 'create', 'store', 'update', 'destroy')->parameters(['coords' => 'employee']);
-        Route::put('/coordinatorappr/{recap}', 'CoordinatorController@submissionApprovals')->name('summary.coordinator.permission');
     });
 
     Route::prefix('report')->namespace('Report')->name('report.')->group(function () {

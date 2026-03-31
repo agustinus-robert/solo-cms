@@ -7,9 +7,9 @@
             </a>
         </div>
         <div class="col-4">
-            {{-- <a href="{{ route('portal::home') }}" class="btn btn-apps">
+            <a href="{{ route('portal::home') }}" class="btn btn-apps">
                 <i class="mdi mdi-account-convert-outline" style="padding: .3rem .6rem; color: #ff52ee;"></i> <span class="btn-apps-label">Portal</span>
-            </a> --}}
+            </a>
         </div>
         <div class="col-4">
             <button class="btn btn-apps {{ $_route == '-1' ? 'active' : '' }}" onclick="signout()">
@@ -44,14 +44,14 @@
                 @can('administration::access')
                     <div class="col-4">
                         <a href="{{ route('administration::dashboard') }}" class="btn btn-apps {{ $_route == 'administration' ? 'active' : '' }}">
-                            <i class="mdi mdi-human-male-board" style="padding: .3rem .6rem; color: #25dbae;"></i> <span class="btn-apps-label">Guru</span>
+                            <i class="mdi mdi-human-male-board" style="padding: .3rem .6rem; color: #25dbae;"></i> <span class="btn-apps-label">Pengajaran</span>
                         </a>
                     </div>
                 @endcan
                 <div class="col-4">
-                    {{-- <a href="{{ route('support::index') }}" class="btn btn-apps">
+                    <a href="{{ route('support::index') }}" class="btn btn-apps">
                         <i class="mdi mdi-headphones text-info" style="padding: .3rem .6rem;"></i> <span class="btn-apps-label">Dukungan</span>
-                    </a> --}}
+                    </a>
                 </div>
             </div>
         </div>
