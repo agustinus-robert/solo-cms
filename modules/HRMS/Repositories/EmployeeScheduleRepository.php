@@ -25,7 +25,6 @@ trait EmployeeScheduleRepository
     {
         $schedule = new EmployeeSchedule(Arr::only($data, ['empl_id', 'start_at', 'end_at', 'dates', 'workdays_count']));
         if ($schedule->save()) {
-            Auth::user()->log('membuat jadwal kerja karyawan ' . $schedule->employee->user->name . ' <strong>[ID: ' . $schedule->id . ']</strong>', EmployeeSchedule::class, $schedule->id);
             return $schedule;
         }
         return false;
@@ -38,7 +37,6 @@ trait EmployeeScheduleRepository
     {
         $schedule->fill(Arr::only($data, ['dates', 'workdays_count']));
         if ($schedule->save()) {
-            Auth::user()->log('memperbarui jadwal kerja karyawan ' . $schedule->employee->user->name . ' <strong>[ID: ' . $schedule->id . ']</strong>', EmployeeSchedule::class, $schedule->id);
             return $schedule;
         }
         return false;
@@ -50,7 +48,6 @@ trait EmployeeScheduleRepository
     public function destroyEmployeeSchedule(EmployeeSchedule $schedule)
     {
         if ($schedule->delete()) {
-            Auth::user()->log('menghapus jadwal kerja karyawan ' . $schedule->employee->user->name . ' <strong>[ID: ' . $schedule->id . ']</strong>', EmployeeSchedule::class, $schedule->id);
             return $schedule;
         }
         return false;

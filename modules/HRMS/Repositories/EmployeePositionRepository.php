@@ -22,7 +22,6 @@ trait EmployeePositionRepository
         ));
 
         if ($contract->positions()->save($position)) {
-            Auth::user()->log('menambahkan jabatan ' . $position->name . ' ke perjanjian kerja dengan nomor ' . $contract->kd . ' <strong>[ID: ' . $position->id . ']</strong>', EmployeePosition::class, $position->id);
             return $position;
         }
         return false;
@@ -36,7 +35,6 @@ trait EmployeePositionRepository
         $position = $position->fill(Arr::only($data, ['position_id', 'start_at', 'end_at']));
 
         if ($position->save()) {
-            Auth::user()->log('memperbarui jabatan ' . $position->name . ' ke perjanjian kerja dengan nomor ' . $position->contract->kd . ' <strong>[ID: ' . $position->id . ']</strong>', EmployeePosition::class, $position->id);
             return $position;
         }
         return false;
@@ -48,7 +46,6 @@ trait EmployeePositionRepository
     public function removeEmployeePosition(EmployeePosition $position)
     {
         if ($position->delete()) {
-            Auth::user()->log('menghapus jabatan ' . $position->name . ' ke perjanjian kerja dengan nomor ' . $position->contract->kd . ' <strong>[ID: ' . $position->id . ']</strong>', EmployeePosition::class, $position->id);
             return $position;
         }
         return false;

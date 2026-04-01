@@ -23,7 +23,12 @@ class PermitSeeder extends Seeder
             'menu', 'order', 'category', 'categoryName', 'tags',
             'warehouse', 'casier', 'department', 'slip', 'slip_category', 'slip_component',
             'position', 'slip_component', 'slip_template', 'leave_category', 'outwork_category',
-            'vacation_category', 'validations', 'employee'
+            'vacation_category', 'validations', 'employee', 'employee_schedule', 'employee_scanlog',
+            'vacation_quota', 'employee_leave', 'employee_vacation', 'isurance_registration', 'isurance_template_bpjs',
+            'salaray_approval', 'employee_report', 'employee_report_salary', 'ticketing', 'employee_isurance',
+            'employee_overtime', 'employee_outwork', 'employee_loan', 'employee_feastday', 'employee_postyear',
+            'employee_payroll_template', 'employee_payroll_calculation', 'employee_ter_taxs', 'employee_income_yearly',
+            'employee_validations_salary', 'employee_report_overtime', 'employee_tax'
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];

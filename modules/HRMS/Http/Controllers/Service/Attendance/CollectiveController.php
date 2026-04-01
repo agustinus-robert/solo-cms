@@ -37,21 +37,6 @@ class CollectiveController extends Controller
                 'employee.user',
                 'position.position' => fn($w) => $w->with('department')
             ])
-            ->whereHas('position.position', function ($p) use ($emplIds) {
-                $p->where(function ($q) use ($emplIds) {
-
-                    $q->whereIn('type', [
-                        PositionTypeEnum::BACKOFFICE->value,
-                        PositionTypeEnum::DRIVER->value
-                    ])
-
-                    ->orWhere(function ($sub) use ($emplIds) {
-                        $sub->where('type', PositionTypeEnum::NONSTAF->value)
-                            ->whereIn('empl_id', $emplIds);
-                    });
-
-                });
-            })
             ->active()
             ->get();
 
@@ -92,8 +77,6 @@ class CollectiveController extends Controller
         }
 
         if (EmployeeSchedule::upsert($request->transformed()->toArray(), ['empl_id', 'start_at', 'end_at'], ['dates', 'workdays_count'])) {
-            $request->user()->log('membuat ' . ($count = count($request->transformed()->toArray())) . ' jadwal kerja karyawan untuk periode ' . ($request->input('month')) . ' secara kolektif');
-
             return redirect()->next()->with('success', 'Berhasil meregistrasikan ' . $count . ' jadwal kerja karyawan untuk periode ' . ($request->input('month')) . ' secara kolektif.');
         }
         return redirect()->fail();

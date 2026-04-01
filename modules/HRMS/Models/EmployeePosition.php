@@ -7,10 +7,11 @@ use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Models\Traits\Approvable\Approver;
 use Modules\Core\Models\CompanyPosition;
+use App\Traits\HasAuditLog;
 
 class EmployeePosition extends Model
 {
-    use Restorable, Searchable, Approver;
+    use Restorable, Searchable, Approver, HasAuditLog;
 
     /**
      * The table associated with the model.

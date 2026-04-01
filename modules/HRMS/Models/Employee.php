@@ -12,10 +12,11 @@ use Modules\Core\Enums\PositionTypeEnum;
 use Modules\Core\Models\CompanySalarySlipComponent;
 use Modules\Core\Models\CompanySalaryTemplate;
 use Modules\HRMS\Models\Traits\EmployeeTrait;
+use App\Traits\HasAuditLog;
 
 class Employee extends Model
 {
-    use Metable, Userstamps, Restorable, Searchable, EmployeeTrait;
+    use Metable, Userstamps, Restorable, Searchable, EmployeeTrait, HasAuditLog;
 
     /**
      * The table associated with the model.

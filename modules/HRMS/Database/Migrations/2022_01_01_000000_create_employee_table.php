@@ -65,8 +65,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('empl_id')->references('id')->on('empls')->onUpdate('cascade')->onDelete('cascade');
-        });
 
+            $table->unique(['empl_id', 'start_at', 'end_at'], 'empl_schedules_unique_index');
+        });
         // 4. Positions
         Schema::create('empl_positions', function (Blueprint $table) {
             $table->increments('id');
@@ -265,7 +266,7 @@ return new class extends Migration
             $table->foreign('empl_id')->references('id')->on('empls')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('empl_document', function(Blueprint $table){
+        Schema::create('empl_documents', function(Blueprint $table){
             $table->increments('id');
             $table->unsignedSmallInteger('empl_id');
             $table->string('name');
@@ -403,7 +404,7 @@ return new class extends Migration
         Schema::dropIfExists('empl_loan_inst_transactions');
         Schema::dropIfExists('empl_loan_installments');
         Schema::dropIfExists('empl_loans');
-        Schema::dropIfExists('empl_document');
+        Schema::dropIfExists('empl_documents');
         Schema::dropIfExists('empl_taxs');
         Schema::dropIfExists('empl_data_recaps');
         Schema::dropIfExists('empl_salaries');

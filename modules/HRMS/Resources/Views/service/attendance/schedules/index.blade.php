@@ -39,18 +39,20 @@
                                         <td class="py-2 text-end" nowrap>
                                             @if ($employee->contract)
                                                 @if ($schedule)
-                                                    @can('show', $schedule)
+                                                    @can('edit_employee_schedule')
                                                         <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('hrms::service.attendance.schedules.show', ['schedule' => $schedule->id, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                     @endcan
                                                 @else
-                                                    @can('store', Modules\HRMS\Models\EmployeeSchedule::class)
+                                                    @can('create_employee_schedule')
                                                         <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::service.attendance.schedules.create', ['employee' => $employee->id, 'month' => request('month', date('Y-m')), 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Buat baru"><i class="mdi mdi-plus-circle-outline"></i></a>
                                                     @endcan
                                                 @endif
-                                                @can('destroy', $schedule)
-                                                    <form class="form-block form-confirm d-inline" action="{{ route('hrms::service.attendance.schedules.destroy', ['schedule' => $schedule->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
-                                                        <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
-                                                    </form>
+                                                @can('delete_employee_schedule')
+                                                    @if(isset($schedule) && $schedule->id)
+                                                        <form class="form-block form-confirm d-inline" action="{{ route('hrms::service.attendance.schedules.destroy', ['schedule' => $schedule->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
+                                                            <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
+                                                        </form>
+                                                    @endif
                                                 @endcan
                                             @endif
                                         </td>
@@ -60,7 +62,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeSchedule::class)
+                                                @can('create_employee_schedule')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('hrms::service.attendance.schedules.create', ['next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Buat jadwal kerja baru</a>
                                                     </div>
@@ -99,7 +101,7 @@
                     </form>
                 </div>
             </div>
-            @can('store', Modules\HRMS\Models\EmployeeSchedule::class)
+            @can('create_employee_schedule')
                 <a class="btn btn-outline-secondary w-100 d-flex text-dark mb-4 rounded bg-white py-3 text-start" style="border-style: dashed;" href="{{ route('hrms::service.attendance.schedules.collective.create', ['month' => request('month', date('Y-m')), 'next' => url()->full()]) }}">
                     <i class="mdi mdi-calendar-multiple-check me-3"></i>
                     <div>Input jadwal kerja kolektif <br> <small class="text-muted">Jika Kamu ingin meregistrasikan 1 jadwal ke banyak karyawan</small></div>

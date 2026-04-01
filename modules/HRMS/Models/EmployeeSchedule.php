@@ -7,10 +7,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Modules\HRMS\Enums\WorkShiftEnum;
+use App\Traits\HasAuditLog;
 
 class EmployeeSchedule extends Model
 {
-    use Searchable;
+    use Searchable, HasAuditLog;
 
     /**
      * The table associated with the model.

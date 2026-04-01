@@ -7,10 +7,11 @@ use App\Models\Traits\Metable\Metable;
 use App\Models\Traits\Cacheable\Cacheable;
 use App\Models\Traits\Searchable\Searchable;
 use App\Models\Traits\Restorable\Restorable;
+use App\Traits\HasAuditLog;
 
 class CompanyPosition extends Model
 {
-    use Metable, Cacheable, Restorable, Searchable;
+    use Metable, Cacheable, Restorable, Searchable, HasAuditLog;
 
     protected $table = 'cmp_positions';
 

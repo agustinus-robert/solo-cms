@@ -117,7 +117,7 @@
                     </form>
                 </div>
             </div>
-            @can('store', \Modules\HRMS\Models\EmployeeScanLog::class)
+            @can('create_employee_scanlog')
                 <div class="card border-0">
                     <div class="card-body">
                         <i class="mdi mdi-calendar-import"></i> Input presensi manual

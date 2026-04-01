@@ -9,11 +9,12 @@ use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Models\CompanyContract;
 use Modules\Core\Enums\WorkLocationEnum;
+use App\Traits\HasAuditLog;
 use Modules\Docs\Models\Traits\Documentable\Documentable;
 
 class EmployeeContract extends Model
 {
-    use Metable, Userstamps, Restorable, Searchable, Documentable;
+    use Metable, Userstamps, Restorable, Searchable, Documentable, HasAuditLog;
 
     /**
      * The table associated with the model.

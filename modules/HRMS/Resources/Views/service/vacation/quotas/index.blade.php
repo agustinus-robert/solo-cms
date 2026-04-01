@@ -117,7 +117,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeVacationQuota::class)
+                                                @can('store_vacation_quota')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('hrms::service.vacation.quotas.create', ['year' => request('year'), 'next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah distribusi cuti baru</a>
                                                     </div>
@@ -160,7 +160,7 @@
                     </div>
                 </div>
             @endif
-            @can('store', Modules\HRMS\Models\EmployeeVacationQuota::class)
+            @can('create_vacation_quota')
                 <form action="{{ route('hrms::service.vacation.quotas.batch-create', ['year' => request('year', date('Y')), 'next' => url()->full()]) }}" method="POST" class="form-block form-confirm">@csrf
                     <button class="btn btn-outline-secondary w-100 d-flex text-dark mb-4 rounded bg-white py-3 text-start" style="border-style: dashed;">
                         <i class="mdi mdi-calendar-multiple-check me-3"></i>

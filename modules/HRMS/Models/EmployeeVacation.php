@@ -8,11 +8,12 @@ use App\Models\Traits\Searchable\Searchable;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\Traits\Approvable\Approvable;
+use App\Traits\HasAuditLog;
 use Modules\Docs\Models\Traits\Documentable\Documentable;
 
 class EmployeeVacation extends Model
 {
-    use Restorable, Searchable, Approvable, Documentable;
+    use Restorable, Searchable, Approvable, Documentable, HasAuditLog;
 
     /**
      * The table associated with the model.
@@ -123,10 +124,18 @@ class EmployeeVacation extends Model
      */
     public function scopeWhenDatesBetween($query, $start_at = false, $end_at = false)
     {
-        return $query->where(
-            fn($subquery) => $subquery->when($start_at, fn($q) => $q->where(fn($s) => $s->whereRaw('json_unquote(json_extract(dates, "$[0].d")) >= ?', $start_at)->orWhereJsonContains('dates', ['d' => $start_at])))
-                ->when($end_at, fn($q) => $q->where(fn($s) => $s->whereRaw('json_unquote(json_extract(dates, "$[0].d")) <= ?', $end_at)->orWhereJsonContains('dates', ['d' => $end_at])))
-        );
+        return $query->where(function($subquery) use ($start_at, $end_at) {
+            $subquery->when($start_at, function($q) use ($start_at) {
+                // Tambahkan ::jsonb setelah nama kolom
+                $q->whereRaw("(dates::jsonb)->0->>'d' >= ?", [$start_at])
+                ->orWhereJsonContains('dates', [['d' => $start_at]]);
+            })
+            ->when($end_at, function($q) use ($end_at) {
+                // Tambahkan ::jsonb setelah nama kolom
+                $q->whereRaw("(dates::jsonb)->0->>'d' <= ?", [$end_at])
+                ->orWhereJsonContains('dates', [['d' => $end_at]]);
+            });
+        });
     }
 
     /**

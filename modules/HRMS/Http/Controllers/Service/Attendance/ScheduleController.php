@@ -33,16 +33,6 @@ class ScheduleController extends Controller
         ])
             ->search($request->get('search'))
             ->whenTrashed($request->get('trash'))
-            ->whereDoesntHave('contract.position', function ($position) {
-                $position->whereHas('position', function ($type) {
-                    $type->where('type', PositionTypeEnum::TEACHER);
-                });
-            })
-            ->whereDoesntHave('contract.position', function ($position) {
-                $position->whereHas('position', function ($type) {
-                    $type->where('type', PositionTypeEnum::TEACHERJAKARTA);
-                });
-            })
             ->paginate($request->get('limit', 10));
 
         return view('hrms::service.attendance.schedules.index', compact('employees'));
@@ -57,17 +47,19 @@ class ScheduleController extends Controller
 
         $month = $request->old('month', $request->get('month', date('Y-m')));
 
-        switch ($employee->position->position->type) {
-            case PositionTypeEnum::BACKOFFICE:
+        $positionTypeKd = $employee->position->position->type->kd ?? null;
+        if (empty($positionTypeKd)) {
+            return redirect()->back()->with('error', 'Karyawan belum di set jabatannya.');
+        }
+
+        switch ($positionTypeKd) {
+            case 'owner':
+            case 'management':
+            case 'staff':
                 $workshifts = WorkShiftEnum::cases();
                 break;
 
-            case PositionTypeEnum::TEACHER:
-                $workshifts = TeacherShiftEnum::cases();
-                break;
-
-            case PositionTypeEnum::SECURITY:
-            case PositionTypeEnum::NONSTAF:
+            case 'support':
                 $workshifts = ObShiftEnum::cases();
                 break;
 
