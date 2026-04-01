@@ -28,7 +28,6 @@ trait EmployeeRepository
                 $this->storeEmployeeContract($employee, Arr::only($data, ['contract_id', 'kd', 'start_at', 'end_at', 'contract_file', 'work_location']));
             }
 
-            Auth::user()->log('menambahkan karyawan baru dengan nama ' . $user->name . ' <strong>[ID: ' . $employee->id . ']</strong>', Employee::class, $employee->id);
             return $employee;
         }
         return false;
@@ -40,7 +39,6 @@ trait EmployeeRepository
     public function updateEmployee(Employee $employee, array $data)
     {
         if ($employee->fill(Arr::only($data, ['joined_at', 'permanent_at', 'kd', 'permanent_kd', 'permanent_sk']))->save()) {
-            Auth::user()->log('memperbarui data karyawan baru dengan nama ' . $employee->user->name . ' <strong>[ID: ' . $employee->id . ']</strong>', Employee::class, $employee->id);
             return $employee;
         }
         return false;
@@ -52,7 +50,6 @@ trait EmployeeRepository
     public function destroyEmployee(Employee $employee)
     {
         if (!$employee->trashed() && $employee->delete()) {
-            Auth::user()->log('menghapus karyawan ' . $employee->user->name . ' <strong>[ID: ' . $employee->id . ']</strong>', Employee::class, $employee->id);
             return $employee;
         }
         return false;
@@ -64,7 +61,6 @@ trait EmployeeRepository
     public function restoreEmployee(Employee $employee)
     {
         if ($employee->trashed() && $employee->restore()) {
-            Auth::user()->log('memulihkan karyawan ' . $employee->user->name . ' <strong>[ID: ' . $employee->id . ']</strong>', Employee::class, $employee->id);
             return $employee;
         }
         return false;

@@ -22,7 +22,7 @@ class StoreRequest extends FormRequest
         return [
             'name'              => 'required|max:191|string',
             'username'          => 'required|min:4|max:191|regex:/^[a-z\d.]{4,20}$/|unique:' . (new User())->getTable() . ',username',
-            'phone_code'        => ['required', 'in:' . Country::select('phones', 'code')->get()->pluck('phones', 'code')->flatten()->join(',')],
+            'phone_code'        => ['required', 'in:' . Country::select('phones', 'kd')->get()->pluck('phones', 'kd')->flatten()->join(',')],
             'phone_number'      => ['required', 'numeric', new UniqueMetaValue(User::class, 'phone_number', $this->user()->getMeta('phone_number'))],
             'joined_at'         => 'required|date',
             'contract_id'       => 'required_unless:contract,1|exists:' . (new CompanyContract())->getTable() . ',id',

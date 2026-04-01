@@ -23,7 +23,7 @@ class PermitSeeder extends Seeder
             'menu', 'order', 'category', 'categoryName', 'tags',
             'warehouse', 'casier', 'department', 'slip', 'slip_category', 'slip_component',
             'position', 'slip_component', 'slip_template', 'leave_category', 'outwork_category',
-            'vacation_category', 'validations'
+            'vacation_category', 'validations', 'employee'
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];

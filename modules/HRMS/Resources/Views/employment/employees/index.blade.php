@@ -78,15 +78,15 @@
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('show_employee')
+                                                @can('edit_employee')
                                                     <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::employment.employees.show', ['employee' => $employee->id, 'page' => 'main', 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Lihat detail"><i class="mdi mdi-eye-outline"></i></a>
                                                 @endcan
-                                                @can('destroy_employee')
+                                                @can('delete_employee')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.employees.destroy', ['employee' => $employee->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
                                                 @endcan
-                                                @can('show_employee')
+                                                @can('edit_employee')
                                                     <div class="dropstart d-inline">
                                                         <button class="btn btn-soft-secondary text-dark rounded px-2 py-1" type="button" data-bs-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
                                                         <ul class="dropdown-menu border-0 shadow">

@@ -26,7 +26,6 @@ trait EmployeeContractRepository
                 );
             }
 
-            Auth::user()->log('menambahkan perjanjian kerja baru dengan nomor ' . $contract->kd . ' <strong>[ID: ' . $contract->id . ']</strong>', EmployeeContract::class, $contract->id);
             return $employee;
         }
         return false;
@@ -38,7 +37,6 @@ trait EmployeeContractRepository
     public function destroyEmployeeContract(EmployeeContract $contract)
     {
         if (!$contract->trashed() && $contract->delete()) {
-            Auth::user()->log('menghapus perjanjian kerja ' . $contract->kd . ' <strong>[ID: ' . $contract->id . ']</strong>', EmployeeContract::class, $contract->id);
             return $contract;
         }
         return false;
@@ -50,7 +48,6 @@ trait EmployeeContractRepository
     public function restoreEmployeeContract(EmployeeContract $contract)
     {
         if ($contract->trashed() && $contract->restore()) {
-            Auth::user()->log('memulihkan perjanjian kerja ' . $contract->kd . ' <strong>[ID: ' . $contract->id . ']</strong>', EmployeeContract::class, $contract->id);
             return $contract;
         }
         return false;

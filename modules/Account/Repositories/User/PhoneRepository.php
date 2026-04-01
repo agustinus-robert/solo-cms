@@ -23,7 +23,6 @@ trait PhoneRepository
     {
         if ($user) {
             $user->setManyMeta(Arr::only($array, $this->metaKeys));
-            Auth::user()->log('memperbarui nomor ponsel pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
             return $user;
         }
         return false;
@@ -36,7 +35,6 @@ trait PhoneRepository
     {
         if ($user) {
             $user->removeManyMeta($this->metaKeys);
-            Auth::user()->log('menghapus nomor ponsel pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
             return $user;
         }
         return false;

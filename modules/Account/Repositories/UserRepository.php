@@ -17,14 +17,10 @@ trait UserRepository
 	public function storeUser(array $data)
 	{
 		$user = new User(
-			array_merge(
-			Arr::only($data, ['name', 'username', 'email_address', 'password']),
-			['grade_id' => userGrades()]
-			)
+			Arr::only($data, ['name', 'username', 'email_address', 'password'])
 		);
-		
+
 		if ($user->save()) {
-			Auth::user()->log('membuat pengguna baru dengan nama ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
 			return $user;
 		}
 		return false;
@@ -36,7 +32,6 @@ trait UserRepository
 	public function destroyUser(User $user)
 	{
 		if (!$user->trashed() && $user->delete()) {
-			Auth::user()->log('menghapus pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
 			return $user;
 		}
 		return false;
@@ -48,7 +43,6 @@ trait UserRepository
 	public function restoreUser(User $user)
 	{
 		if ($user->trashed() && $user->restore()) {
-			Auth::user()->log('memulihkan pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
 			return $user;
 		}
 		return false;
