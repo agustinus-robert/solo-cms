@@ -34,7 +34,6 @@ return new class extends Migration
             $table->id();
             $table->string('kd')->unique();
             $table->string('name');
-            $table->string('category')->nullable();
             $table->boolean('is_active')->default(true);
             $table->json('meta')->nullable();
             $table->timestamps();

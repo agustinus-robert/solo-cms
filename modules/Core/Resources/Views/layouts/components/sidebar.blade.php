@@ -19,6 +19,13 @@
         </li>
 
         <li>
+            <a href="{{ route('core::company.position-type.index') }}" class="waves-effect {{ Route::is('core::company.position-type.*') ? 'active' : '' }}">
+                <i class="bx bx-user-plus"></i>
+                <span key="t-divisi">Tipe Posisi</span>
+            </a>
+        </li>
+
+        <li>
             <a href="{{ route('core::company.positions.index') }}" class="waves-effect {{ Route::is('core::company.positions.*') ? 'active' : '' }}">
                 <i class="bx bx-tag"></i>
                 <span key="t-jabatan">Jabatan</span>

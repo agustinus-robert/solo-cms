@@ -11,6 +11,7 @@ use Modules\Core\Http\Requests\Company\Position\UpdateRequest;
 use Modules\Core\Http\Controllers\Controller;
 use Modules\Core\Repositories\CompanyPositionRepository;
 use Spatie\Permission\Models\Role;
+use Modules\Core\Models\CompanyPositionType;
 
 class PositionController extends Controller
 {
@@ -43,8 +44,21 @@ class PositionController extends Controller
         $roles = Role::where('guard_name', 'web')->get();
         $departments = CompanyDepartment::all();
         $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
+        $positionTypes = CompanyPositionType::all();
 
-        return view('core::company.positions.create', compact('roles', 'positions', 'departments'));
+        $position = new CompanyPosition();
+
+        return view('core::company.positions.upsert', compact('roles', 'positions', 'departments', 'positionTypes', 'position'));
+    }
+
+    public function show(CompanyPosition $position)
+    {
+        $roles = Role::where('guard_name', 'web')->get();
+        $departments = CompanyDepartment::all();
+        $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
+        $positionTypes = CompanyPositionType::all();
+
+        return view('core::company.positions.upsert', compact('roles', 'positions', 'departments', 'positionTypes', 'position'));
     }
 
     /**
@@ -59,19 +73,6 @@ class PositionController extends Controller
         return redirect()->fail();
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(CompanyPosition $position)
-    {
-        $position = $position->load('children', 'parents', 'meta');
-
-        $roles = Role::where('guard_name', 'web')->get();
-        $departments = CompanyDepartment::all();
-        $positions = CompanyPosition::with('department')->get()->groupBy('department.name');
-
-        return view('core::company.positions.show', compact('position', 'roles', 'departments', 'positions'));
-    }
 
     /**
      * Update the specified resource in storage.

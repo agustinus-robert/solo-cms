@@ -11,17 +11,13 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     // Dashboard
     Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
-    Route::prefix('admin-extra')->namespace('AdminExtra')->name('admin-extra.')->group(function () {
-        Route::get('/choose-education', 'EducationController@index')->name('choose.extra-education');
-        Route::post('/choose-education', 'EducationController@store')->name('choose.extra-education.store');
-    });
     // Company
     Route::prefix('company')->namespace('Company')->name('company.')->group(function () {
         // Role references
         Route::put('/roles/{role}/restore', 'RoleController@restore')->name('roles.restore');
         Route::put('/roles/{role}/permissions', 'RoleController@permissions')->name('roles.permissions');
         Route::resource('roles', 'RoleController')->except('edit', 'create');
-
+        Route::resource('position-type', 'PositionTypeController');
         // Department references
         Route::put('/departments/{department}/restore', 'DepartmentController@restore')->name('departments.restore');
         Route::resource('departments', 'DepartmentController')->except('edit');
@@ -35,9 +31,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
             // Leave categories
             Route::put('/leave-categories/{category}/restore', 'LeaveCategoryController@restore')->name('leave-categories.restore');
             Route::resource('leave-categories', 'LeaveCategoryController')->parameters(['leave-categories' => 'category'])->except('edit');
-
-            Route::put('/leave-student-categories/{category}/restore', 'LeaveStudentCategoryController@restore')->name('leave-student-categories.restore');
-            Route::resource('leave-student-categories', 'LeaveStudentCategoryController')->parameters(['leave-student-categories' => 'category'])->except('edit');
 
             // Vacation categories
             Route::put('/vacation-categories/{category}/restore', 'VacationCategoryController@restore')->name('vacation-categories.restore');

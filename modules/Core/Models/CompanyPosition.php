@@ -65,14 +65,7 @@ class CompanyPosition extends Model
 
     public function parents()
     {
-        return $this->belongsToMany(self::class, 'cmp_position_trees', 'position_id', 'parent_id')
-            ->whereHas('employees', function ($query) {
-                $query->whereNull('empl_positions.deleted_at');
-            })
-            ->with(['employees' => function ($query) {
-                $query->whereNull('empl_positions.deleted_at');
-            }])
-            ->orderBy('level');
+        return $this->belongsToMany(self::class, 'cmp_position_trees', 'position_id', 'parent_id');
     }
 
     public function children()

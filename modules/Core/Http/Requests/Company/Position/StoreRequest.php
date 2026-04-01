@@ -13,20 +13,21 @@ class StoreRequest extends FormRequest
      */
     public function rules()
     {
-    	$departments = CompanyDepartment::all();
-        $positions = CompanyPosition::all();
-
         return [
-            'dept_id'           => 'required|in:'.$departments->pluck('id')->join(','),
-            'kd'                => 'required|max:191|string|notin:'.$positions->pluck('kd')->join(','),
-			'name'              => 'required|max:191|string',
-			'description'       => 'nullable|max:500|string',
-			'parents.*'         => 'nullable|in:'.$positions->pluck('id')->join(','),
-            'children.*'        => 'nullable|in:'.$positions->pluck('id')->join(','),
-            'level'             => 'required|numeric|min:1|max:10',
-			'is_visible'        => 'boolean'
+            'dept_id'              => 'required',
+            'position_type_id'     => 'required', // Tambahkan ini
+            'kd'                   => 'required|max:191',
+            'name'                 => 'required|max:191',
+            'description'          => 'nullable',
+            'default_applied_role' => 'nullable', // Tambahkan ini
+            'parents.*'            => 'nullable',
+            'children.*'           => 'nullable',
+            'level'                => 'required|numeric|min:0|max:10',
+            'is_visible'           => 'boolean'
         ];
     }
+
+
 
     /**
      * Get custom attributes for validator errors.
@@ -51,7 +52,8 @@ class StoreRequest extends FormRequest
     public function transform()
     {
         return $this->only([
-            'dept_id', 'kd', 'name', 'description', 'parents', 'children', 'level', 'is_visible'
+            'dept_id', 'position_type_id', 'kd', 'name', 'description',
+            'default_applied_role', 'parents', 'children', 'level', 'is_visible'
         ]);
     }
 }

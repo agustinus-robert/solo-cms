@@ -74,10 +74,10 @@
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_position')
+                                                @can('edit_position')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.positions.show', ['position' => $position->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
-                                                @can('destroy_position')
+                                                @can('delete_position')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.positions.destroy', ['position' => $position->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
