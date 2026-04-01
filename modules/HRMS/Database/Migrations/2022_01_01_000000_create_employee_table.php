@@ -273,6 +273,8 @@ return new class extends Migration
             $table->string('file');
 
             $table->foreign('empl_id')->references('id')->on('empls')->onUpdate('cascade')->onDelete('cascade');
+            $table->softDeletes();
+            $table->timestamps();
         });
 
         // 10. Loans

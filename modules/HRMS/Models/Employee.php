@@ -135,7 +135,9 @@ class Employee extends Model
      */
     public function contract()
     {
-        return $this->hasOne(EmployeeContract::class, 'empl_id')->active();
+        return $this->hasOne(EmployeeContract::class, 'empl_id')
+            ->whereNull('deleted_at')
+            ->latestOfMany();
     }
 
     /**

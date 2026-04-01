@@ -50,7 +50,7 @@
                                         </td>
                                         <td>
                                             @if ($contract = $employee->contract)
-                                                <i class="mdi mdi-circle {{ $employee->contract->is_active ? 'text-success' : 'text-danger' }}" style="font-size: 11pt;"></i> &nbsp; {{ $employee->contract?->kd }}
+                                                <i class="mdi mdi-circle {{ empty($employee->contract->deleted_at) ? 'text-success' : 'text-danger' }}" style="font-size: 11pt;"></i> &nbsp; {{ $employee->contract?->kd }}
                                             @else
                                                 -
                                             @endif

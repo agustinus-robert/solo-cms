@@ -20,7 +20,8 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $employees = Employee::with('user.meta', 'contract.positions.position')
+        $employees = Employee::with('user.meta', 'contract.positions',
+                'contract.positions.position')
             ->search($request->get('search'))
             ->whenTrashed($request->get('trash'))
             ->paginate($request->get('limit', 10));

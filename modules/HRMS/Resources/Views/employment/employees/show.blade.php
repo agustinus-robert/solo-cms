@@ -199,7 +199,7 @@
                                         {{-- @can('show', $contract)
                                             <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::employment.contracts.show', ['contract' => $contract->id, 'next' => url()->full()]) }}"><i class="mdi mdi-eye-outline"></i></a>
                                         @endcan --}}
-                                        @can('destroy', $contract)
+                                        @can('delete_employee')
                                             <form class="form-block form-confirm d-inline" action="{{ route('hrms::employment.contracts.destroy', ['contract' => $contract->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
                                                 <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                             </form>
