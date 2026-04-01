@@ -5,14 +5,6 @@ namespace Modules\HRMS\Http\Requests\Service\Attendance\Schedule;
 class UpdateRequest extends StoreRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('update', $this->schedule);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()

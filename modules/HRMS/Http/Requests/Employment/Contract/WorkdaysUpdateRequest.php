@@ -7,14 +7,6 @@ use App\Http\Requests\FormRequest;
 class WorkdaysUpdateRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('update', $this->contract);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()

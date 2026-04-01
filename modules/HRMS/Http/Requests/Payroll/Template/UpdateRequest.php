@@ -7,14 +7,6 @@ use App\Http\Requests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return $this->user()->can('update', $this->template);
-    }
-
     public function rules()
     {
         return [

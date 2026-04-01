@@ -155,38 +155,50 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            let {
-                data
-            } = await axios.get('{{ route('api::references.phones.index') }}');
-            for (code in data.data) {
-                for (index in data.data[code]) {
-                    let number = data.data[code][index];
-                    let option = document.createElement('option');
-                    option.value = number;
-                    option.innerHTML = `+${number}`;
+            try {
+                const response = await axios.get('{{ route('api::references.phones.index') }}');
+                const phoneSelect = document.querySelector('[name="phone_code"]');
 
-                    if (number == '{{ old('phone_code', 62) }}') {
-                        option.selected = 'selected'
+                const phoneData = response.data.data;
+
+                phoneSelect.innerHTML = '';
+
+                for (let countryCode in phoneData) {
+                    let dialingCode = phoneData[countryCode];
+
+                    let option = document.createElement('option');
+                    option.value = dialingCode;
+                    option.innerHTML = `+${dialingCode} (${countryCode})`;
+
+                    if (dialingCode == '{{ old('phone_code', 62) }}') {
+                        option.selected = true;
                     }
 
-                    document.querySelector('[name="phone_code"]').appendChild(option);
+                    phoneSelect.appendChild(option);
                 }
+
+                if (typeof $ !== 'undefined' && $.fn.select2) {
+                    $('[name="phone_code"]').trigger('change');
+                }
+
+            } catch (error) {
+                console.error("Gagal ambil data ponsel:", error);
             }
 
             const toggleContractForm = () => {
+                const isSkip = document.getElementById('skip_contract').checked;
                 ['[name="contract_id"]', '[name="kd"]', '[name="start_at"]', '[name="end_at"]', '[name="contract_file"]', '[name="work_location"]'].forEach((v) => {
-                    if (document.querySelector(v)) {
-                        document.querySelectorAll(v).forEach((e) => {
-                            e.disabled = document.getElementById('skip_contract').checked ? 'disabled' : ''
-                        })
-                    }
-                })
-            }
+                    document.querySelectorAll(v).forEach((e) => {
+                        e.disabled = isSkip;
+                    });
+                });
+            };
 
-            document.getElementById('skip_contract').addEventListener('change', toggleContractForm)
-
+            document.getElementById('skip_contract').addEventListener('change', toggleContractForm);
             toggleContractForm();
         });
     </script>

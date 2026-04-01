@@ -6,11 +6,6 @@ use App\Http\Requests\FormRequest;
 
 class StoreBpjsSettingRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules()
     {
         return [

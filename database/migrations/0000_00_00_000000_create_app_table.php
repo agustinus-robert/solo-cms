@@ -34,7 +34,29 @@ return new class extends Migration
             (9, 'D4'),
             (10, 'S1'),
             (11, 'S2'),
-            (12, 'S3');
+            (12, 'S3')
+            ON CONFLICT (id) DO NOTHING;
+
+            CREATE SEQUENCE IF NOT EXISTS ref_countries_id_seq;
+            CREATE TABLE IF NOT EXISTS ref_countries (
+                id int4 NOT NULL DEFAULT nextval('ref_countries_id_seq'::regclass),
+                kd varchar(2),
+                name varchar(191),
+                native varchar(191),
+                phones varchar(191),
+                continent varchar(191),
+                capital varchar(191),
+                currencies varchar(191),
+                languages varchar(191),
+                PRIMARY KEY (id)
+            );
+
+            INSERT INTO ref_countries (kd, name, native, phones, continent, capital, currencies, languages) VALUES
+            ('ID', 'Indonesia', 'Indonesia', '62', 'Asia', 'Jakarta', 'IDR', 'Indonesian'),
+            ('SG', 'Singapore', 'Singapore', '65', 'Asia', 'Singapore', 'SGD', 'English, Malay, Mandarin, Tamil'),
+            ('MY', 'Malaysia', 'Malaysia', '60', 'Asia', 'Kuala Lumpur', 'MYR', 'Malay'),
+            ('US', 'United States', 'United States', '1', 'North America', 'Washington D.C.', 'USD', 'English')
+            ON CONFLICT (id) DO NOTHING;
         ");
 
         Schema::create('app_settings', function (Blueprint $table) {
