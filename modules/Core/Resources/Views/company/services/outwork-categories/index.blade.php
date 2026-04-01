@@ -73,7 +73,7 @@
                                                 @can('edit_outwork_category')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.services.outwork-categories.show', ['category' => $category->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
-                                                @can('destroy_outwork_category')
+                                                @can('delete_outwork_category')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.services.outwork-categories.destroy', ['category' => $category->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
@@ -86,7 +86,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store_outwork_category')
+                                                @can('create_outwork_category')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('core::company.services.outwork-categories.create', ['next' => url()->current()]) }}"><i class="mdi mdi-plus"></i> Buat kategori baru</a>
                                                     </div>

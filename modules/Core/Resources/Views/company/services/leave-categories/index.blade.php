@@ -47,16 +47,16 @@
                                         <td nowrap><code>{{ $category->meta?->time_input ?? '' }}</code></td>
                                         <td class="py-2 text-end" nowrap>
                                             @if ($category->trashed())
-                                                @can('restore', $category)
+                                                @can('restore_leave_category')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.services.leave-categories.restore', ['category' => $category->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('put')
                                                         <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Pulihkan"><i class="mdi mdi-refresh"></i></button>
                                                     </form>
                                                 @endcan
                                             @else
-                                                @can('update_leave_category')
+                                                @can('edit_leave_category')
                                                     <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('core::company.services.leave-categories.show', ['category' => $category->id, 'next' => url()->current()]) }}" method="post" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil-outline"></i></a>
                                                 @endcan
-                                                @can('destroy_leave_category')
+                                                @can('delete_leave_category')
                                                     <form class="form-block form-confirm d-inline" action="{{ route('core::company.services.leave-categories.destroy', ['category' => $category->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                         <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                     </form>
