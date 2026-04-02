@@ -59,7 +59,7 @@
                 <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
-                        <span>Setting & Akun</span>
+                        <span>Akun</span>
                     </a>
                 </div>
             </div>

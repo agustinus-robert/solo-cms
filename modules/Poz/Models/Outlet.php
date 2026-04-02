@@ -6,6 +6,7 @@ use App\Traits\HasAuditLog;
 use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Account\Models\User;
+use Modules\HRMS\Models\Employee;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -30,8 +31,13 @@ class Outlet extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function users()
+    public function employees()
     {
-        return $this->belongsToMany(User::class, 'user_casier_outlets', 'outlet_id', 'user_id');
+        return $this->belongsToMany(
+            Employee::class,
+            'user_casier_outlets',
+            'outlet_id',
+            'empl_id'
+        )->with('user');
     }
 }

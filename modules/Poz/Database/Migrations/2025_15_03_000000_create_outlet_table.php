@@ -33,7 +33,11 @@ return new class extends Migration
         });
 
         Schema::create('user_casier_outlets', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('empl_id')
+                ->constrained('empls')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
             $table->foreignId('outlet_id')->constrained('outlets')->cascadeOnUpdate()->cascadeOnDelete();
         });
 

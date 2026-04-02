@@ -1,4 +1,4 @@
-@extends('account::layouts.default')
+@extends('core::layouts.default')
 
 @section('title', 'Kelola Petugas Outlet | ')
 

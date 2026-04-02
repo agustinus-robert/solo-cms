@@ -9,9 +9,6 @@
             <h4 class="mb-0 font-weight-bold">Pengguna Sistem</h4>
             <p class="text-muted small mb-0">Kelola akun dan penempatan role user.</p>
         </div>
-        <a href="{{ route('core::manage-user.create') }}" class="btn btn-primary px-4 shadow-sm">
-            <i class="fas fa-user-plus mr-1"></i> Tambah User
-        </a>
     </div>
 
     <div class="card border-0 shadow-sm">

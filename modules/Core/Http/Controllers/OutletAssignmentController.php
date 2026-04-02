@@ -6,23 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Poz\Models\Outlet;
 use Modules\Account\Models\User;
+use Modules\HRMS\Models\Employee;
 use Illuminate\Support\Facades\DB;
 
 class OutletAssignmentController extends Controller
 {
     public function index()
     {
-        $outlets = Outlet::withCount('users')->latest()->paginate(10);
+        $outlets = Outlet::withCount('employees')->latest()->paginate(10);
         return view('core::outlet-assignment.index', compact('outlets'));
     }
 
     public function edit($id)
     {
-        $outlet = Outlet::with('users')->findOrFail($id);
+        $outlet = Outlet::with('employees')->findOrFail($id);
 
-        $users = User::whereHas('roles', function($q) {
-            $q->whereIn('name', ['outlet', 'casier']);
-        })->get(['id', 'name', 'email']);
+        $users = Employee::with('user')
+            ->whereHas('user.roles', function ($q) {
+                $q->whereIn('name', ['outlet', 'casier']);
+            })
+            ->get();
+
 
         return view('core::outlet-assignment.edit', compact('outlet', 'users'));
     }

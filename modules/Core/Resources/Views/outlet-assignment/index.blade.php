@@ -1,4 +1,4 @@
-@extends('account::layouts.default')
+@extends('core::layouts.default')
 
 @section('content')
 <div class="container-fluid py-4">
