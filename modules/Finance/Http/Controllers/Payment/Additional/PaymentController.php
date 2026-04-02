@@ -144,8 +144,6 @@ class PaymentController extends Controller
             ]);
         }
 
-        $request->user()->log(($current ? 'memperbarui' : 'membuat') . ' rekap ' . count($request->input('additionals', [])) . ' pembayaran pekerjaan tambahan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
-
         return redirect()->next()->with('success', 'Pembayaran total <strong>' . count($request->input('additionals', [])) . '</strong> atas nama <strong>' . $employee->user->name . '</strong> berhasi ' . ($current ? 'diperbarui' : 'dibuat') . '!');
     }
 
@@ -161,8 +159,6 @@ class PaymentController extends Controller
         );
 
         $employee->dataRecapitulations()->whereType(DataRecapitulationTypeEnum::ADDITIONAL_PAYMENT)->whereIn('id', $additionals)->delete();
-
-        $request->user()->log('menghapus rekap ' . count($additionals) . ' lembur karyawan atas nama ' . $employee->user->name, Employee::class, $employee->id);
 
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($additionals) . '</strong> lembur karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dihapus!');
     }

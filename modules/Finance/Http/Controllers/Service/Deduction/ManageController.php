@@ -68,7 +68,6 @@ class ManageController extends Controller
     public function store(StoreRequest $request)
     {
         $resulter = $request->transform();
-        // $deduction = new EmployeeDeduction($request->transformed()->toArray());
         $start_at = $request->start_at;
         $end_at = $request->end_at;
 
@@ -83,7 +82,6 @@ class ManageController extends Controller
         ];
 
         $recap = $employee->dataRecapitulations()->create($arr);
-        //        $recap = $employee->dataRecapitulations()->create($arr);
 
         if ($recap->save()) {
             return redirect()->next()->with('success', 'Potongan atas nama <strong>' . $employee->user->name . '</strong> berhasil disimpan.');

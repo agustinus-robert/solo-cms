@@ -125,7 +125,6 @@ class CalculationController extends Controller
         $employee = Employee::find($request->input('employee'));
 
         if ($employee->salaries()->updateOrCreate($request->transformed()->only('start_at', 'end_at'), $request->transformed()->toArray())) {
-            $request->user()->log('melakukan payroll <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('start_at') . ' &mdash; ' . $request->input('end_at') . '</strong>', Employee::class, $employee->id);
             return redirect()->next()->with('success', 'Payroll <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('start_at') . ' &mdash; ' . $request->input('end_at') . '</strong> berhasil disimpan');
         }
         return redirect()->fail();

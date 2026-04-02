@@ -8,10 +8,11 @@ use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Models\CompanySalary;
 use Modules\Core\Models\CompanySalarySlipComponent;
 use Modules\Core\Models\CompanySalaryTemplate;
+use App\Traits\HasAuditLog;
 
 class EmployeeSalaryTemplate extends Model
 {
-    use Restorable, Searchable;
+    use Restorable, Searchable, HasAuditLog;
 
     /**
      * The table associated with the model.

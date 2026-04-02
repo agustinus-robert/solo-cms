@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Modules\HRMS\Enums\DataRecapitulationTypeEnum;
+use App\Traits\HasAuditLog;
 
 class EmployeeDataRecapitulation extends Model
 {
-    use Restorable, Searchable;
+    use Restorable, Searchable, HasAuditLog;
 
     /**
      * The table associated with the model.

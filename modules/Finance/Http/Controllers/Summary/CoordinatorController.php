@@ -111,8 +111,6 @@ class CoordinatorController extends Controller
             }
         }
 
-        //  Auth::user()->log('membuat rekap ' . count($request->input('fields', [])) . ' POM karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
-
         return redirect()->next()->with('success', 'Rekap total <strong>' . $resulter['counting'] . '</strong> murid dari karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dibuat!');
     }
 

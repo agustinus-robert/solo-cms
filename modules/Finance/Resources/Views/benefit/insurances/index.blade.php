@@ -50,7 +50,7 @@
                                             <span data-bs-toggle="collapse" data-bs-target="#collapse-{{ $employee->id }}">
                                                 <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Lihat daftar"><i class="mdi mdi-file-tree-outline"></i></button>
                                             </span>
-                                            @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                            @can('create_employee_isurance')
                                                 <a class="btn @empty($employee->salaryTemplate) disabled btn-secondary @else  btn-soft-primary @endempty rounded px-2 py-1" href="{{ route('finance::benefit.insurances.registrations.create', ['employee' => $employee->id, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Tambah baru"><i class="mdi mdi-plus-circle-outline"></i></a>
                                             @endcan
                                             <form class="form-block form-confirm d-inline" action="{{ route('finance::benefit.insurances.registrations.reset', ['employee' => $employee->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
@@ -97,7 +97,7 @@
                                                             <tr>
                                                                 <td colspan="4" class="text-muted">Belum ada data asuransi karyawan,
                                                                     @if ($employee->salaryTemplate)
-                                                                        @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                                                        @can('create_employee_isurance')
                                                                             <a href="{{ route('finance::benefit.insurances.registrations.create', ['employee' => $employee->id, 'next' => url()->current()]) }}">klik di sini</a> untuk menambahkan
                                                                         @endcan
                                                                     @endif
@@ -114,7 +114,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                                @can('create_employee_isurance')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('finance::benefit.insurances.registrations.create', ['year' => request('year'), 'next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah distribusi cuti baru</a>
                                                     </div>

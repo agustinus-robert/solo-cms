@@ -8,10 +8,11 @@ use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Models\Traits\Approvable\Approvable;
 use Modules\Docs\Models\Traits\Documentable\Documentable;
 use Modules\HRMS\Enums\TaxTypeEnum;
+use App\Traits\HasAuditLog;
 
 class EmployeeTax extends Model
 {
-    use Restorable, Searchable, Approvable, Documentable;
+    use Restorable, Searchable, Approvable, Documentable, HasAuditLog;
 
     /**
      * The table associated with the model.

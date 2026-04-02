@@ -41,7 +41,7 @@
                                             <span data-bs-toggle="collapse" data-bs-target="#collapse-{{ $employee->id }}">
                                                 <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Lihat daftar"><i class="mdi mdi-file-tree-outline"></i></button>
                                             </span>
-                                            @can('store', Modules\HRMS\Models\EmployeeSalaryTemplate::class)
+                                            @can('create_employee_payroll_template')
                                                 <a class="btn btn-soft-success rounded px-2 py-1" href="{{ route('finance::payroll.templates.create', ['employee' => $employee->id, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Tambah baru"><i class="mdi mdi-plus-circle-outline"></i></a>
                                             @endcan
                                         </td>
@@ -67,10 +67,10 @@
                                                                 <td>{{ $template->companyTemplate->name ?: '~' }}</td>
                                                                 <td class="text-center">{{ $template->items_count }}</td>
                                                                 <td class="py-2 pe-2 text-end" nowrap>
-                                                                    @can('store', Modules\HRMS\Models\EmployeeSalaryTemplate::class)
+                                                                    @can('create_employee_payroll_template')
                                                                         <a class="btn btn-soft-warning rounded px-2 py-1" href="{{ route('finance::payroll.templates.show', ['template' => $template->id, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Ubah"><i class="mdi mdi-pencil"></i></a>
                                                                     @endcan
-                                                                    @can('destroy', $template)
+                                                                    @can('delete_employee_payroll_template')
                                                                         <form class="form-block form-confirm d-inline" action="{{ route('finance::payroll.templates.destroy', ['template' => $template->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                                             <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                                         </form>
@@ -80,7 +80,7 @@
                                                         @empty
                                                             <tr>
                                                                 <td colspan="5" class="text-muted">Tidak ada template gaji yang dibuat
-                                                                    @can('store', Modules\HRMS\Models\EmployeeSalaryTemplate::class)
+                                                                    @can('create_employee_payroll_template')
                                                                         , <a href="{{ route('finance::payroll.templates.create', ['employee' => $employee->id, 'next' => url()->current()]) }}">klik di sini</a> untuk menambahkan
                                                                     @endcan
                                                                 </td>
@@ -96,7 +96,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeSalary::class)
+                                                @can('create_employee_payroll_template')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('finance::payroll.templates.create', ['year' => request('year'), 'next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah template gaji baru</a>
                                                     </div>

@@ -71,7 +71,6 @@ class FeastDayController extends Controller
             return redirect()->back()->with('danger', 'Belum ada template THR, silakan buat template terlebih dahulu!');
         }
 
-        // get reference from slip template
         foreach (collect($feastdayComponents) as $k => $v) {
             $_val[$k] = collect($defaultTemplate)->where('name', $v->name)->first();
         }
@@ -105,7 +104,6 @@ class FeastDayController extends Controller
         );
 
         if (EmployeeDataRecapitulation::updateOrCreate(Arr::only($summary, ['start_at', 'end_at', 'empl_id', 'type']), $summary)) {
-            $request->user()->log('melakukan rekapitulasi THR <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('end_at') . '</strong>', Employee::class, $employee->id);
             return redirect()->next()->with('success', 'Rekapitulasi THR <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('end_at') . '</strong> berhasil disimpan');
         }
         return redirect()->fail();

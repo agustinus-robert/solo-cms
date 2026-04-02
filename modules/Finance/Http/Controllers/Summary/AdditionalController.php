@@ -41,7 +41,7 @@ class AdditionalController extends Controller
     }
 
     /**
-     * Create resource    
+     * Create resource
      */
     public function create(Request $request)
     {
@@ -121,7 +121,7 @@ class AdditionalController extends Controller
     }
 
     /**
-     * Store resource    
+     * Store resource
      */
     public function store(StoreRequest $request)
     {
@@ -150,8 +150,6 @@ class AdditionalController extends Controller
             ]);
         }
 
-        $request->user()->log(($current ? 'memperbarui' : 'membuat') . ' rekap ' . count($request->input('additionals', [])) . ' lembur karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
-
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($request->input('additionals', [])) . '</strong> lembur karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi ' . ($current ? 'diperbarui' : 'dibuat') . '!');
     }
 
@@ -167,8 +165,6 @@ class AdditionalController extends Controller
         );
 
         $employee->dataRecapitulations()->whereType(DataRecapitulationTypeEnum::ADDITIONAL)->whereIn('id', $additionals)->delete();
-
-        $request->user()->log('menghapus rekap ' . count($additionals) . ' lembur karyawan atas nama ' . $employee->user->name, Employee::class, $employee->id);
 
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($additionals) . '</strong> lembur karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dihapus!');
     }

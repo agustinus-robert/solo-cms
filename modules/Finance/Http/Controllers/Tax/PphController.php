@@ -85,7 +85,7 @@ class PphController extends Controller
     public function store(StoreRequest $request)
     {
         $pph = $request->transformed()->toArray();
-        
+
         if ($empl = $this->storeTaxYear($pph, true)) {
             return redirect()->next()->with('success', 'PPh 21 tahunan <strong>' . $empl->employee->user->name . '</strong> berhasil dibuat.');
         }

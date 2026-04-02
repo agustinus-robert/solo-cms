@@ -48,7 +48,7 @@ class ReimbursementController extends Controller
     }
 
     /**
-     * Create resource    
+     * Create resource
      */
     public function create(Request $request)
     {
@@ -76,7 +76,6 @@ class ReimbursementController extends Controller
                 'paid_amount' => $reimbursement['total']
             ]);
         }
-        $request->user()->log('membuat rekap ' . count($request->input('reimbursements', [])) . ' reimbursement karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($request->input('reimbursements', [])) . '</strong> reimbursement karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dibuat!');
     }
 
@@ -90,7 +89,6 @@ class ReimbursementController extends Controller
             ])
         );
         $employee->dataRecapitulations()->whereType(DataRecapitulationTypeEnum::REIMBURSEMENT)->whereIn('id', $reimbursements)->delete();
-        $request->user()->log('menghapus rekap ' . count($reimbursements) . ' reimbursement karyawan atas nama ' . $employee->user->name, Employee::class, $employee->id);
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($reimbursements) . '</strong> reimbursement karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dihapus!');
     }
 }

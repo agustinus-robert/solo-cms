@@ -48,7 +48,6 @@ class EmployeetaxController extends Controller
         $user = User::find($request->transformed()->toArray()['user_id']);
         if ($user) {
             $user->setManyMeta(Arr::only($request->transformed()->toArray(), $this->metaKeys));
-            $request->user()->log('memperbarui informasi NPWP pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
             return redirect()->next()->with('success', 'NPWP karyawan <strong>' . $user->name . '</strong> berhasil disimpan.');
         }
         return redirect()->fail();
@@ -66,7 +65,6 @@ class EmployeetaxController extends Controller
         $user = $employeetax->user;
         if ($user) {
             $user->setManyMeta(Arr::only($request->transformed()->toArray(), $this->metaKeys));
-            $request->user()->log('memperbarui informasi NPWP pengguna ' . $user->name . ' <strong>[ID: ' . $user->id . ']</strong>', User::class, $user->id);
             return redirect()->next()->with('success', 'NPWP karyawan <strong>' . $user->name . '</strong> berhasil disimpan.');
         }
         return redirect()->fail();

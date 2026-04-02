@@ -9,10 +9,11 @@ use Modules\Core\Enums\SalaryUnitEnum;
 use Modules\Core\Enums\SalaryAllowanceEnum;
 use Modules\Core\Enums\SalaryOperateEnum;
 use App\Models\Traits\HasGradeFromSession;
+use App\Traits\HasAuditLog;
 
 class CompanySalarySlipComponent extends Model
 {
-    use Restorable, Searchable, HasGradeFromSession;
+    use Restorable, Searchable, HasAuditLog;
 
     /**
      * The table associated with the model.

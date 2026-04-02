@@ -50,8 +50,6 @@ class ValidationOptionController extends Controller
             EmployeeReimbursement::whereNull('paid_at')->whereIn('id', $reimbursements->pluck('id'))->update(['paid_at' => $end_at]);
         }
 
-        // Send notification via email
-
         return redirect()->next()->with('success', 'Seluruh gaji periode <strong>' . $period . '</strong> berhasil dirilis, terima kasih!');
     }
 

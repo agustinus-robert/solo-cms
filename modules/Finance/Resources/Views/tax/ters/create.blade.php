@@ -149,10 +149,10 @@
             [...document.querySelectorAll('.calc-income-tbody')].forEach(tbody => {
                 let items = [...tbody.querySelectorAll('.items-monthly')];
                 let submonth = Math.abs(items.map(el => parseFloat(el.value || 0)).reduce((result, x) => result + x, 0));
-                
+
                 let subInput = tbody.querySelector('.calc-income-month-subtotal-input');
                 if(subInput) subInput.value = submonth;
-                
+
                 let subInword = tbody.querySelector('.items-monthly-inword');
                 if(subInword) subInword.innerHTML = typeof terbilang === 'function' ? terbilang(submonth).toLowerCase() : submonth;
             });
@@ -162,14 +162,14 @@
             let thpmonth = Math.round(incomeInputs.map(el => parseFloat(el.value || 0)).reduce((thp, x) => thp + x, 0));
             setVal('.calc-totalincome-month-subtotal-input', thpmonth);
             setHtml('.totalincome-month-inword', typeof terbilang === 'function' ? terbilang(Math.abs(thpmonth)).toLowerCase() : thpmonth);
-            
+
             calculateReduction();
         }
 
         const calculateReduction = () => {
             let reducemonth = 0;
             let reductionInputs = [...document.querySelectorAll('.reduction-month-amount')];
-            
+
             if (reductionInputs.length > 0) {
                 reducemonth = Math.round(reductionInputs.map(el => parseFloat(el.value || 0)).reduce((thp, x) => thp + x, 0));
                 setVal('.calc-reduction-month-subtotal-input', reducemonth);
@@ -182,11 +182,11 @@
         const calculateBruto = () => {
             let totalIncome = document.querySelector('.calc-totalincome-month-subtotal-input')?.value || 0;
             let totalReduction = document.querySelector('.calc-reduction-month-subtotal-input')?.value || 0;
-            
+
             // Ambil bruto (bisa dari hitungan otomatis atau input manual)
             let brutoInput = document.querySelector('.calc-bruto-month-subtotal-input');
             let bruto = (parseFloat(totalIncome) + parseFloat(totalReduction));
-            
+
             // Jika user input manual di field bruto, gunakan nilai itu
             if (document.activeElement === brutoInput) {
                 bruto = parseFloat(brutoInput.value || 0);
@@ -207,8 +207,8 @@
             let brutoVal = parseFloat(bruto);
 
             // Cari rate berdasarkan range bruto
-            let result = ters.rate.find(entry => 
-                brutoVal >= parseFloat(entry.lower) && 
+            let result = ters.rate.find(entry =>
+                brutoVal >= parseFloat(entry.lower) &&
                 (entry.upper === null || brutoVal < parseFloat(entry.upper))
             );
 
@@ -218,10 +218,10 @@
             setVal('.calc-ptkp-category-input', ters.status); // Munculin TK/0
             setVal('.calc-ter-category-input', ters.ter);    // Munculin A
             setVal('.calc-ter-value-input', result.percentage); // Munculin Tarif 1.75 atau 2.25
-            
+
             // Hitung PPh TOTAL (100%)
             let pphTotal100 = Math.floor((parseFloat(result.percentage) * brutoVal) / 100);
-            
+
             let pphKaryawan = 0;
 
             // Distribusi 50/50 sesuai config
@@ -230,7 +230,7 @@
                 if(objInput) {
                     let sharePercent = parseFloat(ar.rate || 0);
                     let shareAmount = Math.floor((sharePercent / 100) * pphTotal100);
-                    
+
                     objInput.value = shareAmount;
                     setHtml(`.calc-${ar.key}-value-inword`, typeof terbilang === 'function' ? terbilang(shareAmount).toLowerCase() : shareAmount);
 
@@ -242,7 +242,7 @@
             });
 
             // Tampilkan PPh Total yang SUDAH DIBAGI 2 (Porsi Karyawan) di box bawah
-            setVal('[name="pphtotal"]', pphKaryawan); 
+            setVal('[name="pphtotal"]', pphKaryawan);
             setHtml('.pph-input', pphKaryawan.toLocaleString('id-ID'));
             setHtml('.pph-inword', typeof terbilang === 'function' ? terbilang(pphKaryawan).toLowerCase() : pphKaryawan);
         }
@@ -254,8 +254,8 @@
 
         // Jalankan otomatis setiap kali user mengetik angka
         document.addEventListener('input', (e) => {
-            if (e.target.closest('.form-calculate') || 
-                e.target.classList.contains('items-monthly') || 
+            if (e.target.closest('.form-calculate') ||
+                e.target.classList.contains('items-monthly') ||
                 e.target.classList.contains('reduction-month-amount') ||
                 e.target.classList.contains('calc-bruto-month-subtotal-input')) {
                 sumSubTotal();

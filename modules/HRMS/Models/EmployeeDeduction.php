@@ -9,10 +9,11 @@ use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\CompanySalarySlipComponent;
 use Modules\Core\Models\Traits\Approvable\Approvable;
 use Modules\HRMS\Enums\DeductionTypeEnum;
+use App\Traits\HasAuditLog;
 
 class EmployeeDeduction extends Model
 {
-    use Restorable, Searchable, Approvable;
+    use Restorable, Searchable, Approvable, HasAuditLog;
 
     /**
      * The table associated with the model.

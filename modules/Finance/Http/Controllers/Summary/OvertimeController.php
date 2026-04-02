@@ -99,7 +99,6 @@ class OvertimeController extends Controller
             ]);
         }
 
-        $request->user()->log(($current ? 'memperbarui' : 'membuat') . ' rekap ' . count($request->input('overtimes', [])) . ' lembur karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($request->input('overtimes', [])) . '</strong> lembur karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi ' . ($current ? 'diperbarui' : 'dibuat') . '!');
     }
 
@@ -113,7 +112,6 @@ class OvertimeController extends Controller
             ])
         );
         $employee->dataRecapitulations()->whereType(DataRecapitulationTypeEnum::OVERTIME)->whereIn('id', $overtimes)->delete();
-        $request->user()->log('menghapus rekap ' . count($overtimes) . ' lembur karyawan atas nama ' . $employee->user->name, Employee::class, $employee->id);
 
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($overtimes) . '</strong> lembur karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dihapus!');
     }

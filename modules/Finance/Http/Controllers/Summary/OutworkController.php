@@ -113,7 +113,6 @@ class OutworkController extends Controller
                 'paid_amount' => array_sum(array_column($outwork['dates'], 'total'))
             ]);
         }
-        $request->user()->log(($current ? 'memperbarui' : 'membuat') . ' rekap ' . count($request->input('outworks', [])) . ' kegiatan lain karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
 
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($request->input('outworks', [])) . '</strong> kegiatan lain karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi ' . ($current ? 'diperbarui' : 'dibuat') . '!');
     }
@@ -128,8 +127,6 @@ class OutworkController extends Controller
             ])
         );
         $employee->dataRecapitulations()->whereType(DataRecapitulationTypeEnum::OUTWORK)->whereIn('id', $outworks)->delete();
-        $request->user()->log('menghapus rekap ' . count($outworks) . ' kegiatan lain karyawan atas nama ' . $employee->user->name, Employee::class, $employee->id);
-
         return redirect()->next()->with('success', 'Rekap total <strong>' . count($outworks) . '</strong> kegiatan lain karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dihapus!');
     }
 }

@@ -37,7 +37,7 @@ class RewardController extends Controller
     }
 
     /**
-     * Create resource    
+     * Create resource
      */
     public function create(Request $request)
     {
@@ -59,15 +59,13 @@ class RewardController extends Controller
     }
 
     /**
-     * Store resource    
+     * Store resource
      */
     public function store(StoreRequest $request)
     {
         $employee = Employee::find($request->input('employee'));
 
         $recap = $employee->dataRecapitulations()->create($request->transformed()->toArray());
-
-        Auth::user()->log('membuat rekap Reward karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
 
         return redirect()->next()->with('success', 'Rekap Reward karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dibuat!');
     }

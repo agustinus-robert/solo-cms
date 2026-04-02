@@ -7,10 +7,11 @@ use App\Models\Traits\Restorable\Restorable;
 use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Models\CompanySalary;
 use Modules\Docs\Models\Traits\Documentable\Documentable;
+use App\Traits\HasAuditLog;
 
 class EmployeeSalary extends Model
 {
-    use Restorable, Searchable, Documentable;
+    use Restorable, Searchable, Documentable, HasAuditLog;
 
     /**
      * The table associated with the model.

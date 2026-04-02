@@ -22,7 +22,7 @@ class PphValidationController extends Controller
             return redirect()->back()
                 ->with('danger', 'Template gaji harus di set pada core sebagai default');
         }
-        
+
         $cmpDefault = CompanySalaryTemplate::whereJsonContains('meta->default', true)->first()->id;
         $selectedTemplate = $salary->employee->salaryTemplates->where('cmp_template_id', $cmpDefault)->first()->load('items');
         $items = $salary->components->pluck('ctgs')->flatten(1)->pluck('i')->flatten(1);

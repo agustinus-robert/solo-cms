@@ -36,7 +36,7 @@ class DeductionController extends Controller
     }
 
     /**
-     * Create resource    
+     * Create resource
      */
     public function create(Request $request)
     {
@@ -54,7 +54,7 @@ class DeductionController extends Controller
     }
 
     /**
-     * Store resource    
+     * Store resource
      */
     public function store(StoreRequest $request)
     {
@@ -68,8 +68,6 @@ class DeductionController extends Controller
                 'paid_at' => $now,
             ]);
         }
-
-        $request->user()->log('membuat rekap Reward karyawan atas nama ' . $employee->user->name, EmployeeDataRecapitulation::class, $recap->id);
 
         return redirect()->next()->with('success', 'Rekap potongan karyawan atas nama <strong>' . $employee->user->name . '</strong> berhasi dibuat!');
     }
