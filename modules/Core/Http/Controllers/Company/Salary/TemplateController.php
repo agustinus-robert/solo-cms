@@ -114,7 +114,6 @@ class TemplateController extends Controller
 
     public function sync(Request $request)
     {
-        $this->authorize('store', CompanySalaryTemplate::class);
         $componenet = setting('cmp_payroll_default_components');
         $componenet13 = setting('cmp_payroll_default_postyear_components');
         $componenetTHR = setting('cmp_payroll_default_feastday_components');

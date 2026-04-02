@@ -37,32 +37,6 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Honor Mengajar',
-                        'currency' => false,
-                        'allowance' => 3,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per jam',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
                         'name' => 'Tambahan/Kegiatan',
                         'currency' => false,
                         'unit' => 4,
@@ -89,16 +63,6 @@ class SlipDatabaseSeeder extends Seeder
                     ],
                     [
                         'name' => 'Tj. Jabatan Struktural',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'as_thr' => true,
-                            'as_g13' => true,
-                            'as_pph' => true,
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Wali Kelas',
                         'currency' => true,
                         'meta' => [
                             'default' => 0,
@@ -141,31 +105,6 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Tunjangan Pengabdian',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'editable' => true,
-                            'as_pph' => true,
-                            // 'algorithm' => [
-                            //     'method' => 'MODEL',
-                            //     'models' => [
-                            //         EmployeeDataRecapitulation::class => [
-                            //             'conditions' => [
-                            //               //  ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::TEACHERLOYALTY]],
-                            //                 ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                            //                 ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                            //                 ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                            //             ],
-                            //             'action' => 'sum',
-                            //             'action_column' => 'result->amount_total'
-                            //         ]
-                            //     ]
-                            // ]
-                        ]
-                    ],
-                    [
                         'name' => 'Sosial',
                         'currency' => true,
                         'meta' => [
@@ -175,80 +114,8 @@ class SlipDatabaseSeeder extends Seeder
                             'as_pph' => true
                         ]
                     ],
-                    [
-                        'name' => 'Pengelola BOS',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Beasiswa',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Pengabdian Pesantren',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'editable' => true,
-                            'description' => 'per bulan',
-                            'as_pph' => true,
-                            // 'algorithm' => [
-                            //     'method' => 'MODEL',
-                            //     'models' => [
-                            //         EmployeeDataRecapitulation::class => [
-                            //             'conditions' => [
-                            //             //    ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::BOARDLOYALTY]],
-                            //                 ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                            //                 ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                            //                 ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                            //             ],
-                            //             'action' => 'sum',
-                            //             'action_column' => 'result->amount_total'
-                            //         ]
-                            //     ]
-                            // ]
-                        ]
-                    ],
                 ],
                 'Kegiatan Tambahan' => [
-                    [
-                        'name' => 'Rapat',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'isset_attachment' => 'outworks',
-                            'editable' => true,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::OUTWORK]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
                     [
                         'name' => 'Kehadiran',
                         'currency' => true,
@@ -307,54 +174,6 @@ class SlipDatabaseSeeder extends Seeder
                 ],
                 'Potongan' => [
                     [
-                        'name' => 'Simpanan Wajib',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'as_g13' => false,
-                            'as_thr' => false
-                        ]
-                    ],
-                    [
-                        'name' => 'SQQ',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'as_g13' => false,
-                            'as_thr' => false
-                        ]
-                    ],
-                    [
-                        'name' => 'SSK',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'as_g13' => false,
-                            'as_thr' => false
-                        ]
-                    ],
-                    [
-                        'name' => 'TZ',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'as_g13' => false,
-                            'as_thr' => false
-                        ]
-                    ],
-                    [
                         'name' => 'THR',
                         'currency' => true,
                         'allowance' => 7,
@@ -392,18 +211,6 @@ class SlipDatabaseSeeder extends Seeder
                     ],
                     [
                         'name' => 'Angsuran',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'as_g13' => false,
-                            'as_thr' => false
-                        ]
-                    ],
-                    [
-                        'name' => 'Batik',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
@@ -463,56 +270,6 @@ class SlipDatabaseSeeder extends Seeder
                                         ],
                                         'action' => 'sum',
                                         'action_column' => 'result->attendance_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Kelebihan jam mengajar',
-                        'currency' => false,
-                        'unit' => 4,
-                        'allowance' => null,
-                        'operate' => 0,
-                        'meta' => [
-                            'default' => 0,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->overhour'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Kelebihan jam ekstra',
-                        'currency' => false,
-                        'unit' => 4,
-                        'allowance' => null,
-                        'operate' => 0,
-                        'meta' => [
-                            'default' => 0,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->extrahour'
                                     ]
                                 ]
                             ]
@@ -1023,7 +780,9 @@ class SlipDatabaseSeeder extends Seeder
 
         // Salary default
         $settings = [
-            'cmp_payroll_default_components' => json_decode('[{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Gaji Pokok","component_id":"1","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Kelebihan mengajar - Biasa","component_id":"2","amount":0,"description":"per jam"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Kelebihan mengajar - Ekstra","component_id":"3","amount":0,"description":"per jam"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Masa Kerja","component_id":"4","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Fungsional","component_id":"5","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Profesi","component_id":"6","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Administrasi Bank","component_id":"10","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Penggantian Paket Data (WFH)","component_id":"11","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Laundry","component_id":"12","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Komunikasi","component_id":"13","amount":0,"description":"per bulan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Makan","component_id":"9","amount":0,"description":"per kehadiran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","name":"Tj. Transportasi","component_id":"8","amount":0,"description":"per kehadiran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Penghasilan non upah","name":"BPJS Kesehatan","component_id":"19","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Penghasilan non upah","name":"Jaminan Hari Tua","component_id":"20","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Penghasilan non upah","name":"Jaminan Pensiun","component_id":"23","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","name":"Potongan aksos","component_id":"24","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","name":"BPJS Kesehatan","component_id":"25","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","name":"Jaminan Hari Tua","component_id":"26","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","name":"Jaminan Pensiun","component_id":"27","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","name":"Cash Advanced Operasional Jakarta","component_id":"31","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","name":"Premi BPJS Tenagakerja & Kesehatan","component_id":"32","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","name":"PPh 21 (Bulanan)","component_id":"33","amount":0,"description":null},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","name":"PPh 21 (Tahunan)","component_id":"34","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Hari Efektif Periode Penggajian","component_id":"35","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jumlah Presensi","component_id":"36","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jam Mengajar","component_id":"37","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Kelebihan jam mengajar","component_id":"38","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Kelebihan jam ekstra","component_id":"39","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jumlah Keterlambatan","component_id":"40","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jumlah Cuti","component_id":"41","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jumlah Izin Periode Ini","component_id":"42","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","name":"Jumlah Lembur Periode Ini","component_id":"43","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","name":"Lembur","component_id":"44","amount":0,"description":"per jam"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","name":"Insentif kegiatan","component_id":"46","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","name":"Bonus Bulanan","component_id":"47","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"3","ctg_name":"Potongan Non PPh 21","name":"Potongan lainnya","component_id":"48","amount":0,"description":null}]')
+            'cmp_payroll_default_components' => json_decode('[{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"1","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"3","amount":0,"description":null,"name":"Tj. Jabatan Struktural"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"4","amount":0,"description":null,"name":"TJ. BPJS"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Kegiatan Tambahan","component_id":"7","amount":0,"description":null,"name":"Kehadiran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Kegiatan Tambahan","component_id":"8","amount":0,"description":null,"name":"Tugas Luar"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","component_id":"10","amount":0,"description":null,"name":"Jasa"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"13","name":"Hari Efektif Periode Penggajian","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"14","name":"Jumlah Presensi","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"15","name":"Jumlah Keterlambatan","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"16","name":"Jumlah Cuti","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"17","name":"Jumlah Izin Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"18","name":"Jumlah Lembur Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","component_id":"19","amount":0,"description":null,"name":"Lembur"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"3","ctg_name":"Potongan Non PPh 21","component_id":"22","amount":0,"description":null,"name":"Potongan lainnya"}]'),
+            'cmp_payroll_default_postyear_components' => json_decode('[{"slip_az":"4","slip_name":"Slip PPh 21 (Gaji ke-13)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"28","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"4","slip_name":"Slip PPh 21 (Gaji ke-13)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"29","amount":0,"description":null,"name":"Tj. Jabatan"}]'),
+            'cmp_payroll_default_feastday_components' => json_decode('[{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"23","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"24","amount":0,"description":null,"name":"Tj. Jabatan"},{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"27","amount":0,"description":null,"name":"Tj. Masa Kerja"}]')
         ];
 
         foreach ($settings as $key => $value) {

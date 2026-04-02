@@ -37,10 +37,11 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Kelebihan mengajar - Biasa',
+                        'name' => 'Honor Mengajar',
                         'currency' => false,
                         'allowance' => 3,
                         'meta' => [
+                            'default' => 0,
                             'description' => 'per jam',
                             'as_multiplier' => true,
                             'editable' => true,
@@ -55,39 +56,81 @@ class SlipDatabaseSeeder extends Seeder
                                             ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
                                         ],
                                         'action' => 'sum',
-                                        'action_column' => 'result->overhour',
+                                        'action_column' => 'result->amount_total'
                                     ]
                                 ]
                             ]
                         ]
                     ],
                     [
-                        'name' => 'Kelebihan mengajar - Ekstra',
+                        'name' => 'Tambahan/Kegiatan',
                         'currency' => false,
-                        'allowance' => 3,
+                        'unit' => 4,
+                        'allowance' => null,
+                        'operate' => 0,
                         'meta' => [
-                            'description' => 'per jam',
-                            'as_multiplier' => true,
-                            'editable' => true,
+                            'default' => 0,
                             'algorithm' => [
                                 'method' => 'MODEL',
                                 'models' => [
                                     EmployeeDataRecapitulation::class => [
                                         'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
+                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::OVERTIME]],
                                             ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
                                             ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
                                             ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
                                         ],
                                         'action' => 'sum',
-                                        'action_column' => 'result->extrahour',
+                                        'action_column' => 'result->overtime->total_hour'
                                     ]
                                 ]
                             ]
                         ]
                     ],
                     [
-                        'name' => 'Tj. Masa Kerja',
+                        'name' => 'Tj. Jabatan Struktural',
+                        'currency' => true,
+                        'meta' => [
+                            'default' => 0,
+                            'as_thr' => true,
+                            'as_g13' => true,
+                            'as_pph' => true,
+                        ]
+                    ],
+                    [
+                        'name' => 'Tj. Wali Kelas',
+                        'currency' => true,
+                        'meta' => [
+                            'default' => 0,
+                            'as_thr' => true,
+                            'as_g13' => true,
+                            'as_pph' => true,
+                        ]
+                    ],
+                    [
+                        'name' => 'TJ. BPJS',
+                        'currency' => true,
+                        'allowance' => 7,
+                        'meta' => [
+                            'default' => 0,
+                            'as_pph' => true,
+                            'algorithm' => [
+                                'method' => 'MODEL',
+                                'models' => [
+                                    EmployeeInsurance::class => [
+                                        'conditions' => [
+                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                                            ['f' => 'whereIn', 'p' => ['price_id', [2, 8]]]
+                                        ],
+                                        'action' => 'sum',
+                                        'action_column' => 'cmp_price'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Tj. Keluarga',
                         'currency' => true,
                         'meta' => [
                             'default' => 0,
@@ -98,54 +141,116 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Tj. Fungsional',
+                        'name' => 'Tunjangan Pengabdian',
+                        'currency' => true,
+                        'allowance' => 4,
+                        'meta' => [
+                            'default' => 0,
+                            'editable' => true,
+                            'as_pph' => true,
+                            // 'algorithm' => [
+                            //     'method' => 'MODEL',
+                            //     'models' => [
+                            //         EmployeeDataRecapitulation::class => [
+                            //             'conditions' => [
+                            //               //  ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::TEACHERLOYALTY]],
+                            //                 ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                            //                 ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
+                            //                 ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
+                            //             ],
+                            //             'action' => 'sum',
+                            //             'action_column' => 'result->amount_total'
+                            //         ]
+                            //     ]
+                            // ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Sosial',
                         'currency' => true,
                         'meta' => [
                             'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => true,
+                            'as_thr' => false,
                             'as_g13' => true,
                             'as_pph' => true
                         ]
                     ],
                     [
-                        'name' => 'Tj. Profesi',
+                        'name' => 'Pengelola BOS',
                         'currency' => true,
                         'meta' => [
                             'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => true,
+                            'as_thr' => false,
                             'as_g13' => true,
                             'as_pph' => true
                         ]
                     ],
                     [
-                        'name' => 'Tj. Koordinator',
+                        'name' => 'Beasiswa',
                         'currency' => true,
-                        'unit' => 1,
-                        'allowance' => 2,
-                        'operate' => 1,
                         'meta' => [
                             'default' => 0,
+                            'as_thr' => false,
+                            'as_g13' => true,
+                            'as_pph' => true
+                        ]
+                    ],
+                    [
+                        'name' => 'Pengabdian Pesantren',
+                        'currency' => true,
+                        'allowance' => 4,
+                        'meta' => [
+                            'default' => 0,
+                            'editable' => true,
+                            'description' => 'per bulan',
+                            'as_pph' => true,
+                            // 'algorithm' => [
+                            //     'method' => 'MODEL',
+                            //     'models' => [
+                            //         EmployeeDataRecapitulation::class => [
+                            //             'conditions' => [
+                            //             //    ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::BOARDLOYALTY]],
+                            //                 ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                            //                 ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
+                            //                 ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
+                            //             ],
+                            //             'action' => 'sum',
+                            //             'action_column' => 'result->amount_total'
+                            //         ]
+                            //     ]
+                            // ]
+                        ]
+                    ],
+                ],
+                'Kegiatan Tambahan' => [
+                    [
+                        'name' => 'Rapat',
+                        'currency' => true,
+                        'allowance' => 4,
+                        'meta' => [
+                            'default' => 0,
+                            'isset_attachment' => 'outworks',
+                            'editable' => true,
+                            'as_pph' => true,
                             'algorithm' => [
                                 'method' => 'MODEL',
                                 'models' => [
                                     EmployeeDataRecapitulation::class => [
                                         'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::COORD]],
+                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::OUTWORK]],
                                             ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
                                             ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
+                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
                                         ],
                                         'action' => 'sum',
-                                        'action_column' => 'result->grand_total'
+                                        'action_column' => 'result->amount_total'
                                     ]
                                 ]
                             ]
                         ]
                     ],
                     [
-                        'name' => 'Tj. Transportasi',
+                        'name' => 'Kehadiran',
                         'currency' => true,
                         'allowance' => 3,
                         'meta' => [
@@ -174,185 +279,23 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'Tj. Makan',
+                        'name' => 'Tugas Luar',
                         'currency' => true,
-                        'allowance' => 3,
+                        'allowance' => 4,
                         'meta' => [
                             'default' => 0,
-                            'description' => 'per kehadiran',
-                            'as_multiplier' => true,
+                            'isset_attachment' => 'outworks',
                             'editable' => true,
-                            'as_thr' => true,
-                            'as_g13' => true,
                             'as_pph' => true,
                             'algorithm' => [
                                 'method' => 'MODEL',
                                 'models' => [
                                     EmployeeDataRecapitulation::class => [
                                         'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::ATTENDANCE]],
+                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::OUTWORK]],
                                             ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
                                             ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->attendance_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Administrasi Bank',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Penggantian Paket Data (WFH)',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Laundry',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Komunikasi',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per bulan',
-                            'as_thr' => false,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Kemahalan',
-                        'currency' => true,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'Ditugaskan ke luar',
-                            'as_thr' => false,
-                            'as_g13' => false,
-                            'as_pph' => false,
-                            //'as_multiplier' => true,
-                            // 'algorithm' => [
-                            //     'method' => 'MODEL',
-                            //     'models' => [
-                            //         EmployeeDataRecapitulation::class => [
-                            //             'conditions' => [
-                            //                 ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::ABOARD]],
-                            //                 ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                            //                 ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                            //                 ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                            //             ],
-                            //             'action' => 'sum',
-                            //             'action_column' => 'result->amount_total'
-                            //         ]
-                            //     ]
-                            // ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Kehadiran WFO',
-                        'currency' => true,
-                        'allowance' => 3,
-                        'meta' => [
-                            'description' => 'per kehadiran',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::ATTENDANCE]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->ontime->wfo'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Tj. Kehadiran WFA',
-                        'currency' => true,
-                        'allowance' => 3,
-                        'meta' => [
-                            'description' => 'per kehadiran',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::ATTENDANCE]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->ontime->wfa',
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Bonus',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'editable' => true,
-                            'as_thr' => true,
-                            'as_g13' => true,
-                            'as_pph' => true
-                        ]
-                    ],
-                    [
-                        'name' => 'Honor mengajar',
-                        'currency' => false,
-                        'allowance' => 3,
-                        'meta' => [
-                            'default' => 0,
-                            'description' => 'per jam',
-                            'as_multiplier' => true,
-                            'editable' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
+                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
                                         ],
                                         'action' => 'sum',
                                         'action_column' => 'result->amount_total'
@@ -362,121 +305,9 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                 ],
-                'Penghasilan non upah' => [
-                    [
-                        'name' => 'BPJS Kesehatan',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [2, 8]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Jaminan Hari Tua',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [15]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Jaminan Kecelakaan Kerja',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [16]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Jaminan Kematian',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [17]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Jaminan Pensiun',
-                        'currency' => true,
-                        'allowance' => 7,
-                        'meta' => [
-                            'default' => 0,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [18]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
                 'Potongan' => [
                     [
-                        'name' => 'Potongan aksos',
+                        'name' => 'Simpanan Wajib',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
@@ -488,240 +319,101 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                     [
-                        'name' => 'BPJS Kesehatan',
+                        'name' => 'SQQ',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [2, 8]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'empl_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Jaminan Hari Tua',
+                        'name' => 'SSK',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [15]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Jaminan Pensiun',
+                        'name' => 'TZ',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [18]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Jaminan Kecelakaan Kerja',
+                        'name' => 'THR',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [16]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'empl_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Jaminan Kematian',
+                        'name' => 'Jasa',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [17]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'empl_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Tambahan Anggota Keluarga',
+                        'name' => 'Sosial',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [3, 4, 5, 6, 9, 10, 11, 12]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'empl_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'Cash Advanced Operasional Jakarta',
+                        'name' => 'Angsuran',
                         'currency' => true,
                         'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
                             'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [19]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'empl_price'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                ],
-                'Lain-lain' => [
-                    [
-                        'name' => 'Premi BPJS Tenagakerja & Kesehatan',
-                        'currency' => true,
-                        'allowance' => 99,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeInsurance::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'whereIn', 'p' => ['price_id', [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 16, 17, 18]]]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'cmp_price'
-                                    ]
-                                ]
-                            ]
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
                     [
-                        'name' => 'PPh 21 (Bulanan)',
+                        'name' => 'Batik',
                         'currency' => true,
-                        'allowance' => 99,
+                        'allowance' => 7,
                         'operate' => 2,
                         'meta' => [
                             'default' => 0,
-                            'default_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::PPH]],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->pph'
-                                    ]
-                                ]
-                            ]
+                            'as_pph' => true,
+                            'as_g13' => false,
+                            'as_thr' => false
                         ]
                     ],
-                    [
-                        'name' => 'PPh 21 (Tahunan)',
-                        'currency' => true,
-                        'allowance' => 99,
-                        'operate' => 2,
-                        'meta' => [
-                            'default' => 0,
-                            'default_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::PPH]],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->pph'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
                 ],
             ],
             'Slip Reimbursment dan lain-lain' => [
@@ -771,31 +463,6 @@ class SlipDatabaseSeeder extends Seeder
                                         ],
                                         'action' => 'sum',
                                         'action_column' => 'result->attendance_total'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'name' => 'Jam Mengajar',
-                        'currency' => false,
-                        'unit' => 4,
-                        'allowance' => null,
-                        'operate' => 0,
-                        'meta' => [
-                            'default' => 0,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::HONOR]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
                                     ]
                                 ]
                             ]
@@ -988,32 +655,6 @@ class SlipDatabaseSeeder extends Seeder
                             'default' => 0,
                             'editable' => true,
                             'as_pph' => true,
-                        ]
-                    ],
-                    [
-                        'name' => 'Insentif kegiatan',
-                        'currency' => true,
-                        'allowance' => 4,
-                        'meta' => [
-                            'default' => 0,
-                            'isset_attachment' => 'outworks',
-                            'editable' => true,
-                            'as_pph' => true,
-                            'algorithm' => [
-                                'method' => 'MODEL',
-                                'models' => [
-                                    EmployeeDataRecapitulation::class => [
-                                        'conditions' => [
-                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::OUTWORK]],
-                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
-                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
-                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']],
-                                        ],
-                                        'action' => 'sum',
-                                        'action_column' => 'result->amount_total'
-                                    ]
-                                ]
-                            ]
                         ]
                     ],
                     [
@@ -1356,23 +997,23 @@ class SlipDatabaseSeeder extends Seeder
             ]
         ];
 
-        // slip 1, 2, dll
         foreach ($slips as $_slip => $_cs) {
             $slip = CompanySalarySlip::create([
                 'name' => $_slip,
-                'az' => CompanySalarySlip::count() + 1
+                'az' => CompanySalarySlip::count() + 1,
             ]);
+
             // pendapatan upah, dll
             foreach ($_cs as $_c => $salaries) {
                 $category = $slip->categories()->create([
                     'name' => $_c,
-                    'az' => $slip->categories()->count() + 1
+                    'az' => $slip->categories()->count() + 1,
                 ]);
                 // gp, dll
                 foreach ($salaries as $s => $salary) {
                     $data = CompanySalarySlipComponent::create([
                         ...$salary,
-                        'kd' => isset($salary['kd']) ? $salary['kd'] : ($_c == 'Potongan' ? 'potongan-' : '') . Str::slug($salary['name']),
+                        'kd' => isset($salary['kd']) ? $salary['kd'] : ($_c == 'Potongan' ? 'potongan-' : '') . Str::slug($salary['name'].'-'),
                         'slip_id' => $slip->id,
                         'ctg_id' => $category->id
                     ]);
@@ -1386,7 +1027,10 @@ class SlipDatabaseSeeder extends Seeder
         ];
 
         foreach ($settings as $key => $value) {
-            Setting::create(compact('key', 'value'));
+            Setting::create([
+                'key'      => $key,
+                'value'    => $value
+            ]);
         }
     }
 }
