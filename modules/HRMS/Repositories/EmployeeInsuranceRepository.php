@@ -22,7 +22,6 @@ trait EmployeeInsuranceRepository
     public function storeEmployeeInsurance(Employee $employee, array $data)
     {
         if ($insurance = $employee->insurances()->save(new EmployeeInsurance($data))) {
-            Auth::user()->log('menambahkan asuransi karyawan ' . $insurance->employee->user->name . ' <strong>[ID: ' . $insurance->id . ']</strong>', EmployeeInsurance::class, $insurance->id);
             return $insurance;
         }
         return false;
@@ -34,7 +33,6 @@ trait EmployeeInsuranceRepository
     public function destroyInsurance(EmployeeInsurance $insurance)
     {
         if (!$insurance->trashed() && $insurance->delete()) {
-            Auth::user()->log('menghapus asuransi karyawan ' . $insurance->employee->user->name . ' <strong>[ID: ' . $insurance->id . ']</strong>', EmployeeInsurance::class, $insurance->id);
             return $insurance;
         }
         return false;
@@ -46,7 +44,6 @@ trait EmployeeInsuranceRepository
     public function restoreInsurance(EmployeeInsurance $insurance)
     {
         if ($insurance->trashed() && $insurance->restore()) {
-            Auth::user()->log('memulihkan asuransi karyawan ' . $insurance->employee->user->name . ' <strong>[ID: ' . $insurance->id . ']</strong>', EmployeeInsurance::class, $insurance->id);
             return $insurance;
         }
         return false;

@@ -89,7 +89,7 @@
                                                                     @endif
                                                                     <input type="text" @if ($category !== 'Rekapitulasi')
                                                                              oninput="validatedRupiah(this)"
-                                                                        @endif 
+                                                                        @endif
                                                                         data-no-rupiah="{{ $category === 'Rekapitulasi' ? 1 : 0 }}"
                                                                         class="form-control text-end" data-name="amount" value="0" min="0" onkeyup="renderRealAmountValue(event.currentTarget)" required>
                                                                     @if ($item->component->unit->suffix())
@@ -185,6 +185,19 @@
 
 @push('scripts')
     <script>
+         const terbilang = (angka) => {
+            const bilne = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+            if (angka < 12) return bilne[angka];
+            else if (angka < 20) return terbilang(angka - 10) + " belas";
+            else if (angka < 100) return terbilang(Math.floor(angka / 10)) + " puluh " + terbilang(angka % 10);
+            else if (angka < 200) return "seratus " + terbilang(angka - 100);
+            else if (angka < 1000) return terbilang(Math.floor(angka / 100)) + " ratus " + terbilang(angka % 100);
+            else if (angka < 2000) return "seribu " + terbilang(angka - 1000);
+            else if (angka < 1000000) return terbilang(Math.floor(angka / 1000)) + " ribu " + terbilang(angka % 1000);
+            else if (angka < 1000000000) return terbilang(Math.floor(angka / 1000000)) + " juta " + terbilang(angka % 1000000);
+            return "";
+        }
+
         function validatedRupiah(element) {
             // Jika data-no-rupiah bernilai 1, hentikan fungsi agar titik tidak dianggap ribuan
             if (element.dataset.noRupiah == 1) return;
@@ -230,8 +243,8 @@
                         break;
                 }
 // Cari baris ini di dalam renderAmountValue kamu:
-                amount.value = ['jam'].includes(el.dataset.unit.toLowerCase()) 
-                    ? parseFloat(defaultAmount * (parseFloat(el.dataset.multiplier) || 1)).toFixed(2) 
+                amount.value = ['jam'].includes(el.dataset.unit.toLowerCase())
+                    ? parseFloat(defaultAmount * (parseFloat(el.dataset.multiplier) || 1)).toFixed(2)
                     : Math.round(defaultAmount * (parseFloat(el.dataset.multiplier) || 1)).toLocaleString('id-ID');                amount.dataset.operateSymbol = el.dataset.operateSymbol;
                 amount.readOnly = el.dataset.disabled;
                 renderRealAmountValue(el.closest('tr').querySelector('[data-name="amount"]'));
@@ -244,7 +257,7 @@
         const renderRealAmountValue = (el) => {
             // Cek apakah ini rupiah atau rekap
             let valStr = el.value.toString();
-            let cleanValue = (el.dataset.noRupiah == "1") 
+            let cleanValue = (el.dataset.noRupiah == "1")
                 ? parseFloat(valStr) // Jika rekap, ambil apa adanya (9.75 tetap 9.75)
                 : parseFloat(valStr.replace(/\./g, '')); // Jika rupiah, buang titik ribuan
 
@@ -267,7 +280,7 @@
         const sumSubTotal = () => {
             [...document.querySelectorAll('.calc-tbody')].forEach(tbody => {
                 tbody.querySelectorAll('tr .items-btn-remove').forEach((tr, i) => tr.classList.toggle('disabled', i == 0))
-                
+
                 // Ambil langsung dari realAmount (angka murni), jangan dari value input
                 let subtotal = [...tbody.querySelectorAll('[data-name="amount"]')]
                     .map(el => parseFloat(el.dataset.realAmount || 0))
@@ -276,10 +289,10 @@
                 // Tampilkan subtotal (positif) dengan format ID, tapi simpan angka murninya di dataset
                 let displayValue = Math.abs(subtotal);
                 let inputSub = tbody.querySelector('.calc-row-subtotal-input');
-                
+
                 inputSub.value = displayValue.toLocaleString('id-ID');
                 inputSub.dataset.rawSubtotal = subtotal; // Simpan angka murni untuk sumSlipTotal
-                
+
                 tbody.querySelector('.calc-row-subtotal-inwords').innerHTML = terbilang(Math.round(displayValue)).toLowerCase();
             });
             sumSlipTotal();
@@ -296,7 +309,7 @@
                 slipInput.classList.toggle('text-danger', sliptotal < 0);
                 slipInput.value = sliptotal.toLocaleString('id-ID');
                 slipInput.dataset.rawSlipTotal = sliptotal; // Simpan untuk sumTHP
-                
+
                 table.querySelector('.calc-slip-total-inwords').innerHTML = terbilang(Math.abs(Math.round(sliptotal))).toLowerCase();
             })
             sumTHP();

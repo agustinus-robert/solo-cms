@@ -48,7 +48,7 @@ class TerController extends Controller
         $configs = setting('cmp_pph_objective_percentage');
 
         if (!$configs) {
-            return redirect()->fail('Mohon setting persentase pengenaan pajak di template pph21!');
+            return redirect()->next()->with(['error' => 'Mohon setting persentase pengenaan pajak di template pph21!']);
         }
 
         $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');

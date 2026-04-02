@@ -63,13 +63,18 @@ trait TaxRepository
 
                             if (isset($x->after)) {
                                 foreach ($query->get() as $recap) {
+                                    $column = parseJsonColumn($x->action_column);
+
+                                    $value = $query->{$x->action}($column);
+
                                     $amount += match ($x->after) {
-                                        'multiply_by_self_overdays' => $query->{$x->action}($x->action_column) * $employee->getOverdaysSalary(),
-                                        default => $query->{$x->action}($x->action_column)
+                                        'multiply_by_self_overdays' => $value * $employee->getOverdaysSalary(),
+                                        default => $value
                                     };
                                 }
                             } else {
-                                $amount += $query->{$x->action}($x->action_column);
+                                $column = parseJsonColumn($x->action_column);
+                                $amount += $query->{$x->action}($column);
                             }
                         }
                         break;
@@ -154,7 +159,7 @@ trait TaxRepository
         // PPh TER
         $pphTer = floor($rateDecimal * $totalMonth);
 
-        // Transform data yang akan disimpan ke database 
+        // Transform data yang akan disimpan ke database
         $dataTax = [
             'empl_id'   => $employee->id,
             'start_at'  => $start_at,

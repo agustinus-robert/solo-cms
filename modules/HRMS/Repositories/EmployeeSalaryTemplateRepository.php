@@ -17,7 +17,6 @@ trait EmployeeSalaryTemplateRepository
     {
         if ($salary = $employee->salaryTemplate()->create(Arr::only($data, ['name', 'prefix', 'cmp_template_id', 'start_at', 'end_at']))) {
             $salary->items()->createMany($data['items']);
-            Auth::user()->log('menambahkan template gaji karyawan ' . $salary->employee->user->name . ' <strong>[ID: ' . $salary->id . ']</strong>', EmployeeSalary::class, $salary->id);
             return $salary;
         }
         return false;
@@ -36,7 +35,6 @@ trait EmployeeSalaryTemplateRepository
 
         if (count(array_filter($items)) && $template->save()) {
             $template->components()->sync($items);
-            Auth::user()->log('memperbarui template gaji karyawan ' . $template->employee->user->name . ' <strong>[ID: ' . $template->id . ']</strong>', EmployeeSalaryTemplate::class, $template->id);
             return $template;
         }
         return false;
@@ -48,7 +46,6 @@ trait EmployeeSalaryTemplateRepository
     public function destroyEmployeeSalaryTemplate(EmployeeSalaryTemplate $template)
     {
         if (!$template->trashed() && $template->delete()) {
-            Auth::user()->log('menghapus template gaji karyawan ' . $template->employee->user->name . ' <strong>[ID: ' . $template->id . ']</strong>', EmployeeSalaryTemplate::class, $template->id);
             return $template;
         }
         return false;
@@ -60,7 +57,6 @@ trait EmployeeSalaryTemplateRepository
     public function restoreEmployeeSalaryTemplate(EmployeeSalaryTemplate $template)
     {
         if ($template->trashed() && $template->restore()) {
-            Auth::user()->log('memulihkan template gaji karyawan ' . $template->employee->user->name . ' <strong>[ID: ' . $template->id . ']</strong>', EmployeeSalaryTemplate::class, $template->id);
             return $template;
         }
         return false;

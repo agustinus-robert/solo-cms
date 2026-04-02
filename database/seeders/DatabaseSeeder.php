@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            TaxRatesSeeder::class,
             \Modules\Core\Database\Seeders\MomentDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\DepartementDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\ContractDatabaseSeeder::class,

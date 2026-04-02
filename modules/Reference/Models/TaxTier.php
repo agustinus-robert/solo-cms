@@ -13,7 +13,7 @@ class TaxTier extends Model
     /**
      * The table associated with the model.
      */
-    protected $table = 'ref_tax_rates';
+    protected $table = 'ref_ter_rates';
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +50,6 @@ class TaxTier extends Model
      * The accessors to append to the model's array form.
      */
     protected $appends = [
-        // 
+        //
     ];
 }

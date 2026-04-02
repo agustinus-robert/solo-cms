@@ -8,10 +8,11 @@ use App\Models\Traits\Searchable\Searchable;
 use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\CompanyInsurancePrice;
 use Modules\Docs\Models\Traits\Documentable\Documentable;
+use App\Traits\HasAuditLog;
 
 class EmployeeInsurance extends Model
 {
-    use Restorable, Searchable, Documentable;
+    use Restorable, Searchable, Documentable, HasAuditLog;
 
     /**
      * The table associated with the model.

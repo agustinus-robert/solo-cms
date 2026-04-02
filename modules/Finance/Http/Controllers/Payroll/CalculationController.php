@@ -94,11 +94,14 @@ class CalculationController extends Controller
                                                 $amount += ($calculate / $employee->getMeta('default_workhour')) * $employee->getMeta('default_workhour');
                                                 //   dd($amount);
                                             } else {
-                                                $amount += $query->{$x->action}($x->action_column);
+                                                $amount += $query->{$x->action}(
+                                                    parseJsonColumn($x->action_column)
+                                                );
                                             }
                                         } else {
-                                            $amount += $query->{$x->action}($x->action_column);
-                                        }
+                                            $amount += $query->{$x->action}(
+                                                parseJsonColumn($x->action_column)
+                                            );                                      }
                                     }
                                 }
                             };

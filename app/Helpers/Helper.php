@@ -2,6 +2,8 @@
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 if (!function_exists('cfg')) {
     /*
@@ -101,5 +103,28 @@ if (!function_exists('hexToRgba')) {
             $b = hexdec(substr($hex, 4, 2));
         }
         return "rgba($r, $g, $b, $alpha)";
+    }
+}
+
+
+if (!function_exists('parseJsonColumn')) {
+    function parseJsonColumn($column)
+    {
+        if (!str_contains($column, '->')) {
+            return $column;
+        }
+
+        $parts = preg_split('/(->>|->)/', $column);
+        $operators = [];
+        preg_match_all('/(->>|->)/', $column, $operators);
+
+        $sql = "{$parts[0]}::jsonb";
+
+        foreach ($operators[0] as $i => $op) {
+            $key = trim($parts[$i + 1]);
+            $sql .= " $op '$key'";
+        }
+
+        return DB::raw("($sql)::numeric");
     }
 }

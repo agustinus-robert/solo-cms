@@ -56,8 +56,6 @@ class RegistrationController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('store', EmployeeInsurance::class);
-
         $employee = Employee::find($request->input('employee'));
 
         $insurances = [];
@@ -73,8 +71,6 @@ class RegistrationController extends Controller
 
     public function destroy(EmployeeInsurance $insurance)
     {
-        $this->authorize('destroy', $insurance);
-
         if ($data = $this->destroyInsurance($insurance)) {
             return redirect()->next()->with('success', 'Daftar asuransi <strong>' . $data->price->insurance->name . '</strong> karyawan atas nama <strong>' . $data->employee->user->name . '</strong> telah berhasil dihapus.');
         }
@@ -83,8 +79,6 @@ class RegistrationController extends Controller
 
     public function reset(Employee $employee)
     {
-        $this->authorize('destroy', $employee);
-
         if ($employee->insurances()->delete()) {
             return redirect()->next()->with('success', 'Daftar asuransi karyawan atas nama <strong>' . $employee->user->name . '</strong> telah berhasil dikosongkan.');
         }
@@ -93,8 +87,6 @@ class RegistrationController extends Controller
 
     public function savemaxsalary(Request $request)
     {
-        $this->authorize('store', EmployeeInsurance::class);
-
         setting_set('cmp_insurance_max_salary', $request->input('max_salary'));
 
         return redirect()->next()->with('success', 'Setting maksimal gaji BPJS Pensiun sebesar <strong>' . $request->input('max_salary') . '</strong> telah berhasil disimpan.');

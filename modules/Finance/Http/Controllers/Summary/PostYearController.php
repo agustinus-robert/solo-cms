@@ -50,14 +50,14 @@ class PostYearController extends Controller
 
         if (is_null($cmpDefaultTemplate)) {
             return redirect()->back()
-                ->with('danger', 'Belum ada template gaji pada karyawan ini');
+                ->with('error', 'Belum ada template ditetapkan sebagai default');
         }
 
         $defaultTemplate = $cmpDefaultTemplate->components;
         $postyearComponents = CompanySalaryTemplate::whereJsonContains('meta->postyear', true)->first()->components ?? null;
 
         if (is_null($postyearComponents)) {
-            return redirect()->back()->with('danger', 'Belum ada template gaji ke 13, silakan buat template terlebih dahulu!');
+            return redirect()->back()->with('error', 'Belum ada template gaji ke 13, silakan buat template terlebih dahulu!');
         }
 
         // get reference from slip template
@@ -69,7 +69,7 @@ class PostYearController extends Controller
         $salaryTemplates = $employee->salaryTemplates()->with(['items' => fn($cmpn) => $cmpn->with(['component'])->whereIn('component_id', $val_id)])->where('cmp_template_id', $cmpDefaultTemplate->id)->where(fn($y) => $y->whereYear('start_at', date('Y'))->orWhereYear('end_at', date('Y')))->get()->filter(fn($f) => $f->items->count() > 0);
 
         if (count($salaryTemplates) == 0) {
-            return redirect()->back()->with('danger', 'Belum ada template G13 pada ' . $employee->user->name . ', silakan buat template terlebih dahulu!');
+            return redirect()->back()->with('error', 'Belum ada template G13 pada ' . $employee->user->name . ', silakan buat template terlebih dahulu!');
         }
 
         return view('finance::summary.postyears.create', [
