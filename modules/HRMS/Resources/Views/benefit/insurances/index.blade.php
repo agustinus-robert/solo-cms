@@ -51,7 +51,7 @@
                                             <span data-bs-toggle="collapse" data-bs-target="#collapse-{{ $employee->id }}">
                                                 <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Lihat daftar"><i class="mdi mdi-file-tree-outline"></i></button>
                                             </span>
-                                            @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                            @can('create_isurance_registration')
                                                 <a class="btn @empty($employee->salaryTemplate) disabled btn-secondary @else  btn-soft-primary @endempty rounded px-2 py-1" href="{{ route('hrms::benefit.insurances.registrations.create', ['employee' => $employee->id, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Tambah baru"><i class="mdi mdi-plus-circle-outline"></i></a>
                                                 <div class="dropstart d-inline">
                                                     <button class="btn btn-soft-secondary text-dark rounded px-2 py-1" type="button" data-bs-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
@@ -125,7 +125,7 @@
                                                                 <td>Rp {{ \Str::money($insurance->cmp_price) }}</td>
                                                                 <td>Rp {{ \Str::money($insurance->empl_price) }}</td>
                                                                 <td class="py-2 pe-2 text-end" nowrap>
-                                                                    @can('destroy', $insurance)
+                                                                    @can('delete_isurance_registration')
                                                                         <form class="form-block form-confirm d-inline" action="{{ route('hrms::benefit.insurances.registrations.destroy', ['insurance' => $insurance->id, 'next' => url()->full()]) }}" method="post"> @csrf @method('delete')
                                                                             <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                                         </form>
@@ -136,7 +136,7 @@
                                                             <tr>
                                                                 <td colspan="4" class="text-muted">Belum ada data asuransi karyawan,
                                                                     @if ($employee->salaryTemplate)
-                                                                        @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                                                        @can('create_isurance_registration')
                                                                             <a href="{{ route('hrms::benefit.insurances.registrations.create', ['employee' => $employee->id, 'next' => url()->full()]) }}">klik di sini</a> untuk menambahkan
                                                                         @endcan
                                                                     @endif
@@ -153,7 +153,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store', Modules\HRMS\Models\EmployeeInsurance::class)
+                                                @can('store')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('hrms::benefit.insurances.registrations.create', ['year' => request('year'), 'next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah distribusi cuti baru</a>
                                                     </div>

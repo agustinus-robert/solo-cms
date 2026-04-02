@@ -65,7 +65,7 @@
                                                 <span data-bs-toggle="collapse" data-bs-target="#collapse-{{ $employee->id }}">
                                                     <button class="btn btn-soft-info rounded px-2 py-1" data-bs-toggle="tooltip" title="Lihat daftar"><i class="mdi mdi-file-tree-outline"></i></button>
                                                 </span>
-                                                @can('store', Modules\HRMS\Models\EmployeeVacationQuota::class)
+                                                @can('create_vacation_quota')
                                                     <a class="btn btn-soft-primary rounded px-2 py-1" href="{{ route('hrms::service.vacation.quotas.create', ['employee' => $employee->id, 'year' => $year, 'next' => url()->full()]) }}" data-bs-toggle="tooltip" title="Tambah baru"><i class="mdi mdi-plus-circle-outline"></i></a>
                                                 @endcan
                                             @endif
@@ -92,7 +92,7 @@
                                                                 <td>{{ $quota->quota ?: '∞' }} hari</td>
                                                                 <td>{{ is_null($quota->quota) ? '∞' : abs($quota->quota - $quota->vacations->sum(fn($vacation) => count($vacation->dates))) }} hari</td>
                                                                 <td class="py-2 pe-2 text-end" nowrap>
-                                                                    @can('destroy', $quota)
+                                                                    @can('delete_vacation_quota', $quota)
                                                                         <form class="form-block form-confirm d-inline" action="{{ route('hrms::service.vacation.quotas.destroy', ['quota' => $quota->id, 'next' => url()->current()]) }}" method="post"> @csrf @method('delete')
                                                                             <button class="btn btn-soft-danger rounded px-2 py-1" data-bs-toggle="tooltip" title="Hapus"><i class="mdi mdi-trash-can-outline"></i></button>
                                                                         </form>
@@ -117,7 +117,7 @@
                                         <td colspan="6">
                                             @include('components.notfound')
                                             @if (!request('trash'))
-                                                @can('store_vacation_quota')
+                                                @can('create_vacation_quota')
                                                     <div class="mb-lg-5 mb-4 text-center">
                                                         <a class="btn btn-soft-danger" href="{{ route('hrms::service.vacation.quotas.create', ['year' => request('year'), 'next' => url()->full()]) }}"><i class="mdi mdi-plus"></i> Tambah distribusi cuti baru</a>
                                                     </div>

@@ -34,16 +34,6 @@ class AttendanceController extends Controller
         $summaries = EmployeeDataRecapitulation::whereType(DataRecapitulationTypeEnum::ATTENDANCE)->whereStrictPeriodIn($start_at, $end_at)->get();
 
         $employees = Employee::with('user', 'contract.position.position')
-            ->whereDoesntHave('contract.position', function ($position) {
-                $position->whereHas('position', function ($type) {
-                    $type->where('type', PositionTypeEnum::TEACHER);
-                });
-            })
-            ->whereDoesntHave('contract.position', function ($position) {
-                $position->whereHas('position', function ($type) {
-                    $type->where('type', PositionTypeEnum::TEACHERJAKARTA);
-                });
-            })
             ->whenPositionOfDepartment($request->get('department'), $request->get('position'))
             ->search($request->get('search'))
             ->paginate($request->get('limit', 10));
@@ -127,7 +117,6 @@ class AttendanceController extends Controller
         );
 
         if (EmployeeDataRecapitulation::updateOrCreate(Arr::only($summary, ['empl_id', 'type', 'start_at', 'end_at']), $summary)) {
-            $request->user()->log('melakukan rekapitulasi presensi <strong>' . $employee->user->name . '</strong>', Employee::class, $employee->id);
             return redirect()->next()->with('success', 'Rekapitulasi presensi <strong>' . $employee->user->name . '</strong> berhasil disimpan.');
         }
         return redirect()->fail();
@@ -168,7 +157,6 @@ class AttendanceController extends Controller
         if ($employee) {
             $attendance->fill($request->transformed()->toArray());
             if ($attendance->save()) {
-                $request->user()->log('memperbarui rekapitulasi presensi <strong>' . $attendance->employee->user->name . '</strong>', Employee::class, $attendance->empl_id);
                 return redirect()->next()->with('success', 'Rekapitulasi presensi <strong>' . $attendance->employee->user->name . '</strong> berhasil diperbarui.');
             }
             return redirect()->fail();

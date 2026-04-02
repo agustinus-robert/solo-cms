@@ -120,14 +120,7 @@
     <li class="menu-title" key="t-system">Sistem & Akun</li>
 
     <li class="nav-main-item">
-        <a class="nav-main-link" href="{{ route('hrms::summary.ticket.index') }}">
-            <i class="nav-main-link-icon mdi mdi-ticket-outline"></i>
-            <span class="nav-main-link-name">Support Ticket</span>
-        </a>
-    </li>
-
-    <li class="nav-main-item">
-        <a class="nav-main-link" href="{{ route('account::home') }}">
+        <a class="nav-main-link" href="{{ route('account::manage-profile.index') }}">
             <i class="nav-main-link-icon mdi mdi-account-outline"></i>
             <span class="nav-main-link-name">Akun Saya</span>
         </a>

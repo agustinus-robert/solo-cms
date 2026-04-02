@@ -84,7 +84,6 @@ class PostYearController extends Controller
         );
 
         if (EmployeeDataRecapitulation::updateOrCreate(Arr::only($summary, ['start_at', 'end_at', 'empl_id', 'type']), $summary)) {
-            $request->user()->log('melakukan rekapitulasi Gaji ke-13 <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('start_at') . ' s.d. ' . $request->input('end_at') . '</strong>', Employee::class, $employee->id);
             return redirect()->next()->with('success', 'Rekapitulasi Gaji ke-13 <strong>' . $employee->user->name . '</strong> untuk cut off tanggal <strong>' . $request->input('start_at') . ' s.d. ' . $request->input('end_at') . '</strong> berhasil disimpan');
         }
         return redirect()->fail();

@@ -100,15 +100,13 @@ class EmployeeVacation extends Model
      */
     public function scopeWhereExtractedDatesBetween($query, $start_at, $end_at)
     {
-        if (version_compare(config('database.connections.mysql.v'), '8.0.0', '>=')) {
-            return $query->join(DB::raw("JSON_TABLE(dates, '$[*]' COLUMNS(`_dates` DATE PATH '$.d')) AS _"), "{$this->table}.id", "{$this->table}.id")->whereBetween('_dates', [$start_at, $end_at]);
-        } else {
-            $length = EmployeeVacation::selectRaw('MAX(JSON_LENGTH(dates)) as length')->value('length');
-            for ($i = 0; $i < $length; $i++) {
-                $query = $query->{$i == 0 ? "whereBetween" : "orWhereBetween"}("dates->[{$i}]->d", [$start_at, $end_at]);
-            }
-            return $query;
-        }
+        return $query->whereRaw("
+            EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements({$this->table}.dates::jsonb) AS elem
+                WHERE (elem->>'d')::timestamp BETWEEN ? AND ?
+            )
+        ", [$start_at, $end_at]);
     }
 
     /**

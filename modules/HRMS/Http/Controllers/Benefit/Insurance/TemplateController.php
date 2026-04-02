@@ -84,12 +84,6 @@ class TemplateController extends Controller
                 ->with('success', 'Template <strong>' . e($key) . '</strong> telah berhasil dibuat.');
         } catch (\Throwable $e) {
 
-            Log::error('Error saving template setting', [
-                'error' => $e->getMessage(),
-                'key'   => $key ?? null,
-                'user'  => $request->user()?->id,
-            ]);
-
             return redirect()
                 ->back()
                 ->with('error', 'Terjadi kesalahan internal. Silakan coba lagi.')
@@ -150,14 +144,6 @@ class TemplateController extends Controller
                 ->next()
                 ->with('success', 'Template <strong>' . e($key) . '</strong> telah berhasil diperbarui.');
         } catch (\Throwable $e) {
-
-            Log::error('Error updating template setting', [
-                'error' => $e->getMessage(),
-                'key'   => $key ?? null,
-                'user'  => $request->user()?->id,
-                'old'   => $oldValue ?? null,
-                'new'   => $newValue ?? null,
-            ]);
 
             return redirect()
                 ->back()

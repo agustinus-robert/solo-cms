@@ -64,7 +64,11 @@
             "app/Helpers/Inwords.php",
             "app/Helpers/Setting.php",
             "app/Helpers/BreakJson.php",
-            "app/Helpers/Helper.php"
+            "app/Helpers/Helper.php",
+            "app/Helpers/Vacation.php",
+            "app/Helpers/Postyear.php",
+            "app/Helpers/Taxrate.php",
+            "app/Helpers/Isurance.php"
         ]
     },
     "autoload-dev": {

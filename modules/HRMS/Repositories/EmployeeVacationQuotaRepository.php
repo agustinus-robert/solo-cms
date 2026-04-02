@@ -22,7 +22,6 @@ trait EmployeeVacationQuotaRepository
         $employee = Employee::find($data['empl_id']);
 
         if ($employee->vacationQuotas()->saveMany(array_map(fn($quota) => new EmployeeVacationQuota($quota), $data['quotas']))) {
-            Auth::user()->log('membuat distribusi kuota cuti karyawan ' . $employee->user->name . ' <strong>[ID: ' . $employee->id . ']</strong>', Employee::class, $employee->id);
             return $employee;
         }
         return false;
@@ -34,7 +33,6 @@ trait EmployeeVacationQuotaRepository
     public function destroyEmployeeVacationQuota(EmployeeVacationQuota $quota)
     {
         if ($quota->delete()) {
-            Auth::user()->log('menghapus distribusi kuota cuti karyawan ' . $quota->employee->user->name . ' <strong>[ID: ' . $quota->id . ']</strong>', EmployeeContract::class, $quota->id);
             return $quota;
         }
         return false;
@@ -52,23 +50,19 @@ trait EmployeeVacationQuotaRepository
         DB::beginTransaction();
 
         try {
-            // Mengambil semua karyawan dengan relasi 'position' dan 'user.meta'
             $employees = Employee::with('position.position', 'user.meta')
                 ->whereHas('contract')
                 ->get();
 
             foreach ($employees as $employee) {
-                // Mengambil kuota cuti karyawan pada tahun yang ditentukan
                 $quota = $employee->vacationQuotas()
                     ->whereDate('start_at', $start_at->format('Y-m-d'))
                     ->whereDate('end_at', $end_at->format('Y-m-d'))
                     ->first();
 
-                // Jika kuota cuti belum ada, tambahkan sesuai jenis kelamin karyawan
                 if (empty($quota)) {
                     $dataQuota = $this->addQuotaByGender($employee->user->getMeta('profile_sex'), $start_at, $end_at);
                     $employee->vacationQuotas()->createMany($dataQuota);
-                    Log::info('menambahkan kuota cuti karyawan ' . $employee->user->name, ['data' => $dataQuota]);
                 }
             }
             DB::commit();
