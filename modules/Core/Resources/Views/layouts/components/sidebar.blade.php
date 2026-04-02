@@ -68,6 +68,29 @@
             </ul>
         </li>
 
+        <li class="menu-title" key="t-menu">Manajemen User</li>
+
+        <li class="nav-main-item">
+            <a class="nav-main-link {{ Route::is('core::manage-role.*') ? 'active' : '' }}" href="{{ route('core::manage-role.index') }}">
+                <i class="nav-main-link-icon bx bx-shield-quarter"></i>
+                <span class="nav-main-link-name">Role</span>
+            </a>
+        </li>
+
+        <li class="nav-main-item">
+            <a class="nav-main-link {{ Route::is('core::manage-user.*') ? 'active' : '' }}" href="{{ route('core::manage-user.index') }}">
+                <i class="nav-main-link-icon bx bx-user"></i>
+                <span class="nav-main-link-name">Pengaturan Pengguna</span>
+            </a>
+        </li>
+
+        <li class="nav-main-item">
+            <a class="nav-main-link {{ Route::is('core::manage-outlet.*') ? 'active' : '' }}" href="{{ route('core::manage-outlet.index') }}">
+                <i class="nav-main-link-icon bx bxs-store"></i>
+                <span class="nav-main-link-name">Pengaturan Outlet</span>
+            </a>
+        </li>
+
         <li class="menu-title" key="t-system">Sistem</li>
 
         <li>

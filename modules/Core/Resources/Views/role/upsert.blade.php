@@ -36,7 +36,7 @@
         <div class="col-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('account::manage-role.index') }}">Role</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('core::manage-role.index') }}">Role</a></li>
                     <li class="breadcrumb-item active">{{ $role->exists ? 'Edit' : 'Tambah' }}</li>
                 </ol>
             </nav>
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('account::manage-role.store') }}" method="POST">
+                    <form action="{{ route('core::manage-role.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="role_id" value="{{ $role->id }}">
 
@@ -126,7 +126,7 @@
                         </div>
 
                         <div class="mt-4 pt-3 border-top d-flex justify-content-end">
-                            <a href="{{ route('account::manage-role.index') }}" class="btn btn-light px-4 mr-2 text-secondary">
+                            <a href="{{ route('core::manage-role.index') }}" class="btn btn-light px-4 mr-2 text-secondary">
                                 <i class="fas fa-times mr-1"></i> Batal
                             </a>
                             <button type="submit" class="btn btn-primary px-5 shadow-sm">

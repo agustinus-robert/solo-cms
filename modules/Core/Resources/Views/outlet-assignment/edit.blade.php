@@ -10,12 +10,12 @@
             <h4 class="fw-bold text-dark mb-1">Penempatan Petugas Outlet</h4>
             <p class="text-muted small mb-0">Kelola siapa saja kasir/petugas yang aktif di outlet ini.</p>
         </div>
-        <a href="{{ route('account::manage-outlet.index') }}" class="btn btn-light rounded-pill px-4 shadow-sm">
+        <a href="{{ route('core::manage-outlet.index') }}" class="btn btn-light rounded-pill px-4 shadow-sm">
             <i class="mdi mdi-arrow-left me-1"></i> Kembali
         </a>
     </div>
 
-    <form action="{{ route('account::manage-outlet.update', $outlet->id) }}" method="POST">
+    <form action="{{ route('core::manage-outlet.update', $outlet->id) }}" method="POST">
         @csrf
         @method('PUT')
 

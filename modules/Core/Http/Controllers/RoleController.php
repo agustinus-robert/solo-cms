@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Account\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -98,18 +98,16 @@ class RoleController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('account::role.index', compact('roles'));
+        return view('core::role.index', compact('roles'));
     }
 
-    // 2. Tampilan Tambah (Lari ke Upsert)
     public function create()
     {
         $role = new Role(); // Data kosong
         $menus = $this->menus;
-        return view('account::role.upsert', compact('role', 'menus'));
+        return view('core::role.upsert', compact('role', 'menus'));
     }
 
-    // 3. Tampilan Edit (Lari ke Upsert juga)
     public function edit($id)
     {
         $role = Role::where('id', $id)->firstOrFail();
@@ -133,7 +131,7 @@ class RoleController extends Controller
         $role->syncPermissions($request->permissions ?? []);
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        return redirect()->route('account::manage-role.index')->with('success', 'Berhasil simpan, Cok!');
+        return redirect()->route('core::manage-role.index')->with('success', 'Berhasil simpan, Cok!');
     }
 
     // 5. Proses Hapus

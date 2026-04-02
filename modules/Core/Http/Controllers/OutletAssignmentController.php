@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Account\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ class OutletAssignmentController extends Controller
     public function index()
     {
         $outlets = Outlet::withCount('users')->latest()->paginate(10);
-        return view('account::outlet-assignment.index', compact('outlets'));
+        return view('core::outlet-assignment.index', compact('outlets'));
     }
 
     public function edit($id)
@@ -24,7 +24,7 @@ class OutletAssignmentController extends Controller
             $q->whereIn('name', ['outlet', 'casier']);
         })->get(['id', 'name', 'email']);
 
-        return view('account::outlet-assignment.edit', compact('outlet', 'users'));
+        return view('core::outlet-assignment.edit', compact('outlet', 'users'));
     }
 
     public function update(Request $request, $id)
@@ -39,7 +39,7 @@ class OutletAssignmentController extends Controller
 
         $outlet->users()->sync($request->user_ids ?? []);
 
-        return redirect()->route('account::manage-outlet.index')
+        return redirect()->route('core::manage-outlet.index')
                          ->with('success', "Petugas di outlet $outlet->name telah diperbarui.");
     }
 }

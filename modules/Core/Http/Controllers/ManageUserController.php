@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Account\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Account\Models\User;
@@ -13,13 +13,13 @@ class ManageUserController extends Controller
     public function index()
     {
         $users = User::with('roles')->latest()->paginate(10);
-        return view('account::user.manage-user.index', compact('users'));
+        return view('core::manage-user.index', compact('users'));
     }
 
     public function create()
     {
         $roles = Role::where('guard_name', 'web')->get();
-        return view('account::user.manage-user.upsert', [
+        return view('core::manage-user.upsert', [
             'user' => new User(),
             'roles' => $roles,
             'userRoles' => []
@@ -33,7 +33,7 @@ class ManageUserController extends Controller
 
         $userRoles = $user->roles->pluck('name')->toArray();
 
-        return view('account::user.manage-user.upsert', compact('user', 'roles', 'userRoles'));
+        return view('core::manage-user.upsert', compact('user', 'roles', 'userRoles'));
     }
 
     public function store(Request $request)
@@ -58,7 +58,7 @@ class ManageUserController extends Controller
 
         $user->syncRoles($request->roles);
 
-        return redirect()->route('account::manage-user.index')->with('success', 'Data User & Role berhasil disimpan!');
+        return redirect()->route('core::manage-user.index')->with('success', 'Data User & Role berhasil disimpan!');
     }
 
     public function destroy($id)

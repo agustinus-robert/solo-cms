@@ -4,15 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h4 class="font-weight-bold mb-1 text-dark">Manajemen Pengguna</h4>
-            <p class="text-muted small mb-0">Ringkasan data akun dan hak akses sistem.</p>
-        </div>
-        <a href="{{ route('account::manage-user.create') }}" class="btn btn-primary shadow-sm px-4">
-            <i class="fas fa-plus-circle mr-2"></i> Tambah User
-        </a>
-    </div>
 
     <div class="row">
         <div class="col-md-3 mb-4">
@@ -78,7 +69,6 @@
                                     <th class="border-0 px-4 py-3">User</th>
                                     <th class="border-0 py-3">Role</th>
                                     <th class="border-0 py-3">Terdaftar</th>
-                                    <th class="border-0 px-4 py-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -102,11 +92,6 @@
                                         @endforeach
                                     </td>
                                     <td class="py-3 small text-muted">{{ $u->created_at->diffForHumans() }}</td>
-                                    <td class="px-4 py-3 text-right">
-                                        <a href="{{ route('account::manage-user.edit', $u->id) }}" class="btn btn-sm btn-light border shadow-sm">
-                                            <i class="fas fa-edit text-primary"></i>
-                                        </a>
-                                    </td>
                                 </tr>
                                 @empty
                                 <tr>
@@ -118,7 +103,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white text-center py-3 border-0">
-                    <a href="{{ route('account::manage-user.index') }}" class="font-weight-bold small">Lihat Semua User <i class="fas fa-arrow-right ml-1"></i></a>
+                    <a href="{{ route('core::manage-user.index') }}" class="font-weight-bold small">Lihat Semua User <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
         </div>

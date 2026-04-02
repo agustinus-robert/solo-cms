@@ -1,4 +1,4 @@
-@extends('account::layouts.default')
+@extends('core::layouts.default')
 
 @section('title', 'Manajemen User | ')
 
@@ -9,7 +9,7 @@
             <h4 class="mb-0 font-weight-bold">Pengguna Sistem</h4>
             <p class="text-muted small mb-0">Kelola akun dan penempatan role user.</p>
         </div>
-        <a href="{{ route('account::manage-user.create') }}" class="btn btn-primary px-4 shadow-sm">
+        <a href="{{ route('core::manage-user.create') }}" class="btn btn-primary px-4 shadow-sm">
             <i class="fas fa-user-plus mr-1"></i> Tambah User
         </a>
     </div>
@@ -65,12 +65,12 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center" style="gap: 10px;">
-                                    <a href="{{ route('account::manage-user.edit', $user->id) }}"
+                                    <a href="{{ route('core::manage-user.edit', $user->id) }}"
                                        class="btn btn-warning btn-sm text-white shadow-sm" title="Edit User & Role">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
 
-                                    <form action="{{ route('account::manage-user.destroy', $user->id) }}"
+                                    <form action="{{ route('core::manage-user.destroy', $user->id) }}"
                                           method="POST" class="m-0 p-0"
                                           onsubmit="return confirm('Yakin hapus user {{ $user->name }}?')">
                                         @csrf @method('DELETE')

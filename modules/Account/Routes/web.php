@@ -16,10 +16,6 @@ Route::middleware('auth')->group(function () {
     Route::view('/home', 'account::home')->name('home');
     Route::view('/home-member', 'account::home-member')->name('home-member');
     Route::get('/account-dashboard', 'DashboardController@index')->name('account.dashboard');
-    Route::resourcePermission('/manage-role', 'RoleController', 'role');
-    Route::resourcePermission('/manage-user', 'ManageUserController', 'user');
-    Route::resourcePermission('/manage-outlet', 'OutletAssignmentController', 'outlet')
-        ->only(['index', 'edit', 'update']);
     Route::resource('/manage-audit-log', 'AuditLogController')->only('index');
     Route::resource('/manage-session', 'LoginSessionController')->only('index');
     Route::resource('/manage-profile', 'ProfileController');

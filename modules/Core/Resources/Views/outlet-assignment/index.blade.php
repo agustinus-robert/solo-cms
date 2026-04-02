@@ -31,7 +31,7 @@
                             </span>
                         </td>
                         <td class="text-end px-4">
-                            <a href="{{ route('account::manage-outlet.edit', $outlet->id) }}"
+                            <a href="{{ route('core::manage-outlet.edit', $outlet->id) }}"
                                class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 <i class="mdi mdi-account-cog me-1"></i> Kelola Petugas
                             </a>

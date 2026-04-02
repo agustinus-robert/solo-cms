@@ -1,4 +1,4 @@
-@extends('account::layouts.default')
+@extends('core::layouts.default')
 
 @section('title', 'Manajemen Role | ')
 
@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="d-flex align-items-center justify-content-between mb-4">
         <h4 class="mb-0 font-weight-bold">Manajemen Role</h4>
-        <a href="{{ route('account::manage-role.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('core::manage-role.create') }}" class="btn btn-primary shadow-sm">
             <i class="fas fa-plus mr-1"></i> Tambah Role
         </a>
     </div>
@@ -39,12 +39,12 @@
                            <td class="text-center align-middle py-3">
                                 <div class="d-flex justify-content-center align-items-center" style="gap: 10px;">
 
-                                    <a href="{{ route('account::manage-role.edit', $role->id) }}"
+                                    <a href="{{ route('core::manage-role.edit', $role->id) }}"
                                     class="btn btn-warning btn-sm text-white shadow-sm">
                                         <i class="fas fa-pencil-alt mr-1"></i> Edit
                                     </a>
 
-                                    <form action="{{ route('account::manage-role.destroy', $role->id) }}"
+                                    <form action="{{ route('core::manage-role.destroy', $role->id) }}"
                                         method="POST"
                                         class="m-0 p-0"
                                         onsubmit="return confirm('Hapus role {{ $role->name }}?')">

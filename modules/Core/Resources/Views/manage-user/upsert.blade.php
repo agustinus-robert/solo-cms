@@ -1,4 +1,4 @@
-@extends('account::layouts.default')
+@extends('core::layouts.default')
 
 @section('title', ($user->exists ? 'Edit' : 'Tambah') . ' User | ')
 
@@ -19,7 +19,7 @@
         <p class="text-muted">Isi formulir di bawah ini untuk mengatur akun dan hak akses.</p>
     </div>
 
-    <form action="{{ route('account::manage-user.store') }}" method="POST">
+    <form action="{{ route('core::manage-user.store') }}" method="POST">
         @csrf
         <input type="hidden" name="user_id" value="{{ $user->id }}">
 
@@ -94,7 +94,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end align-items-center mb-5" style="gap: 15px;">
-                    <a href="{{ route('account::manage-user.index') }}" class="btn btn-secondary px-4 py-2">
+                    <a href="{{ route('core::manage-user.index') }}" class="btn btn-secondary px-4 py-2">
                         <i class="fas fa-arrow-left mr-2"></i> Kembali
                     </a>
                     <button type="submit" class="btn btn-primary px-5 py-2 shadow-sm font-weight-bold">

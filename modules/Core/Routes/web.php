@@ -11,6 +11,11 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     // Dashboard
     Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
+    Route::resourcePermission('/manage-role', 'RoleController', 'role');
+    Route::resourcePermission('/manage-user', 'ManageUserController', 'user');
+    Route::resourcePermission('/manage-outlet', 'OutletAssignmentController', 'outlet')
+        ->only(['index', 'edit', 'update']);
+
     // Company
     Route::prefix('company')->namespace('Company')->name('company.')->group(function () {
         // Role references
