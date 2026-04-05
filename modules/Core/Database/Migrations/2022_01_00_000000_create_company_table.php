@@ -269,7 +269,10 @@ return new class extends Migration
             $table->unsignedTinyInteger('sex')->nullable();
             $table->unsignedTinyInteger('mariage')->nullable();
             $table->unsignedTinyInteger('child')->nullable();
+            $table->string('category')->nullable();
             $table->double('value', 20, 2)->nullable();
+            $table->date('effective_start');
+            $table->date('effective_end')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

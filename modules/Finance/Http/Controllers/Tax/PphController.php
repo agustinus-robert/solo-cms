@@ -45,11 +45,12 @@ class PphController extends Controller
         $defaults = setting('cmp_pph_components');
 
         if (!$defaults) {
-            return redirect()->fail('Harap membuat template pajak tahunan terlebih dahulu!');
+            return redirect()->next()->with(['error' => 'arap membuat template pajak tahunan terlebih dahulu!']);
+
         }
 
         if (!$request->filled(['start_at', 'end_at'])) {
-           return redirect()->back()->with('fail', 'Harap tambahkan periode tahunan');
+           return redirect()->back()->with('error', 'Harap tambahkan periode tahunan');
         }
 
         $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');

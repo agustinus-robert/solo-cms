@@ -11,7 +11,7 @@ use App\Models\Traits\HasGradeFromSession;
 
 class CompanyPtkp extends Model
 {
-    use Restorable, Searchable, HasGradeFromSession;
+    use Restorable, Searchable;
 
     /**
      * The table associated with the model.
@@ -24,9 +24,9 @@ class CompanyPtkp extends Model
     protected $fillable = [
         'sex',
         'mariage',
+        'category',
         'child',
         'value',
-        'grade_id'
     ];
 
     /**

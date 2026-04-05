@@ -67,6 +67,46 @@
                             </div>
                         </div>
 
+                        <hr class="my-4">
+
+                        <h6 class="font-weight-bold mb-3 text-primary">Data Wajib diisikan</h6>
+                       <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="small font-weight-bold">AGAMA</label>
+                                <select name="profile_religion" class="form-select form-control-lg" required>
+                                    <option value="">-- Pilih --</option>
+                                    @foreach(\Modules\Account\Enums\ReligionEnum::cases() as $religion)
+                                        <option value="{{ $religion->value }}"
+                                            @selected(old('profile_religion', $user->getMeta('profile_religion')) == $religion->value)>
+                                            {{ $religion->label() }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="small font-weight-bold">JENIS KELAMIN</label>
+                                <select name="profile_sex" class="form-select form-control-lg" required>
+                                    <option value="male" @selected(old('profile_sex', $user->getMeta('profile_sex')) == 'male')>Laki-laki</option>
+                                    <option value="female" @selected(old('profile_sex', $user->getMeta('profile_sex')) == 'female')>Perempuan</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="small font-weight-bold">STATUS PERNIKAHAN</label>
+                                <select name="profile_mariage" class="form-select form-control-lg" required>
+                                    <option value="single" @selected(old('profile_mariage', $user->getMeta('profile_mariage')) == 'single')>Lajang (TK)</option>
+                                    <option value="mariage" @selected(old('profile_mariage', $user->getMeta('profile_mariage')) == 'mariage')>Menikah (K)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="small font-weight-bold">ANAK/TANGGUNGAN</label>
+                                <input type="number" name="profile_child" class="form-control form-control-lg"
+                                    value="{{ old('profile_child', $user->getMeta('profile_child', 0)) }}" min="0" max="10" required>
+                            </div>
+                        </div>
+
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary px-5 font-weight-bold">Simpan Perubahan</button>
                         </div>

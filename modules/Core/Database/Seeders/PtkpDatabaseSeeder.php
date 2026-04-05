@@ -15,70 +15,31 @@ class PtkpDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $taxPtkpClassification = [
-            'TER Kategori A' => [
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::SINGLE,
-                    'child' => 0,
-                    'value' =>  54000000
-                ],
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::SINGLE,
-                    'child' => 1,
-                    'value' => 58500000
-                ],
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::MARRY,
-                    'child' => 1,
-                    'value' => 58500000
-                ],
+       $taxPtkpClassification = [
+            'A' => [
+                ['mariage' => MariageEnum::SINGLE, 'child' => 0, 'value' => 54000000],
+                ['mariage' => MariageEnum::SINGLE, 'child' => 1, 'value' => 58500000],
+                ['mariage' => MariageEnum::MARRY,  'child' => 1, 'value' => 58500000],
             ],
-            'TER Kategori B' => [
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::SINGLE,
-                    'child' => 2,
-                    'value' => 63000000
-                ],
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::SINGLE,
-                    'child' => 3,
-                    'value' => 67500000
-                ],
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::MARRY,
-                    'child' => 2,
-                    'value' => 63000000
-                ],
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::MARRY,
-                    'child' => 2,
-                    'value' => 67500000
-                ],
+            'B' => [
+                ['mariage' => MariageEnum::SINGLE, 'child' => 2, 'value' => 63000000],
+                ['mariage' => MariageEnum::SINGLE, 'child' => 3, 'value' => 67500000],
+                ['mariage' => MariageEnum::MARRY,  'child' => 2, 'value' => 63000000],
             ],
-            'TER Kategori C' => [
-                [
-                    'sex' => 3,
-                    'mariage' => MariageEnum::MARRY,
-                    'child' => 3,
-                    'value' => 67500000
-                ]
+            'C' => [
+                ['mariage' => MariageEnum::MARRY, 'child' => 3, 'value' => 67500000],
             ]
         ];
 
-        foreach ($taxPtkpClassification as $name => $_o) {
-            foreach ($_o as $ptkps) {
+        foreach ($taxPtkpClassification as $category => $items) {
+            foreach ($items as $ptkp) {
                 CompanyPtkp::create([
-                    'sex'      => $ptkps['sex'],
-                    'mariage'  => $ptkps['mariage'],
-                    'child'    => $ptkps['child'],
-                    'value'    => $ptkps['value']
+                    'category' => $category,
+                    'sex' => 3,
+                    'mariage' => $ptkp['mariage'],
+                    'child' => min($ptkp['child'], 3),
+                    'value' => $ptkp['value'],
+                    'effective_start' => '2024-01-01',
                 ]);
             }
         }
