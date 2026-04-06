@@ -1,6 +1,6 @@
 @extends('portal::layouts.index')
 
-@section('title', 'Lembur | ')
+@section('title', 'Buat Pengajuan Lembur | ' . env('APP_NAME'))
 
 @section('navtitle', 'Lembur')
 
@@ -18,186 +18,152 @@
 ])
 
 @section('contents')
-    @include('layouts.component.material-nav')
+    {{-- Header Topbar - Selalu di paling atas section contents --}}
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <div class="navbar-brand-box">
+                    <a href="index.html" class="logo logo-dark">
+                        <span class="logo-sm"><img src="{{ asset('skote/images/logo.svg') }}" height="22"></span>
+                        <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
+                    </a>
+                    <a href="index.html" class="logo logo-light">
+                        <span class="logo-sm"><img src="{{ asset('skote/images/logo-light.svg') }}" height="22"></span>
+                        <span class="logo-lg"><img src="{{ asset('skote/images/logo-light.png') }}" height="39"></span>
+                    </a>
+                </div>
+                <button type="button" class="btn btn-sm font-size-16 d-lg-none header-item waves-effect waves-light px-3" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
+            </div>
 
-    <style>
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .card-form {
-            border-radius: 1.25rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        .form-label-custom {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025rem;
-            color: #344767;
-        }
-        @media (min-width: 992px) {
-            .divider-vertical {
-                border-right: 1px solid #ebedef;
-                padding-right: 2rem;
-            }
-            .content-right {
-                padding-left: 2rem;
-            }
-        }
-    </style>
+            <div class="d-flex">
+                @include('layouts.nav-dashboard')
+                @include('layouts.shortcut_menu')
+                <div class="dropdown d-none d-lg-inline-block ms-1">
+                    @include('layouts.nav_name')
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <div class="main-content container-fluid py-4">
+    <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
 
-                {{-- Header --}}
-                <div class="d-flex align-items-center mb-4">
-                    <a href="{{ request('next', route('portal::overtime.submission.index')) }}" class="btn btn-link text-dark p-0 me-3">
-                        <span class="material-symbols-rounded" style="font-size: 36px;">arrow_back_ios_new</span>
-                    </a>
-                    <div>
-                        <h3 class="font-weight-bolder mb-0">Pengajuan Lembur Baru</h3>
-                        <p class="text-sm mb-0 text-secondary">Isi rincian pekerjaan lembur Anda di bawah ini.</p>
+                {{-- Page Header --}}
+                <div class="row align-items-center mb-4 mt-2">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center">
+                            <a href="{{ request('next', route('portal::overtime.submission.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
+                                <i class="mdi mdi-arrow-left font-size-18"></i>
+                            </a>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Form Pengajuan Lembur</h4>
+                                <p class="text-muted mb-0 font-size-13">Silakan lengkapi detail lembur Anda di bawah ini.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card card-form border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="row justify-content-center">
-                            <div class="col-xl-11">
+                <div class="row justify-content-center">
+                    <div class="col-xl-9">
+                        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                            <div class="card-body p-4">
                                 <form class="form-confirm form-block" action="{{ route('portal::overtime.submission.store') }}" method="post" enctype="multipart/form-data">
                                     @csrf
 
-                                    {{-- Nama Pekerjaan --}}
-                                    <div class="row align-items-start mb-4">
-                                        <div class="col-lg-3 divider-vertical">
-                                            <label class="form-label-custom font-weight-bold">
-                                                <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">work</span>
-                                                Pekerjaan
-                                            </label>
-                                            <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Apa tugas utama yang Anda kerjakan saat lembur?</p>
-                                        </div>
-                                        <div class="col-lg-9 content-right">
-                                            <div class="tg-steps-overtime-name">
-                                                <input type="text" class="form-control border-radius-md @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="Contoh: Maintenance Server atau Input Data Siswa" required>
-                                                @error('name') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
-                                            </div>
+                                    {{-- Row 1: Pekerjaan --}}
+                                    <div class="row mb-4 tg-steps-overtime-name">
+                                        <label class="col-md-3 col-form-label fw-bold">Nama Pekerjaan <span class="text-danger">*</span></label>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="Contoh: Perbaikan Bug POS System" required>
+                                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
 
-                                    <hr class="horizontal dark my-4">
-
-                                    {{-- Waktu Lembur --}}
-                                    <div class="row align-items-start mb-4">
-                                        <div class="col-lg-3 divider-vertical">
-                                            <label class="form-label-custom font-weight-bold">
-                                                <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">schedule</span>
-                                                Waktu
-                                            </label>
-                                            <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Tentukan tanggal dan durasi jam lembur Anda.</p>
+                                    {{-- Row 2: Waktu (Repeatable) --}}
+                                    <div class="row mb-4 tg-steps-overtime-dates">
+                                        <div class="col-md-3 d-flex justify-content-between align-items-start">
+                                            <label class="col-form-label fw-bold">Waktu Lembur <span class="text-danger">*</span></label>
                                         </div>
-                                        <div class="col-lg-9 content-right">
-                                            <div class="tg-steps-overtime-dates" id="dates">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div class="flex-grow-1 dates-input">
-                                                        <div class="row gy-2 me-2">
-                                                            <div class="col-sm-5">
-                                                                <input type="date" class="form-control border-radius-md @error('dates.d.0') is-invalid @enderror" name="dates[d][]" max="{{ date('Y-m-d') }}" value="{{ old('dates.d.0') }}" required>
-                                                            </div>
-                                                            <div class="col-sm-7">
-                                                                <div class="input-group">
-                                                                    <input type="time" class="form-control @error('dates.s.0') is-invalid @enderror" name="dates[s][]" onchange="changeMinTime(event)" value="{{ old('dates.s.0') }}" required>
-                                                                    <span class="input-group-text bg-light">s.d.</span>
-                                                                    <input type="time" class="form-control @error('dates.e.0') is-invalid @enderror" name="dates[e][]" onchange="changeMaxTime(event)" value="{{ old('dates.e.0') }}" required>
-                                                                </div>
+                                        <div class="col-md-9">
+                                            <div id="dates-container">
+                                                <div class="date-row p-3 bg-light rounded mb-3 border border-dashed position-relative">
+                                                    <div class="row g-2">
+                                                        <div class="col-sm-5">
+                                                            <label class="font-size-11 text-muted text-uppercase fw-bold">Tanggal</label>
+                                                            <input type="date" class="form-control form-control-sm" name="dates[d][]" max="{{ date('Y-m-d') }}" value="{{ old('dates.d.0') }}" required>
+                                                        </div>
+                                                        <div class="col-sm-7">
+                                                            <label class="font-size-11 text-muted text-uppercase fw-bold">Jam Kerja</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="time" class="form-control" name="dates[s][]" onchange="changeMinTime(event)" required>
+                                                                <span class="input-group-text bg-white">s.d.</span>
+                                                                <input type="time" class="form-control" name="dates[e][]" onchange="changeMaxTime(event)" required>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button type="button" class="btn btn-outline-primary rounded-circle btn-add px-2 py-1"><span class="material-symbols-rounded">add</span></button>
                                                 </div>
                                             </div>
-                                            @error('dates.*.*') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                                            <button type="button" class="btn btn-sm btn-soft-primary waves-effect waves-light btn-add-date">
+                                                <i class="mdi mdi-plus me-1"></i> Tambah Hari Lembur
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <hr class="horizontal dark my-4">
-
-                                    {{-- Deskripsi --}}
-                                    <div class="row align-items-start mb-4">
-                                        <div class="col-lg-3 divider-vertical">
-                                            <label class="form-label-custom font-weight-bold">
-                                                <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">notes</span>
-                                                Deskripsi
-                                            </label>
-                                            <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Detail realisasi kegiatan atau alasan lembur.</p>
+                                    {{-- Row 3: Deskripsi & Lampiran --}}
+                                    <div class="row mb-4">
+                                        <label class="col-md-3 col-form-label fw-bold">Deskripsi Pekerjaan</label>
+                                        <div class="col-md-9 tg-steps-overtime-description">
+                                            <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="4" placeholder="Detail hasil pengerjaan atau alasan lembur...">{{ old('description') }}</textarea>
                                         </div>
-                                        <div class="col-lg-9 content-right">
-                                            <div class="tg-steps-overtime-description">
-                                                <textarea class="form-control border-radius-md @error('description') is-invalid @enderror" name="description" rows="4" placeholder="Tulis rincian hasil pekerjaan lembur di sini...">{{ old('description') }}</textarea>
-                                                @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+
+                                    <div class="row mb-4 tg-steps-overtime-attachment">
+                                        <label class="col-md-3 col-form-label fw-bold">Lampiran Berkas</label>
+                                        <div class="col-md-9">
+                                            <div class="border border-2 border-dashed rounded p-3 text-center bg-light bg-opacity-50">
+                                                <input class="form-control form-control-sm" name="attachment" type="file" accept="image/*,application/pdf">
+                                                <p class="text-muted font-size-11 mt-2 mb-0">Format: JPG, PNG, PDF (Maks. 2MB)</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Lampiran --}}
-                                    <div class="row align-items-start mb-4">
-                                        <div class="col-lg-3 divider-vertical">
-                                            <label class="form-label-custom font-weight-bold">
-                                                <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">upload_file</span>
-                                                Lampiran
-                                            </label>
-                                        </div>
-                                        <div class="col-lg-9 content-right">
-                                            <div class="tg-steps-overtime-attachment p-3 border-radius-md" style="border: 2px dashed #e9ecef; background: #fafafa;">
-                                                <input class="form-control border-0 bg-transparent @error('attachment') is-invalid @enderror" name="attachment" type="file" id="upload-input" accept="image/*,application/pdf">
-                                                <div class="mt-1"><span class="text-xxs text-secondary">Format: .jpg, .png, .pdf (Maks. 2MB)</span></div>
-                                                @error('attachment') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <hr class="my-4">
 
-                                    <hr class="horizontal dark my-4">
-
-                                    {{-- Approvers --}}
-                                    @foreach ($superiors as $superior)
-                                        <div class="row align-items-start mb-4">
-                                            <div class="col-lg-3 divider-vertical">
-                                                <label class="form-label-custom font-weight-bold">
-                                                    <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">person_search</span>
-                                                    {{ $superior['label'] }}
-                                                </label>
-                                            </div>
-                                            <div class="col-lg-9 content-right">
-                                                <div class="tg-steps-overtime-approvers">
-                                                    <select class="form-select border-radius-md @error('approvables.' . $superior['step']) is-invalid @enderror" name="approvables[{{ $superior['step'] }}]" @if ($superior['required']) required @endif>
+                                    {{-- Row 4: Atasan --}}
+                                    <div class="tg-steps-overtime-approvers">
+                                        @foreach ($superiors as $superior)
+                                            <div class="row mb-3">
+                                                <label class="col-md-3 col-form-label fw-bold">{{ $superior['label'] }} <span class="text-danger">*</span></label>
+                                                <div class="col-md-9">
+                                                    <select class="form-select @error('approvables.' . $superior['step']) is-invalid @enderror" name="approvables[{{ $superior['step'] }}]" @if ($superior['required']) required @endif>
                                                         @if (count($superior['positions']) > 1)
                                                             <option value="">-- Pilih Atasan --</option>
                                                         @endif
                                                         @foreach ($superior['positions'] as $position)
                                                             <optgroup label="{{ $position->name }}">
-                                                                @forelse ($position->employeePositions as $pEmp)
+                                                                @foreach ($position->employeePositions as $pEmp)
                                                                     <option value="{{ $pEmp->id }}" @selected(count($superior['positions']) == 1)>{{ $pEmp->employee->user->name }}</option>
-                                                                @empty
-                                                                    <option value="" disabled>Tidak ada karyawan</option>
-                                                                @endforelse
+                                                                @endforeach
                                                             </optgroup>
                                                         @endforeach
                                                     </select>
-                                                    @error('approvables.' . $superior['step']) <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
 
-                                    {{-- Actions --}}
+                                    {{-- Submit --}}
                                     <div class="row mt-5">
-                                        <div class="col-lg-9 offset-lg-3 content-right d-flex gap-2">
-                                            <button type="submit" class="btn bg-gradient-primary border-radius-md px-4 d-flex align-items-center gap-2 mb-0">
-                                                <span class="material-symbols-rounded">send</span> Ajukan Lembur
-                                            </button>
-                                            <a href="{{ request('next', route('portal::overtime.submission.index')) }}" class="btn btn-outline-secondary border-radius-md px-4 mb-0">
-                                                Batal
-                                            </a>
+                                        <div class="col-md-9 offset-md-3">
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-primary btn-lg px-5 waves-effect waves-light">
+                                                    <i class="mdi mdi-check-circle-outline me-1"></i> Ajukan Sekarang
+                                                </button>
+                                                <a href="{{ request('next', route('portal::overtime.submission.index')) }}" class="btn btn-light btn-lg px-4">Batal</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -205,61 +171,56 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-    {{-- Template untuk Add Row (Disesuaikan style-nya tanpa ubah JS) --}}
+    {{-- Template Row Tanggal --}}
     <div id="dates-template" class="d-none">
-        <div class="d-flex justify-content-between align-items-start mb-2 mt-2">
-            <div class="flex-grow-1 dates-input">
-                <div class="row gy-2 me-2">
-                    <div class="col-sm-5">
-                        <input type="date" class="form-control border-radius-md" name="dates[d][]" max="{{ date('Y-m-d') }}">
-                    </div>
-                    <div class="col-sm-7">
-                        <div class="input-group">
-                            <input type="time" class="form-control" name="dates[s][]" onchange="changeMinTime(event)">
-                            <span class="input-group-text bg-light">s.d.</span>
-                            <input type="time" class="form-control" name="dates[e][]" onchange="changeMaxTime(event)">
-                        </div>
+        <div class="date-row p-3 bg-light rounded mb-3 border border-dashed position-relative animate-fade-in">
+            <button type="button" class="btn btn-sm btn-soft-danger rounded-circle position-absolute" style="top: -10px; right: -10px;" onclick="this.closest('.date-row').remove()">
+                <i class="mdi mdi-close"></i>
+            </button>
+            <div class="row g-2">
+                <div class="col-sm-5">
+                    <label class="font-size-11 text-muted text-uppercase fw-bold">Tanggal</label>
+                    <input type="date" class="form-control form-control-sm" name="dates[d][]" max="{{ date('Y-m-d') }}" required>
+                </div>
+                <div class="col-sm-7">
+                    <label class="font-size-11 text-muted text-uppercase fw-bold">Jam Kerja</label>
+                    <div class="input-group input-group-sm">
+                        <input type="time" class="form-control" name="dates[s][]" onchange="changeMinTime(event)" required>
+                        <span class="input-group-text bg-white">s.d.</span>
+                        <input type="time" class="form-control" name="dates[e][]" onchange="changeMaxTime(event)" required>
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-outline-danger rounded-circle btn-remove px-2 py-1" onclick="removeAttachment(event)">
-                <span class="material-symbols-rounded">remove</span>
-            </button>
         </div>
     </div>
 
     <script>
         const max_dates = 5;
 
-        let removeAttachment = (e) => {
-            // Updated: find parent d-flex to remove
-            e.currentTarget.closest('.d-flex').remove();
-            document.querySelector('#dates .btn-add').classList.toggle('disabled', document.getElementById('dates').querySelectorAll('.dates-input').length > max_dates);
-        }
-
         let changeMinTime = (e) => {
-            for (let sibling of e.target.parentNode.children) {
-                if (sibling !== e.target) sibling.min = e.target.value;
-            }
+            let endTimeInput = e.target.parentNode.querySelector('input[name="dates[e][]"]');
+            if(endTimeInput) endTimeInput.min = e.target.value;
         }
 
         let changeMaxTime = (e) => {
-            for (let sibling of e.target.parentNode.children) {
-                if (sibling !== e.target) sibling.max = e.target.value;
-            }
+            let startTimeInput = e.target.parentNode.querySelector('input[name="dates[s][]"]');
+            if(startTimeInput) startTimeInput.max = e.target.value;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('#dates .btn-add').addEventListener('click', (e) => {
-                if (document.getElementById('dates').querySelectorAll('.dates-input').length < max_dates) {
-                    document.getElementById('dates').insertAdjacentHTML('beforeend', document.getElementById('dates-template').innerHTML);
-                    e.currentTarget.classList.toggle('disabled', document.getElementById('dates').querySelectorAll('.dates-input').length == max_dates)
+            document.querySelector('.btn-add-date').addEventListener('click', (e) => {
+                let container = document.getElementById('dates-container');
+                if (container.querySelectorAll('.date-row').length < max_dates) {
+                    container.insertAdjacentHTML('beforeend', document.getElementById('dates-template').innerHTML);
+                } else {
+                    alert('Maksimal pengajuan adalah 5 hari.');
                 }
             });
         });

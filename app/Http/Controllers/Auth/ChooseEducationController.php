@@ -22,6 +22,6 @@ class ChooseEducationController extends Controller
         ]);
 
         $request->session()->put('selected_grade', $request->education_id);
-        return redirect()->route('portal::dashboard.index');
+        return redirect()->route('portal::dashboard-msdm.index');
     }
 }

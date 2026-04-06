@@ -15,7 +15,7 @@ class ShopMiddleware
         }
 
         if (!Gate::forUser($request->user())->allows('is-casier')) {
-            return redirect()->route('portal::dashboard.index');
+            return redirect()->route('portal::dashboard-msdm.index');
         }
 
         return $next($request);

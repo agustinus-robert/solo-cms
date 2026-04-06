@@ -66,7 +66,7 @@ class User extends Authenticatable
     public function getRedirectRoute(): string
     {
         return match ((int)$this->current_team_id) {
-            1 => route('portal::dashboard.index')
+            1 => route('portal::dashboard-msdm.index')
         };
     }
 }

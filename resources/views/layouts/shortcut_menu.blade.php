@@ -15,7 +15,7 @@
         <div class="px-lg-2">
             <div class="row g-0">
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('portal::dashboard.index') }}">
+                    <a class="dropdown-icon-item" href="{{ route('portal::dashboard-msdm.index') }}">
                         <i class="bx bxs-dashboard" style='font-size:30px;'></i>
                         <span>Dashboard</span>
                     </a>

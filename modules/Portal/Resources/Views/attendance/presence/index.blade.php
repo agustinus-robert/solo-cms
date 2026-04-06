@@ -31,7 +31,7 @@
 
 @section('content')
     <div class="d-flex align-items-center mb-4">
-        <a class="text-decoration-none" href="{{ request('next', route('portal::dashboard.index')) }}"><i class="mdi mdi-arrow-left-circle-outline mdi-36px"></i></a>
+        <a class="text-decoration-none" href="{{ request('next', route('portal::dashboard-msdm.index')) }}"><i class="mdi mdi-arrow-left-circle-outline mdi-36px"></i></a>
         <div class="ms-4">
             <h2 class="mb-1">Presensi</h2>
             <div class="text-muted">Yuk! Lakukan check-in dan check-out untuk hindari keterlambatan, usahakan selalu tepat waktu ya!</div>

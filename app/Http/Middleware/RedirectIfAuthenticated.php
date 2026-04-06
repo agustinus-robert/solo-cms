@@ -26,7 +26,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect($request->get('next', '/portal/dashboard'));
+                return redirect($request->get('next', '/portal/dashboard-msdm'));
             }
         }
 

@@ -109,7 +109,7 @@
             </ul>
         </li>
         <li class="nav-item d-flex align-items-center">
-            <a href="{{ route('account::user.profile') }}" class="nav-link font-weight-bold px-0 text-body">
+            <a href="{{ route('account::manage-profile.index') }}" class="nav-link font-weight-bold px-0 text-body">
             <i class="material-symbols-rounded">account_circle</i>
             </a>
         </li>

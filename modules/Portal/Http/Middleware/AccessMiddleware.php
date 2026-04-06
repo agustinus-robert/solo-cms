@@ -13,8 +13,8 @@ class AccessMiddleware
         $user = $request->user();
         if (isLevelOne($user)) {
             return $next($request);
-        } 
-        
+        }
+
         if(isSuperUser($user)){
             if (!session()->has('selected_grade')) {
                 return redirect()->route('choose.education');
@@ -31,7 +31,7 @@ class AccessMiddleware
         }
 
         if (Gate::forUser($request->user())->allows('is-casier')) {
-            return redirect()->route('portal::dashboard.index');
+            return redirect()->route('portal::dashboard-msdm.index');
         }
 
         if (Gate::forUser($request->user())->allows('is-supplier')) {

@@ -30,7 +30,11 @@ class SubmissionController extends Controller
 			->latest()
 			->paginate($request->get('limit', 10));
 
-		$leaves_this_year_count = $employee->leaves()->where('dates->[*]->d', 'like', '%' . date('Y') . '%')->whereApproved()->count();
+        $year = date('Y');
+        $leaves_this_year_count = $employee->leaves()
+            ->whereRaw("jsonb_path_exists(dates::jsonb, '$[*] ? (@.d >= \"$year-01-01\" && @.d <= \"$year-12-31\")')")
+            ->whereApproved()
+            ->count();
 
 		return view('portal::leave.submission.index', compact('employee', 'leaves', 'leaves_this_year_count'));
 	}

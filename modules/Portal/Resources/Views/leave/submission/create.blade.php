@@ -1,259 +1,270 @@
 @extends('portal::layouts.index')
 
-@section('title', 'Izin | ')
-
-@section('navtitle', 'Perizinan')
-
-@include('components.tourguide', [
-    'steps' => array_filter([
-        ['selector' => '.tg-steps-leave-category', 'title' => 'Jenis izin', 'content' => 'Pilih jenis izin yang sesuai dengan kebutuhan kamu.'],
-        ['selector' => '.tg-steps-leave-date', 'title' => 'Tanggal izin', 'content' => 'Kolom ini diisi tanggal izin yang udah kamu rencanain.'],
-        ['selector' => '.tg-steps-leave-description', 'title' => 'Keperluan izin', 'content' => 'Bisa diisi keperluan, catatan, alasan, atau deskripsi penting lainnya.'],
-        ['selector' => '.tg-steps-leave-attachment', 'title' => 'Lampiran berkas', 'content' => 'Kalau ada lampiran bisa diunggah di sini, misalnya surat keterangan dokter atau lainnya.'],
-    ]),
-])
+@section('title', 'Buat Pengajuan Izin | ' . env('APP_NAME'))
 
 @section('contents')
-    @include('layouts.component.material-nav')
-
     <style>
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .category-scroll {
-            max-height: 350px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            padding-right: 5px;
-        }
+        .material-symbols-rounded { vertical-align: middle; }
+
+        /* Card & Layout */
+        .card-form { border-radius: 15px; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .form-label-custom { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #495057; display: block; margin-bottom: 0.5rem; }
+
+        /* Category Selection */
+        .category-scroll { max-height: 380px; overflow-y: auto; padding-right: 8px; }
+        .category-scroll::-webkit-scrollbar { width: 4px; }
+        .category-scroll::-webkit-scrollbar-thumb { background: #e2e5ec; border-radius: 10px; }
+
         .category-item {
-            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: #fff;
+            border: 1px solid #eff2f7;
+            border-radius: 12px;
             cursor: pointer;
-            border: 1px solid #f0f0f0;
-            margin-bottom: 8px;
-            border-radius: 12px !important;
-            background-color: #fff;
+            transition: all 0.2s ease;
         }
-        .category-item:hover {
+        .category-item:hover { border-color: #556ee6; background-color: #fbfbff; }
+
+        .form-check-input { width: 1.2rem; height: 1.2rem; margin-top: 0; cursor: pointer; }
+        .form-check-input:checked + .category-content .fw-bold { color: #556ee6; }
+        .form-check-input:checked ~ .category-active-check { display: block !important; }
+
+        /* File Upload */
+        .upload-wrapper {
+            border: 2px dashed #ced4da;
             background-color: #f8f9fa;
-            border-color: #d1d1d1;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
         }
-        .form-check-input:checked + div .fw-bold {
-            color: var(--bs-primary);
-        }
-        .card-form {
-            border-radius: 1.25rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        /* Border Tengah (Vertical Divider) */
+        .upload-wrapper:hover { border-color: #556ee6; background-color: #f1f4ff; }
+
         @media (min-width: 992px) {
-            .divider-vertical {
-                border-right: 1px solid #ebedef;
-                padding-right: 2rem;
-            }
-            .content-right {
-                padding-left: 2rem;
-            }
-        }
-        .form-label-custom {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025rem;
-            color: #344767;
+            .divider-vertical { border-right: 1px solid #eff2f7; }
         }
     </style>
 
-    <div class="main-content container-fluid py-4">
-        <div class="page-content">
-            <div class="container-fluid">
-                {{-- Header --}}
-                <div class="d-flex align-items-center mb-4">
-                    <a href="{{ request('next', route('portal::leave.submission.index')) }}" class="btn btn-link text-dark p-0 me-3">
-                        <span class="material-symbols-rounded" style="font-size: 36px;">arrow_back_ios_new</span>
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <div class="navbar-brand-box">
+                    <a href="index.html" class="logo logo-dark">
+                        <span class="logo-sm">
+                            <img src="{{ asset('skote/images/logo.svg') }}" alt="" height="22">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="{{ asset('skote/images/logo-dark.png') }}" alt="" height="17">
+                        </span>
                     </a>
-                    <div>
-                        <h3 class="font-weight-bolder mb-0 text-dark">Formulir Izin</h3>
-                        <p class="text-sm mb-0 text-secondary">Silakan lengkapi data pengajuan izin Anda.</p>
-                    </div>
+
+                    <a href="index.html" class="logo logo-light">
+                        <span class="logo-sm">
+                            <img src="{{ asset('skote/images/logo-light.svg') }}" alt="" height="22">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="{{ asset('skote/images/logo-light.png') }}" alt="" height="39">
+                        </span>
+                    </a>
                 </div>
 
-                {{-- Alert Errors --}}
-                @if (count($errors))
-                    <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show text-white mb-4" role="alert" style="background: #ea0606; border-radius: 12px;">
-                        <div class="d-flex align-items-center">
-                            <span class="material-symbols-rounded me-2">error</span>
-                            <strong class="text-sm">Terjadi kesalahan input:</strong>
-                        </div>
-                        <ul class="ps-4 mb-0 mt-2 text-xs">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="btn-close text-lg py-3 opacity-10" data-bs-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                @endif
+                <button type="button" class="btn btn-sm font-size-16 d-lg-none header-item waves-effect waves-light px-3" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
 
-                <div class="card card-form border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <form class="form-confirm form-block" action="{{ route('portal::leave.submission.store') }}" method="post" enctype="multipart/form-data">
-                            @csrf
+            </div>
 
-                            {{-- Kategori Izin --}}
-                            <div class="row align-items-start mb-4">
-                                <div class="col-lg-3 divider-vertical">
-                                    <label class="form-label-custom font-weight-bold">
-                                        <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">category</span>
-                                        Kategori
-                                    </label>
-                                    <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Pilih salah satu alasan atau kategori izin yang tersedia.</p>
-                                </div>
-                                <div class="col-lg-9 content-right">
-                                    <div class="tg-steps-leave-category">
-                                        <div class="category-scroll">
-                                            @forelse($categories as $category)
-                                                @if ($category->children->count())
-                                                    <div class="text-uppercase text-xxs font-weight-bolder text-primary mb-2 mt-2 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $category->id }}" style="cursor: pointer; letter-spacing: 1px;">
-                                                        {{ $category->name }}
-                                                        <span class="material-symbols-rounded ms-auto" style="font-size: 16px;">expand_more</span>
-                                                    </div>
-                                                    <div class="collapse show" id="collapse-{{ $category->id }}">
-                                                        @foreach ($category->children as $child)
-                                                            <label class="list-group-item category-item d-flex align-items-center p-3">
-                                                                <input class="form-check-input me-3" type="radio" name="ctg_id" data-meta="{{ json_encode($child->meta) }}" value="{{ $child->id }}" data-quota="{{ $child->meta?->quota ?: -1 }}">
-                                                                <div class="flex-grow-1">
-                                                                    <div class="fw-bold text-sm mb-0">{{ $child->name }}</div>
-                                                                    <div class="text-xxs text-secondary">Sisa Kuota: <span class="badge bg-light text-dark">{{ $child->meta?->quota ?: '∞' }} hari</span></div>
-                                                                </div>
-                                                            </label>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    <label class="category-item d-flex align-items-center p-3">
-                                                        <input class="form-check-input me-3" type="radio" name="ctg_id" data-meta="{{ json_encode($category->meta) }}" value="{{ $category->id }}" data-quota="{{ $category->meta?->quota ?: -1 }}" required>
-                                                        <div class="flex-grow-1">
-                                                            <div class="fw-bold text-sm mb-0">{{ $category->name }}</div>
-                                                            <div class="text-xxs text-secondary">Sisa Kuota: <span class="badge bg-light text-dark">{{ $category->meta?->quota ?: '∞' }} hari</span></div>
-                                                        </div>
-                                                    </label>
-                                                @endif
-                                            @empty
-                                                <div class="p-4 text-center border-radius-md bg-light">
-                                                    <p class="text-sm text-secondary mb-0">Tidak ada kategori izin</p>
-                                                </div>
-                                            @endforelse
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="d-flex">
 
-                            <hr class="horizontal dark my-4">
+                <div class="dropdown d-inline-block d-lg-none ms-2">
+                    <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="mdi mdi-magnify"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown">
 
-                            {{-- Tanggal Izin --}}
-                            <div class="row align-items-start mb-4">
-                                <div class="col-lg-3 divider-vertical">
-                                    <label class="form-label-custom font-weight-bold">
-                                        <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">calendar_today</span>
-                                        Tanggal
-                                    </label>
-                                    <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Tentukan satu atau lebih tanggal rencana izin Anda.</p>
-                                </div>
-                                <div class="col-lg-9 content-right">
-                                    <div class="tg-steps-leave-date">
-                                        <div class="inputs-meta-fields" id="inputs-options">
-                                            <div id="fields-options-tbody">
-                                                {{-- Template Row --}}
-                                                <div class="d-flex gap-2 mb-2 align-items-start" id="fields-options-template">
-                                                    <div class="flex-grow-1">
-                                                        <input type="date" class="form-control border-radius-md" name="dates[]" min="{{ date('Y-m-d') }}" required>
-                                                    </div>
-                                                    <button class="btn btn-link text-danger btn-delete d-none p-2 mb-0" type="button" onclick="removeRow(event)">
-                                                        <span class="material-symbols-rounded">delete</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <button id="fields-options-add" type="button" class="btn btn-outline-primary btn-sm mt-2 d-flex align-items-center gap-1 border-radius-md disabled">
-                                                <span class="material-symbols-rounded text-sm">add_circle</span> Tambah Tanggal
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <form class="p-3">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ..." aria-label="Search input">
 
-                            {{-- Waktu Detail --}}
-                            <div class="row d-none mb-4" id="hide_if_date_only">
-                                <div class="col-lg-3 divider-vertical">
-                                    <label class="form-label-custom font-weight-bold">
-                                        <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">schedule</span>
-                                        Pukul
-                                    </label>
-                                </div>
-                                <div class="col-lg-6 content-right">
-                                    <div class="input-group shadow-none">
-                                        <input type="time" class="form-control border-radius-md" name="time_start">
-                                        <span class="input-group-text bg-light hide_if_start_only">s.d.</span>
-                                        <input type="time" class="form-control border-radius-md hide_if_start_only" name="time_end">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="horizontal dark my-4">
-
-                            {{-- Deskripsi --}}
-                            <div class="row align-items-start mb-4">
-                                <div class="col-lg-3 divider-vertical">
-                                    <label class="form-label-custom font-weight-bold">
-                                        <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">notes</span>
-                                        Keterangan
-                                    </label>
-                                    <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Tuliskan alasan detail untuk mempercepat proses approval.</p>
-                                </div>
-                                <div class="col-lg-9 content-right">
-                                    <div class="tg-steps-leave-description">
-                                        <textarea class="form-control border-radius-md" name="description" rows="3" placeholder="Contoh: Mengantar anak imunisasi atau urusan keluarga mendadak..."></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Lampiran --}}
-                            <div class="row align-items-start mb-4">
-                                <div class="col-lg-3 divider-vertical">
-                                    <label class="form-label-custom font-weight-bold">
-                                        <span class="material-symbols-rounded me-1 text-primary" style="font-size: 20px;">upload_file</span>
-                                        Lampiran
-                                    </label>
-                                    <p class="text-xxs text-secondary mt-1 d-none d-lg-block">Unggah berkas pendukung jika diperlukan (opsional).</p>
-                                </div>
-                                <div class="col-lg-9 content-right">
-                                    <div class="tg-steps-leave-attachment p-3 border-radius-md" style="border: 2px dashed #e9ecef; background: #fafafa;">
-                                        <input class="form-control border-0 bg-transparent" name="attachment" type="file" id="upload-input" accept="image/*,application/pdf">
-                                        <div class="mt-1"><span class="text-xxs text-secondary">Format: .JPG, .PNG, .PDF (Maks. 2MB)</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Actions --}}
-                            <div class="row mt-5">
-                                <div class="col-lg-9 offset-lg-3 content-right d-flex gap-2">
-                                    <button type="submit" class="btn bg-gradient-primary border-radius-md px-4 d-flex align-items-center gap-2 mb-0">
-                                        <span class="material-symbols-rounded">check_circle</span> Kirim Pengajuan
-                                    </button>
-                                    <a href="{{ request('next', route('portal::leave.submission.index')) }}" class="btn btn-light border-radius-md px-4 mb-0">
-                                        Batalkan
-                                    </a>
+                                    <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
+
+                @include('layouts.nav-dashboard')
+                @include('layouts.shortcut_menu')
+                <div class="dropdown d-none d-lg-inline-block ms-1">
+                    @include('layouts.nav_name')
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+
+                {{-- Breadcrumb/Header --}}
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center">
+                            <a href="{{ request('next', route('portal::leave.submission.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
+                                <i class="mdi mdi-arrow-left font-size-18"></i>
+                            </a>
+                            <div>
+                                <h4 class="mb-1 fw-bold">Formulir Pengajuan Izin</h4>
+                                <ol class="breadcrumb m-0 small">
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Portal</a></li>
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Izin</a></li>
+                                    <li class="breadcrumb-item active">Buat Baru</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (count($errors))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="mdi mdi-block-helper me-2"></i>
+                        <strong>Mohon periksa kembali:</strong>
+                        <ul class="mb-0 mt-2 small">
+                            @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <div class="row justify-content-center">
+                    <div class="col-xl-10">
+                        <div class="card card-form">
+                            <div class="card-body p-4 p-lg-5">
+                                <form class="form-confirm form-block" action="{{ route('portal::leave.submission.store') }}" method="post" enctype="multipart/form-data">
+                                    @csrf
+
+                                    <div class="row">
+                                        {{-- Kiri: Kategori --}}
+                                        <div class="col-lg-5 divider-vertical pe-lg-4">
+                                            <label class="form-label-custom">
+                                                <i class="mdi mdi-format-list-bulleted-type text-primary me-1"></i> Pilih Jenis Izin
+                                            </label>
+                                            <p class="text-muted small mb-3">Pilih kategori yang paling sesuai dengan alasan ketidakhadiran Anda.</p>
+
+                                            <div class="tg-steps-leave-category">
+                                                <div class="category-scroll">
+                                                    @forelse($categories as $category)
+                                                        @if ($category->children->count())
+                                                            <div class="text-primary fw-bold small text-uppercase mb-2 mt-3" style="letter-spacing: 1px;">{{ $category->name }}</div>
+                                                            @foreach ($category->children as $child)
+                                                                <label class="category-item">
+                                                                    <input class="form-check-input me-3" type="radio" name="ctg_id" data-meta="{{ json_encode($child->meta) }}" value="{{ $child->id }}" data-quota="{{ $child->meta?->quota ?: -1 }}" required>
+                                                                    <div class="category-content flex-grow-1">
+                                                                        <div class="fw-bold text-dark font-size-14">{{ $child->name }}</div>
+                                                                        <div class="text-muted font-size-11">Sisa Kuota: <span class="badge badge-soft-info">{{ $child->meta?->quota ?: '∞' }} hari</span></div>
+                                                                    </div>
+                                                                    <i class="mdi mdi-check-circle text-primary category-active-check d-none font-size-18"></i>
+                                                                </label>
+                                                            @endforeach
+                                                        @else
+                                                            <label class="category-item">
+                                                                <input class="form-check-input me-3" type="radio" name="ctg_id" data-meta="{{ json_encode($category->meta) }}" value="{{ $category->id }}" data-quota="{{ $category->meta?->quota ?: -1 }}" required>
+                                                                <div class="category-content flex-grow-1">
+                                                                    <div class="fw-bold text-dark font-size-14">{{ $category->name }}</div>
+                                                                    <div class="text-muted font-size-11">Sisa Kuota: <span class="badge badge-soft-info">{{ $category->meta?->quota ?: '∞' }} hari</span></div>
+                                                                </div>
+                                                                <i class="mdi mdi-check-circle text-primary category-active-check d-none font-size-18"></i>
+                                                            </label>
+                                                        @endif
+                                                    @empty
+                                                        <div class="text-center p-4 bg-light rounded">Data kategori tidak tersedia</div>
+                                                    @endforelse
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Kanan: Detail Waktu & Keterangan --}}
+                                        <div class="col-lg-7 ps-lg-4 mt-4 mt-lg-0">
+
+                                            {{-- Tanggal --}}
+                                            <div class="mb-4 tg-steps-leave-date">
+                                                <label class="form-label-custom"><i class="mdi mdi-calendar-range text-primary me-1"></i> Tanggal Rencana Izin</label>
+                                                <div id="inputs-options">
+                                                    <div id="fields-options-tbody">
+                                                        <div class="d-flex gap-2 mb-2" id="fields-options-template">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text bg-light border-light"><i class="mdi mdi-calendar"></i></span>
+                                                                <input type="date" class="form-control" name="dates[]" min="{{ date('Y-m-d') }}" required>
+                                                            </div>
+                                                            <button class="btn btn-soft-danger btn-delete d-none" type="button" onclick="removeRow(event)">
+                                                                <i class="mdi mdi-trash-can-outline"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <button id="fields-options-add" type="button" class="btn btn-link btn-sm text-primary p-0 mt-1 fw-bold disabled">
+                                                        <i class="mdi mdi-plus-circle me-1"></i> Tambah Tanggal Lain
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {{-- Waktu (Hidden by default) --}}
+                                            <div class="mb-4 d-none" id="hide_if_date_only">
+                                                <label class="form-label-custom"><i class="mdi mdi-clock-outline text-primary me-1"></i> Detail Jam Izin</label>
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <input type="time" class="form-control" name="time_start">
+                                                        <small class="text-muted">Jam Mulai</small>
+                                                    </div>
+                                                    <div class="col-6 hide_if_start_only">
+                                                        <input type="time" class="form-control" name="time_end">
+                                                        <small class="text-muted">Jam Selesai</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Keterangan --}}
+                                            <div class="mb-4 tg-steps-leave-description">
+                                                <label class="form-label-custom"><i class="mdi mdi-text-subject text-primary me-1"></i> Alasan / Keterangan</label>
+                                                <textarea class="form-control" name="description" rows="4" placeholder="Tuliskan alasan pengajuan Anda secara jelas..."></textarea>
+                                            </div>
+
+                                            {{-- Lampiran --}}
+                                            <div class="mb-4 tg-steps-leave-attachment">
+                                                <label class="form-label-custom"><i class="mdi mdi-paperclip text-primary me-1"></i> Dokumen Pendukung (Opsional)</label>
+                                                <div class="upload-wrapper">
+                                                    <i class="mdi mdi-cloud-upload-outline display-4 text-light"></i>
+                                                    <input class="form-control mt-2" name="attachment" type="file" id="upload-input" accept="image/*,application/pdf">
+                                                    <p class="text-muted font-size-12 mt-2 mb-0">Format: JPG, PNG, atau PDF (Maks. 2MB)</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
+                                                <a href="{{ request('next', route('portal::leave.submission.index')) }}" class="btn btn-light btn-md px-4 me-md-2">Batal</a>
+                                                <button type="submit" class="btn btn-primary btn-md px-5 shadow-primary">
+                                                    <i class="mdi mdi-send me-1"></i> Kirim Pengajuan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    {{-- JS script tetap sama dengan yang Anda miliki karena fungsinya sudah benar --}}
     <script>
         const tbody = document.querySelector('#fields-options-tbody');
         let quota = 0;
@@ -280,19 +291,14 @@
                 }
 
                 document.querySelector('#hide_if_date_only').classList.toggle('d-none', !(meta && meta.hasOwnProperty('time_input')));
-
                 document.querySelector('[name="time_start"]').required = (time_input ? 'required' : '');
                 document.querySelector('[name="time_end"]').required = (time_input == 'start_to_end' ? 'required' : '');
 
-                Array.from(tbody.children).map((el, i) => {
-                    if (i > 0) el.remove();
-                })
-
+                Array.from(tbody.children).map((el, i) => { if (i > 0) el.remove(); })
                 Array.from(document.querySelectorAll('.inputs-meta-fields')).map((el) => el.classList.add('d-none'));
-                document.querySelector(`#inputs-options`).classList.remove('d-none');
 
+                // Reset date values
                 Array.from(document.querySelectorAll('[name="dates[]"]')).map((el) => el.value = '');
-
                 toggleAddButtonBasedQuota();
             }
         }
@@ -301,6 +307,7 @@
             const addBtn = document.getElementById('fields-options-add');
             const isAtQuota = tbody.children.length >= quota;
             addBtn.classList.toggle('disabled', isAtQuota);
+            addBtn.style.pointerEvents = isAtQuota ? 'none' : 'auto';
             addBtn.style.opacity = isAtQuota ? '0.5' : '1';
         }
 

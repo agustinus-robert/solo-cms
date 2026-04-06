@@ -54,31 +54,7 @@
                     </div>
                 </div>
 
-                <div class="topnav">
-                    <div class="container-fluid">
-                        <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
-
-                            <div class="navbar-collapse collapse" id="topnav-menu-content">
-                                <ul class="navbar-nav">
-
-                                    <li class="nav-item">
-                                        <a class="nav-link arrow-none" href="{{ route('portal::dashboard.index') }}" id="topnav-dashboard" role="button">
-                                            <i class="bx bx-home-circle me-2"></i><span key="t-dashboards">Dashboards</span>
-                                        </a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link arrow-none" href="{{ route('portal::outlet.manage-outlet.index') }}" id="topnav-uielement" role="button">
-                                            <i class="bx bx-building-house me-2"></i>
-                                            <span key="t-ui-elements"> Kelola Outlet</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-
+                @include('layouts.nav-dashboard')
                 @include('layouts.shortcut_menu')
                 <div class="dropdown d-none d-lg-inline-block ms-1">
                     @include('layouts.nav_name')

@@ -1,6 +1,6 @@
 @extends('portal::layouts.index')
 
-@section('title', 'Kegiatan Lainnya | ')
+@section('title', 'Kegiatan Lainnya | ' . env('APP_NAME'))
 
 @section('navtitle', 'Insentif')
 
@@ -34,262 +34,258 @@
 ])
 
 @section('contents')
-    @include('layouts.component.material-nav')
+    {{-- Header Topbar --}}
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <div class="navbar-brand-box">
+                    <a href="index.html" class="logo logo-dark">
+                        <span class="logo-sm"><img src="{{ asset('skote/images/logo.svg') }}" height="22"></span>
+                        <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
+                    </a>
+                </div>
+                <button type="button" class="btn btn-sm font-size-16 d-lg-none header-item waves-effect waves-light px-3" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="d-flex">
+                @include('layouts.nav-dashboard')
+                @include('layouts.shortcut_menu')
+                <div class="dropdown d-none d-lg-inline-block ms-1">
+                    @include('layouts.nav_name')
+                </div>
+            </div>
+        </div>
+    </header>
 
     <style>
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
         .card-soft {
-            border-radius: 1rem;
+            border-radius: 12px;
             border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-        .bg-light-soft {
-            background-color: #f8f9fa;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
         }
         .badge-date {
-            background-color: #f1f3f5;
+            background-color: #f3f3f9;
             color: #495057;
             font-weight: 500;
-            border-radius: 6px;
-            padding: 4px 8px;
+            border-radius: 4px;
+            padding: 3px 8px;
             display: inline-block;
-            margin-bottom: 2px;
         }
-        .timeline-step {
-            width: 28px;
-            height: 28px;
+        .timeline-step-sm {
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            z-index: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
     </style>
 
-    <div class="container-fluid py-4">
-        {{-- Header --}}
-        <div class="d-flex align-items-center mb-4 ps-2">
-            <a href="{{ request('next', route('portal::dashboard-msdm.index')) }}" class="btn btn-link text-dark p-0 me-3">
-                <span class="material-symbols-rounded" style="font-size: 32px;">arrow_back_ios_new</span>
-            </a>
-            <div>
-                <h3 class="font-weight-bolder mb-0 text-dark">Insentif Kegiatan</h3>
-                <p class="text-sm mb-0 text-secondary">Catat kegiatan tambahanmu dan pantau proses insentifnya.</p>
-            </div>
-        </div>
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
 
-        {{-- Alerts --}}
-        <div class="row px-2">
-            @if (Session::has('success') || Session::has('danger'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="w-100">
-                    <div class="alert {{ Session::has('success') ? 'alert-success' : 'alert-danger' }} border-0 text-white shadow-sm" style="border-radius: 12px;">
+                {{-- Header & Title --}}
+                <div class="row align-items-center mb-4 mt-2">
+                    <div class="col-sm-6">
                         <div class="d-flex align-items-center">
-                            <span class="material-symbols-rounded me-2">{{ Session::has('success') ? 'check_circle' : 'error' }}</span>
-                            <span>{{ Session::get('success') ?? Session::get('danger') }}</span>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
-
-        <div class="row">
-            {{-- Sisi Kiri: Aksi --}}
-            <div class="col-xl-4">
-                {{-- Card Pengajuan --}}
-                <div class="card card-soft tg-steps-outwork-submission mb-4 overflow-hidden">
-                    <div class="card-body py-4 text-center position-relative">
-                        <div class="my-3">
-                            <a class="btn btn-icon-only btn-rounded btn-outline-primary btn-lg d-inline-flex align-items-center justify-content-center bg-white shadow-sm"
-                               href="{{ route('portal::outwork.submission.create', ['next' => url()->full()]) }}"
-                               style="width: 70px; height: 70px; border-width: 2px;">
-                                <span class="material-symbols-rounded text-primary" style="font-size: 36px;">add_task</span>
+                            <a href="{{ request('next', route('portal::dashboard-msdm.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
+                                <i class="mdi mdi-arrow-left font-size-18"></i>
                             </a>
-                        </div>
-                        <h5 class="font-weight-bolder">Pengajuan Baru</h5>
-                        <p class="text-muted text-sm px-3">Ada kegiatan di luar tugas utama? Laporkan di sini untuk mendapatkan insentif.</p>
-                        <span class="material-symbols-rounded position-absolute text-primary" style="right: -15px; bottom: -15px; font-size: 100px; opacity: 0.05;">payments</span>
-                    </div>
-                </div>
-
-                {{-- Admin Actions --}}
-                @if (isset($employee->position->position_id) && in_array($employee->position->position_id, [Modules\Core\Enums\PositionTypeEnum::KEPALASEKOLAH->value, Modules\Core\Enums\PositionTypeEnum::HUMAS->value], true))
-                    @if ($approvers->contains($employee->position->id))
-                        <div class="tg-steps-outwork-manage list-group mb-4">
-                            <a href="{{ route('portal::outwork.manage.index', ['next' => url()->current()]) }}" class="list-group-item list-group-item-action card-soft border-0 mb-3 py-3 d-flex align-items-center">
-                                <div class="icon icon-shape bg-soft-info text-info border-radius-md me-3 d-flex align-items-center justify-content-center">
-                                    <span class="material-symbols-rounded">fact_check</span>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-0 text-sm font-weight-bold">Kelola Insentif</h6>
-                                    <p class="text-xs text-secondary mb-0">Verifikasi kegiatan karyawan</p>
-                                </div>
-                                <span class="material-symbols-rounded text-secondary">chevron_right</span>
-                            </a>
-                        </div>
-                    @endif
-                @endif
-            </div>
-
-            {{-- Sisi Kanan: Tabel Riwayat --}}
-            <div class="col-xl-8">
-                <div class="card card-soft">
-                    <div class="card-header pb-2 pt-3 bg-white border-bottom">
-                        <div class="d-flex align-items-center justify-content-between px-2">
-                            <div class="d-flex align-items-center">
-                                <div class="icon icon-sm shadow-sm border-radius-md bg-gradient-primary text-center me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <span class="material-symbols-rounded text-white" style="font-size: 18px;">history</span>
-                                </div>
-                                <h6 class="font-weight-bolder mb-0 text-dark">Riwayat Kegiatan</h6>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Insentif Kegiatan</h4>
+                                <p class="text-muted mb-0 font-size-13">Pantau laporan kegiatan dan status insentif Anda.</p>
                             </div>
-                            <button class="btn btn-sm btn-outline-primary mb-0 py-1 px-3 d-flex align-items-center border-radius-md" data-bs-toggle="collapse" data-bs-target="#collapse-filter">
-                                <span class="material-symbols-rounded text-xs me-1">tune</span> Filter
-                            </button>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Filter --}}
-                    <div class="card-body border-bottom pt-0 bg-light-soft tg-steps-outwork-filter">
-                        <div class="collapse @if (request('search')) show @endif" id="collapse-filter">
-                            <form action="{{ route('portal::outwork.submission.index') }}" method="get" class="row g-2 mt-2 pb-3 px-2">
-                                <div class="col-md-5">
-                                    <label class="text-xxs font-weight-bold mb-1 text-secondary text-uppercase ps-1">Cari Kegiatan</label>
-                                    <input class="form-control form-control-sm border-radius-md" type="search" name="search" placeholder="Nama kegiatan..." value="{{ request('search') }}">
+                {{-- Alert Notification --}}
+                @if (Session::has('success') || Session::has('danger'))
+                    <div class="alert {{ Session::has('success') ? 'alert-success' : 'alert-danger' }} alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                        <i class="mdi {{ Session::has('success') ? 'mdi-check-circle' : 'mdi-block-helper' }} me-2"></i>
+                        {{ Session::get('success') ?? Session::get('danger') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <div class="row">
+                    {{-- Left Sidebar: Actions --}}
+                    <div class="col-xl-3">
+                        <div class="card card-soft tg-steps-outwork-submission overflow-hidden mb-4">
+                            <div class="card-body text-center p-4">
+                                <div class="avatar-md mx-auto mb-3">
+                                    <span class="avatar-title rounded-circle text-white font-size-24 shadow-sm">
+                                        <i class="mdi mdi-plus-circle-outline"></i>
+                                    </span>
                                 </div>
-                                <div class="col-md-5">
-                                    <label class="text-xxs font-weight-bold mb-1 text-secondary text-uppercase ps-1">Periode</label>
-                                    <div class="input-group input-group-sm">
-                                        <button type="button" class="btn btn-outline-secondary mb-0 py-1 d-none d-sm-block shadow-none" data-daterangepicker="true" data-daterangepicker-start="[name='start_at']" data-daterangepicker-end="[name='end_at']">
-                                            <span class="material-symbols-rounded text-xs">calendar_month</span>
-                                        </button>
-                                        <input class="form-control" type="date" name="start_at" value="{{ request('start_at') }}">
-                                        <input class="form-control" type="date" name="end_at" value="{{ request('end_at') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end gap-1">
-                                    <button type="submit" class="btn btn-dark btn-sm flex-grow-1 mb-0 border-radius-md">
-                                        <span class="material-symbols-rounded text-sm">search</span>
-                                    </button>
-                                    <a class="btn btn-light btn-sm mb-0 border-radius-md" href="{{ route('portal::outwork.submission.index') }}">
-                                        <span class="material-symbols-rounded text-sm">restart_alt</span>
+                                <h5 class="fw-bold font-size-15">Pengajuan Baru</h5>
+                                <p class="text-muted font-size-12 mb-3">Laporkan kegiatan tambahan untuk mendapatkan insentif.</p>
+                                <a href="{{ route('portal::outwork.submission.create', ['next' => url()->full()]) }}" class="btn btn-primary btn-sm w-100 waves-effect waves-light">
+                                    Buat Laporan
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Admin/Manager Access --}}
+                        @if (isset($employee->position->position_id) && in_array($employee->position->position_id, [Modules\Core\Enums\PositionTypeEnum::KEPALASEKOLAH->value, Modules\Core\Enums\PositionTypeEnum::HUMAS->value], true))
+                            @if ($approvers->contains($employee->position->id))
+                                <div class="tg-steps-outwork-manage mb-4">
+                                    <label class="text-muted font-size-11 fw-bold text-uppercase mb-2 d-block">Manajemen</label>
+                                    <a href="{{ route('portal::outwork.manage.index', ['next' => url()->current()]) }}" class="card card-soft border mb-0 waves-effect">
+                                        <div class="card-body p-3 d-flex align-items-center">
+                                            <div class="avatar-xs me-3">
+                                                <span class="avatar-title rounded bg-soft-info text-info">
+                                                    <i class="mdi mdi-clipboard-check-multiple-outline"></i>
+                                                </span>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-0 font-size-13 fw-bold">Kelola Insentif</h6>
+                                                <small class="text-muted">Verifikasi laporan staf</small>
+                                            </div>
+                                            <i class="mdi mdi-chevron-right text-muted"></i>
+                                        </div>
                                     </a>
                                 </div>
-                            </form>
-                        </div>
+                            @endif
+                        @endif
                     </div>
 
-                    {{-- Tabel --}}
-                    <div class="table-responsive tg-steps-outwork-table">
-                        <table class="table align-items-center mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-4">Kegiatan & Kategori</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Waktu Pelaksanaan</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lampiran</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                                    <th class="text-secondary opacity-7 pe-4"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($outworks as $outwork)
-                                    <tr @class(['opacity-6' => $outwork->trashed()])>
-                                        <td>
-                                            <div class="d-flex px-3 py-2">
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm font-weight-bold text-dark">{{ $outwork->name }}</h6>
-                                                    <p class="text-xs text-secondary mb-0 text-truncate" style="max-width: 200px;">
-                                                        {{ $outwork->category->name }}
-                                                    </p>
-                                                    <small class="text-xxs text-primary font-weight-bold">Diajukan: {{ $outwork->created_at->format('d/m/Y') }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="py-2">
-                                                @foreach ($outwork->dates->take(2) as $date)
-                                                    <div class="badge-date text-xs d-block mb-1" style="max-width: fit-content;">
-                                                        <span class="material-symbols-rounded text-xs me-1">schedule</span>
-                                                        {{ date('d M Y', strtotime($date['d'])) }}
-                                                        @isset($date['t_s']) <span class="text-xxs opacity-7">({{ $date['t_s'] }} - {{ $date['t_e'] ?? 'Selesai' }})</span> @endisset
-                                                    </div>
-                                                @endforeach
-                                                @php($remain = $outwork->dates->count() - 2)
-                                                @if ($remain > 0)
-                                                    <span class="text-xxs text-secondary ms-1">+{{ $remain }} hari lainnya</span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            @if (isset($outwork->attachment) && Storage::exists($outwork->attachment))
-                                                <a href="{{ Storage::url($outwork->attachment) }}" target="_blank" class="btn btn-link text-info p-0 mb-0">
-                                                    <span class="material-symbols-rounded">attachment</span>
-                                                </a>
-                                            @else
-                                                <span class="text-secondary text-xs">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            @include('portal::outwork.components.status', ['outwork' => $outwork])
-                                        </td>
-                                        <td class="align-middle text-end pe-4">
-                                            <div class="dropstart">
-                                                <button class="btn btn-link text-secondary mb-0 p-0" data-bs-toggle="dropdown">
-                                                    <span class="material-symbols-rounded">more_vert</span>
-                                                </button>
-                                                <ul class="dropdown-menu shadow border-0 py-2">
-                                                    <li><a class="dropdown-item d-flex align-items-center" href="{{ route('portal::outwork.submission.show', ['outwork' => $outwork->id, 'next' => request('next')]) }}">
-                                                        <span class="material-symbols-rounded text-sm me-2 text-primary">visibility</span> Detail</a>
-                                                    </li>
-                                                    @if($outwork->hasApprovables() && !$outwork->trashed())
-                                                        <li><a class="dropdown-item d-flex align-items-center" href="javascript:;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $outwork->id }}">
-                                                            <span class="material-symbols-rounded text-sm me-2 text-warning">track_changes</span> Lacak Status</a>
-                                                        </li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
+                    {{-- Right Content: Table History --}}
+                    <div class="col-xl-9">
+                        <div class="card card-soft shadow-sm border-0">
+                            <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+                                <h5 class="card-title mb-0 fw-bold"><i class="mdi mdi-history me-1 text-primary"></i> Riwayat Kegiatan</h5>
+                                <button class="btn btn-sm btn-light waves-effect border" data-bs-toggle="collapse" data-bs-target="#collapse-filter">
+                                    <i class="mdi mdi-filter-variant me-1"></i> Filter
+                                </button>
+                            </div>
 
-                                    {{-- Approval Timeline --}}
-                                    @if ($outwork->hasApprovables() && !$outwork->trashed())
-                                        <tr class="collapse @if ($outwork->hasAnyApprovableResultIn('PENDING')) show @endif" id="collapse-{{ $outwork->id }}">
-                                            <td colspan="5" class="bg-light-soft py-4 px-5">
-                                                <div class="timeline timeline-one-side" style="border-left: 2px dashed #dee2e6; margin-left: 14px;">
-                                                    @foreach ($outwork->approvables as $approvable)
-                                                        <div class="timeline-block mb-3 position-relative" style="padding-left: 30px;">
-                                                            <span class="timeline-step position-absolute" style="left: -15px; top: 0;">
-                                                                <span class="material-symbols-rounded text-{{ $approvable->result->color() }}" style="font-size: 18px;">
-                                                                    {{ $approvable->result->icon() == 'mdi mdi-check' ? 'check_circle' : ($approvable->result->icon() == 'mdi mdi-close' ? 'cancel' : 'hourglass_top') }}
-                                                                </span>
-                                                            </span>
-                                                            <div class="timeline-content">
-                                                                <h6 class="text-dark text-xs font-weight-bold mb-0">
-                                                                    {{ ucfirst($approvable->type) }} Level {{ $approvable->level }}
-                                                                </h6>
-                                                                <p class="text-secondary text-xxs mt-1 mb-0">{{ $approvable->userable ? $approvable->userable->getApproverLabel() : 'Menunggu Sistem' }}</p>
-                                                                @if($approvable->reason) <p class="text-xs italic mb-0 text-muted mt-1">"{{ $approvable->reason }}"</p> @endif
-                                                            </div>
+                            {{-- Filter Form --}}
+                            <div class="collapse @if (request('search')) show @endif" id="collapse-filter">
+                                <div class="card-body bg-light bg-opacity-25 border-bottom">
+                                    <form action="{{ route('portal::outwork.submission.index') }}" method="get" class="row g-3">
+                                        <div class="col-md-5">
+                                            <label class="form-label font-size-12 fw-bold text-muted">CARI KEGIATAN</label>
+                                            <input class="form-control form-control-sm" type="search" name="search" placeholder="Nama kegiatan..." value="{{ request('search') }}">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label font-size-12 fw-bold text-muted">PERIODE TANGGAL</label>
+                                            <div class="input-group input-group-sm">
+                                                <input class="form-control" type="date" name="start_at" value="{{ request('start_at') }}">
+                                                <span class="input-group-text">s/d</span>
+                                                <input class="form-control" type="date" name="end_at" value="{{ request('end_at') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end gap-2">
+                                            <button type="submit" class="btn btn-primary btn-sm flex-grow-1"><i class="mdi mdi-magnify"></i></button>
+                                            <a class="btn btn-light btn-sm" href="{{ route('portal::outwork.submission.index') }}"><i class="mdi mdi-refresh"></i></a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- Table --}}
+                            <div class="table-responsive tg-steps-outwork-table">
+                                <table class="table align-middle table-nowrap table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr class="font-size-11 fw-bold text-muted text-uppercase">
+                                            <th class="ps-4">Kegiatan & Kategori</th>
+                                            <th>Waktu Pelaksanaan</th>
+                                            <th class="text-center">Lampiran</th>
+                                            <th class="text-center">Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($outworks as $outwork)
+                                            <tr @class(['opacity-50' => $outwork->trashed()])>
+                                                <td class="ps-4">
+                                                    <h6 class="font-size-14 mb-1 fw-bold text-dark">{{ $outwork->name }}</h6>
+                                                    <p class="text-muted font-size-11 mb-0">{{ $outwork->category->name }}</p>
+                                                    <small class="text-primary font-size-10">Diajukan: {{ $outwork->created_at->format('d/m/Y') }}</small>
+                                                </td>
+                                                <td>
+                                                    @foreach ($outwork->dates->take(2) as $date)
+                                                        <div class="badge-date font-size-11 mb-1">
+                                                            <i class="mdi mdi-calendar-clock me-1"></i>
+                                                            {{ date('d M Y', strtotime($date['d'])) }}
+                                                            @isset($date['t_s']) <small class="text-muted">({{ $date['t_s'] }})</small> @endisset
                                                         </div>
                                                     @endforeach
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @empty
-                                    <tr><td colspan="5" class="text-center py-5">@include('components.notfound')</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                                    @if ($outwork->dates->count() > 2)
+                                                        <small class="text-muted d-block font-size-10">+{{ $outwork->dates->count() - 2 }} hari lagi</small>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (isset($outwork->attachment) && Storage::exists($outwork->attachment))
+                                                        <a href="{{ Storage::url($outwork->attachment) }}" target="_blank" class="btn btn-sm btn-soft-info">
+                                                            <i class="mdi mdi-paperclip font-size-14"></i>
+                                                        </a>
+                                                    @else
+                                                        <span class="text-muted font-size-18">-</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @include('portal::outwork.components.status', ['outwork' => $outwork])
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <div class="dropdown">
+                                                        <a href="#" class="dropdown-toggle card-drop" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="mdi mdi-dots-vertical font-size-18"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                                            <li><a class="dropdown-item" href="{{ route('portal::outwork.submission.show', ['outwork' => $outwork->id, 'next' => request('next')]) }}"><i class="mdi mdi-eye-outline me-2 text-primary"></i> Detail</a></li>
+                                                            @if($outwork->hasApprovables() && !$outwork->trashed())
+                                                                <li><a class="dropdown-item" href="javascript:;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $outwork->id }}"><i class="mdi mdi-timeline-text-outline me-2 text-warning"></i> Lacak Status</a></li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
 
-                    <div class="card-footer py-3 border-top bg-white">
-                        {{ $outworks->appends(request()->all())->links() }}
+                                            {{-- Approval Tracking --}}
+                                            @if ($outwork->hasApprovables() && !$outwork->trashed())
+                                                <tr class="collapse @if ($outwork->hasAnyApprovableResultIn('PENDING')) show @endif" id="collapse-{{ $outwork->id }}">
+                                                    <td colspan="5" class="p-0 border-0">
+                                                        <div class="bg-light bg-opacity-50 p-4 border-start border-4 border-warning ms-4 my-2 rounded-3">
+                                                            <div class="row gx-2">
+                                                                @foreach ($outwork->approvables as $approvable)
+                                                                    <div class="col-md-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="timeline-step-sm me-2">
+                                                                                <i class="mdi {{ $approvable->result->icon() }} font-size-12 text-{{ $approvable->result->color() }}"></i>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="mb-0 font-size-11 fw-bold text-dark">{{ ucfirst($approvable->type) }} Lv.{{ $approvable->level }}</p>
+                                                                                <small class="text-muted font-size-10">{{ $approvable->userable ? $approvable->userable->getApproverLabel() : 'Menunggu...' }}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @empty
+                                            <tr><td colspan="5" class="text-center py-5">@include('components.notfound')</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="card-footer bg-transparent py-3 border-top">
+                                {{ $outworks->appends(request()->all())->links() }}
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

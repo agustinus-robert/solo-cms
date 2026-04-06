@@ -43,12 +43,6 @@
                                     <span>Setting</span>
                                 </a>
                             </div>
-                            {{-- <div class="col">
-                                <a class="dropdown-icon-item" href="{{ route('portal::dashboard.index') }}">
-                                    <i class="bx bx-cart-alt" style='font-size:30px;'></i>
-                                    <span>Dashboard POS</span>
-                                </a>
-                            </div> --}}
 
                             <div class="col">
                                 <a class="dropdown-icon-item" href="{{ route('administration::dashboard') }}">

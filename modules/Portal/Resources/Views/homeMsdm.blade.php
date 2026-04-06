@@ -1,4 +1,4 @@
-@extends('layouts.dashboarding')
+@extends('portal::layouts.index')
 
 @section('navtitle', 'Dashboard')
 
@@ -20,23 +20,11 @@
 @endpush
 
 @section('body-content')
+    @include('portal::layouts.components.skote-header')
 
-    @if(config('theme.default') === 'material')
-        @include('layouts.component.material-nav')
-    @elseif(config('theme.default') === 'skote')
-        @include('portal::layouts.components.skote-header')
-    @endif
-
-    @if(config('theme.default') === 'material')
-        <div class="container-fluid py-2">
-            @include('portal::layouts.components.material-content')
-        </div>
-    @elseif(config('theme.default') === 'skote')
-        <div class="main-content">
-            @include('portal::layouts.components.skote-content')
-        </div>
-    @endif
-
+    <div class="main-content">
+        @include('portal::layouts.components.skote-content')
+    </div>
 @endsection
 
 @push('scripts')
