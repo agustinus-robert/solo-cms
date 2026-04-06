@@ -213,21 +213,22 @@
         const calculatePph = (bruto) => {
             const ters = @JSON($ters);
             const objectives = @JSON($configs);
+            if(!ters || !ters.rates) return;
 
-            if(!ters || !ters.rate) return;
             let brutoVal = parseFloat(bruto);
-            let result = ters.rate.find(entry =>
-                brutoVal >= parseFloat(entry.lower) &&
-                (entry.upper === null || brutoVal < parseFloat(entry.upper))
-            );
+            let result = ters.rates.find(entry => {
+                let lower = parseFloat(entry.lower);
+                let upper = entry.upper === null ? Infinity : parseFloat(entry.upper);
+                return brutoVal >= lower && brutoVal < upper;
+            });
 
             if (!result) return;
 
             setVal('.calc-ptkp-category-input', ters.status);
-            setVal('.calc-ter-category-input', ters.ter);
+            setVal('.calc-ter-category-input', ters.category);
             setVal('.calc-ter-value-input', result.percentage);
 
-            let pphTotal100 = Math.floor((parseFloat(result.percentage) * brutoVal) / 100);
+            let pphTotal100 = Math.floor((parseFloat(result.percentage) / 100) * brutoVal);
             let pphKaryawan = 0;
 
             Object.values(objectives).forEach((ar) => {

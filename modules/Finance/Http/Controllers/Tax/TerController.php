@@ -17,6 +17,8 @@ use Modules\Finance\Http\Requests\Tax\Pph\StoreRequest;
 use Modules\Finance\Repositories\TaxRepository;
 use Modules\HRMS\Enums\DataRecapitulationTypeEnum;
 use Modules\HRMS\Models\EmployeeDataRecapitulation;
+use App\Services\PayrollCalculator;
+use App\Services\TerCategoryResolver;
 
 class TerController extends Controller
 {
@@ -63,8 +65,32 @@ class TerController extends Controller
                 ->whereDate('end_at', $end_at->format('Y-m-d')),
         ])->has('contract')->find($request->get('employee'));
 
-        $ters = getTERCategory($employee->user->getMeta('profile_mariage'), $employee->user->getMeta('profile_child'), $employee->user->getMeta('profile_sex'), $employee->getMeta('tax_status'));
+//        $ters = getTERCategory($employee->user->getMeta('profile_mariage'), $employee->user->getMeta('profile_child'), $employee->user->getMeta('profile_sex'), $employee->getMeta('tax_status'));
         $data = $this->getComponentValue($employee, $start_at, $end_at);
+
+        $collectionData = collect($data);
+        $totalBruto = $collectionData->whereIn('ctg_az', [1, 2])->sum('real_salary');
+
+        $terResolver = app(TerCategoryResolver::class);
+        $ters = $terResolver->resolve(
+            $employee->user->getMeta('profile_mariage'),
+            $employee->user->getMeta('profile_child'),
+            $employee->user->getMeta('profile_sex')
+        );
+
+        $calculator = app(PayrollCalculator::class);
+
+        $context = [
+            'gaji'          => $totalBruto,
+            'penghasilan'   => $totalBruto,
+            'mariage'       => $employee->user->getMeta('profile_mariage'),
+            'child'         => $employee->user->getMeta('profile_child'),
+            'sex'           => $employee->user->getMeta('profile_sex'),
+            'tax_category'  => $ters['category'],
+            'employee_type' => $employee->getMeta('employee_type') ?? 'monthly',
+        ];
+
+        $terNominal = $calculator->calculate('TER', $context, $start_at);
 
         return view('finance::tax.ters.create', [
             'start_at'   => $start_at,

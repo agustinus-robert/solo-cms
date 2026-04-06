@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TaxRatesSeeder extends Seeder
+class TaxRatesSeederCopy extends Seeder
 {
     /**
      * Run the database seeds.
@@ -143,7 +143,7 @@ class TaxRatesSeeder extends Seeder
         ];
 
         foreach ($data as $row) {
-            DB::table('ref_tax_rates')->insert([
+            DB::table('ref_ter_rates')->insert([
                 'category' => $row[0],
                 'lower_bound' => $row[1],
                 'upper_bound' => $row[2],

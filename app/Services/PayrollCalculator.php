@@ -6,6 +6,7 @@ use App\Models\PayrollRule;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Carbon\Carbon;
 use App\Services\PtkpResolver;
+use App\Services\TaxRateResolver;
 
 class PayrollCalculator
 {
@@ -47,18 +48,26 @@ class PayrollCalculator
 
     protected function evaluate($rule, $context, $date)
     {
-        $ptkpResolver = app(PtkpResolver::class);
+        $ptkpResolver     = app(PtkpResolver::class);
+        $taxRateResolver  = app(TaxRateResolver::class);
 
-        $employeeType = $context['employee_type'] ?? 'monthly';
+        $employeeType     = $context['employee_type'] ?? 'monthly';
+        $dailyThreshold   = $rule->config['daily_threshold'] ?? 450000;
+        $dailyFactor      = $rule->config['daily_factor'] ?? 0.5;
 
         if ($employeeType === 'daily') {
-            $jamKerja     = $context['jam_kerja_per_hari'] ?? 0;
-            $upahPerJam   = $context['upah_per_jam'] ?? 0;
-            $hariKerja    = $context['hari_kerja'] ?? 0;
+            $jamKerja   = $context['jam_kerja_per_hari'] ?? 0;
+            $upahPerJam = $context['upah_per_jam'] ?? 0;
+            $hariKerja  = $context['hari_kerja'] ?? 0;
 
-            $gajiHarian        = $jamKerja * $upahPerJam;
-            $gajiBulananEquiv  = $gajiHarian * $hariKerja;
-            $grossAnnum        = $gajiBulananEquiv * 12 / 30;
+            $gajiHarian = $jamKerja * $upahPerJam;
+
+            if ($gajiHarian > $dailyThreshold) {
+                $gajiHarian *= $dailyFactor;
+            }
+
+            $gajiBulananEquiv = $gajiHarian * $hariKerja;
+            $grossAnnum       = $gajiBulananEquiv * 12 / 30;
         } else {
             $grossAnnum = ($context['gaji'] ?? 0) * 12;
         }
@@ -67,14 +76,19 @@ class PayrollCalculator
         $pkp  = max(0, $grossAnnum - $ptkp);
 
         $variables = array_merge($context, $rule->config ?? []);
-        $variables['gaji']       = $grossAnnum / 12;
+        $variables['gaji']        = $grossAnnum / 12;
         $variables['penghasilan'] = $grossAnnum;
-        $variables['ptkp']       = $ptkp;
-        $variables['pkp']        = $pkp;
+        $variables['ptkp']        = $ptkp;
+        $variables['pkp']         = $pkp;
 
         $variables['rate_lookup'] = $this->lookupRate(
             $rule,
             $context['gaji'] ?? $context['penghasilan'] ?? $grossAnnum
+        );
+
+        $variables['tax_rate'] = $taxRateResolver->getRate(
+            $context['tax_category'] ?? 'A',
+            $variables['penghasilan']
         );
 
         $variables['progressive'] = function ($pkpVal) use ($rule) {

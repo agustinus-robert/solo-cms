@@ -51,6 +51,7 @@ return new class extends Migration {
 
         Schema::create('payroll_bpjs_brackets', function (Blueprint $table) {
             $table->id();
+            $table->string('class');
             $table->foreignId('payroll_bpjs_rule_id')->constrained('payroll_bpjs_rules')->cascadeOnDelete();
 
             $table->bigInteger('min')->nullable();

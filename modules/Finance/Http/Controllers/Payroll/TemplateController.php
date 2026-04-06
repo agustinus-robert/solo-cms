@@ -57,6 +57,11 @@ class TemplateController extends Controller
         $cmptid = $settings->pluck('meta.component');
         $secondarySlip = CompanySalarySlipComponent::with('category.slip')->whereIn('id', $cmptid)->get()->unique('category.id')->pluck('category')->first();
 
+        if(is_null($employee)){
+            return redirect()->back()
+                ->with('error', 'Template default gaji harus di set dahulu');
+        }
+
         return view('finance::payroll.templates.create', [
             'employee'      => $employee,
             'slips'         => $slips = CompanySalarySlip::with('categories.components')->get(),
