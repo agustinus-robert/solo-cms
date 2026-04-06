@@ -17,7 +17,7 @@
                 <div class="row mb-3">
                     <label class="col-lg-3 col-xl-2 col-form-label">Nama karyawan</label>
                     <div class="col-lg-8 col-xl-7 col-xxl-4">
-                        <input type="hidden" class="form-control" value="{{ $template->empl_id }}" disabled readonly>
+                        <input type="hidden" class="form-control" value="{{ $template->empl_id }}" name="empl_id">
                         <input type="text" class="form-control" value="{{ $template->employee->user->name }}" disabled readonly>
                     </div>
                 </div>
@@ -37,8 +37,8 @@
                     <label class="col-lg-3 col-xl-2 col-form-label">Masa berlaku</label>
                     <div class="col-lg-9 col-xl-9 col-xxl-6">
                         <div class="input-group">
-                            <input type="datetime-local" class="form-control @error('start_at') is-invalid @enderror" name="start_at" value="{{ $template->start_at->format('Y-m-d H:i:s') }}" required="">
-                            <input type="datetime-local" class="form-control @error('end_at') is-invalid @enderror" name="end_at" value="{{ $template->end_at->format('Y-m-d H:i:s') }}" required="">
+                            <input type="datetime-local" class="form-control @error('start_at') is-invalid @enderror" name="start_at" value="{{ $template->start_at->format('Y-m-d\TH:i') }}" required="">
+                            <input type="datetime-local" class="form-control @error('end_at') is-invalid @enderror" name="end_at" value="{{ $template->end_at->format('Y-m-d\TH:i') }}" required="">
                         </div>
                     </div>
                 </div>
@@ -60,48 +60,82 @@
                                 @foreach ($slips as $slip)
                                     @foreach ($slip->categories as $category)
                                         <tbody data-slip-name="{{ $slip->name }}" data-slip-ctgname="{{ $category->name }}">
-                                            @foreach ($template->items->filter(fn($item) => $item->ctg_az == $loop->iteration && $item->slip_az == $loop->parent->iteration) as $stg_component)
+                                            @php
+                                                $items = $template->items->filter(fn($item) => $item->ctg_az == $loop->iteration && $item->slip_az == $loop->parent->iteration);
+                                            @endphp
+
+                                            @forelse ($items as $stg_component)
                                                 <tr class="form-index has-add-button">
                                                     <td class="td-hide-on-add">
-                                                        @if ($loop->parent->first && $loop->first)
-                                                            {{ $slip->name }}
-                                                        @endif
+                                                        @if ($loop->parent->first && $loop->first) {{ $slip->name }} @endif
                                                     </td>
                                                     <td class="td-hide-on-add">
-                                                        @if ($loop->first)
-                                                            {{ $category->name }}
-                                                        @endif
+                                                        @if ($loop->first) {{ $category->name }} @endif
                                                     </td>
                                                     <td style="min-width: 120px;">
                                                         <input type="hidden" data-name="slip_az" value="{{ $loop->parent->parent->iteration }}">
                                                         <input type="hidden" data-name="slip_name" value="{{ $slip->name }}">
                                                         <input type="hidden" data-name="ctg_az" value="{{ $loop->parent->iteration }}">
                                                         <input type="hidden" data-name="ctg_name" value="{{ $category->name }}">
-                                                        <input type="hidden" data-name="name" value="{{ optional($stg_component)['name'] }}">
+                                                        <input type="hidden" data-name="name" value="{{ $stg_component->name }}">
                                                         <select class="form-select" data-name="component_id" onchange="renderUnitComponent(event.currentTarget)">
-                                                            <option value="" data-disabled="1">-- Pilih template --</option>
+                                                            <option value="" data-disabled="1">-- Pilih komponen --</option>
                                                             @foreach ($category->components as $component)
-                                                                <option value="{{ $component->id }}" data-currency="{{ $component->currency }}" data-unit="{{ $component->unit?->label() }}" data-stg-default="{{ optional($stg_component)['amount'] }}" data-default="{{ $component->meta->default ?? null }}" data-template-default="{{ $template->items->filter(fn($item) => $item->component_id == $component->id)->first()['amount'] ?? null }}"
-                                                                    data-description="{{ $component->meta->description ?? null }}" data-disabled="{{ $component->unit?->disabledState() }}" @selected(optional($stg_component)['component_id'] == $component->id)>{{ $component->name }}
+                                                                <option value="{{ $component->id }}"
+                                                                    data-currency="{{ $component->currency }}"
+                                                                    data-unit="{{ $component->unit?->label() }}"
+                                                                    data-description="{{ $component->meta->description ?? null }}"
+                                                                    data-disabled="{{ $component->unit?->disabledState() }}"
+                                                                    @selected($stg_component->component_id == $component->id)>{{ $component->name }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </td>
                                                     <td style="min-width: 120px;">
                                                         <div class="input-group">
-                                                            <input type="text" oninput="validatedRupiah(this)" data-name="amount" class="form-control" required @if (is_null(optional($stg_component)['amount'])) disabled @endif value="{{ optional($stg_component)['amount'] }}">
+                                                            {{-- PERBAIKAN: Tambah iscurrency="1" dan format ribuan di value --}}
+                                                            <input type="text" oninput="validatedRupiah(this)" data-name="amount" class="form-control" iscurrency="1" required
+                                                                @if (is_null($stg_component->amount)) disabled @endif
+                                                                value="{{ number_format($stg_component->amount ?? 0, 0, ',', '.') }}">
                                                             <div class="input-group-text d-none"></div>
                                                         </div>
                                                     </td>
                                                     <td style="min-width: 120px;">
-                                                        <input type="text" data-name="description" class="form-control" disabled>
+                                                        <input type="text" data-name="description" class="form-control" value="{{ $stg_component->description }}" @if (is_null($stg_component->amount)) disabled @endif>
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-light text-danger rounded-circle btn-add @if (!$loop->first) d-none @endif px-2 py-1" onclick="addRow(event)"><i class="mdi mdi-plus"></i></button>
                                                         <button type="button" class="btn btn-secondary rounded-circle btn-remove @if ($loop->first) d-none @endif px-2 py-1" onclick="removeRow(event)"><i class="mdi mdi-minus"></i></button>
                                                     </td>
                                                 </tr>
-                                            @endforeach
+                                            @empty
+                                                {{-- Handle jika kategori kosong agar tetap bisa tambah baris --}}
+                                                <tr class="form-index has-add-button">
+                                                    <td class="td-hide-on-add"></td>
+                                                    <td class="td-hide-on-add">@if ($loop->first) {{ $category->name }} @endif</td>
+                                                    <td style="min-width: 120px;">
+                                                        <input type="hidden" data-name="slip_az" value="{{ $loop->parent->iteration }}">
+                                                        <input type="hidden" data-name="slip_name" value="{{ $slip->name }}">
+                                                        <input type="hidden" data-name="ctg_az" value="{{ $loop->iteration }}">
+                                                        <input type="hidden" data-name="ctg_name" value="{{ $category->name }}">
+                                                        <input type="hidden" data-name="name">
+                                                        <select class="form-select" data-name="component_id" onchange="renderUnitComponent(event.currentTarget)">
+                                                            <option value="" data-disabled="1">-- Pilih komponen --</option>
+                                                            @foreach ($category->components as $component)
+                                                                <option value="{{ $component->id }}" data-currency="{{ $component->currency }}" data-unit="{{ $component->unit?->label() }}" data-disabled="{{ $component->unit?->disabledState() }}">{{ $component->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <input type="text" oninput="validatedRupiah(this)" data-name="amount" class="form-control" iscurrency="1" disabled required>
+                                                            <div class="input-group-text d-none"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td><input type="text" data-name="description" class="form-control" disabled></td>
+                                                    <td><button type="button" class="btn btn-light text-danger rounded-circle btn-add px-2 py-1" onclick="addRow(event)"><i class="mdi mdi-plus"></i></button></td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     @endforeach
                                 @endforeach
@@ -124,23 +158,21 @@
     </div>
 @endsection
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/tom-select/css/tom-select.bootstrap5.min.css') }}">
-@endpush
-
 @push('scripts')
     <script>
         function validatedRupiah(element) {
-            if (element.getAttribute('iscurrency') == 1) {
-                let value = element.value.replace(/\D/g, '');
-                value = new Intl.NumberFormat('id-ID').format(value);
-                element.value = value;
+            let value = element.value.replace(/\D/g, '');
+            if (element.getAttribute('iscurrency') == "1") {
+                if (value === "") {
+                    element.value = "";
+                    return;
+                }
+                element.value = new Intl.NumberFormat('id-ID').format(value);
             } else {
-                let value = element.value.replace(/\D/g, '');
+                element.value = value;
             }
         }
 
-        let overtimeSalary = @JSON($overtimeSalary);
         let primarySlip = @JSON($primarySlip);
         let secondarySlip = @JSON($secondarySlip);
         let defaultComponent = @JSON($defaultComponent);
@@ -148,26 +180,23 @@
         let cmptid = @JSON($cmptid);
 
         const addRow = (e) => {
-            let tr = e.currentTarget.parentNode.parentNode;
+            let tr = e.currentTarget.closest('tr');
             let el = tr.cloneNode(true)
             el.classList.remove('has-add-button');
             Array.from(el.querySelectorAll('.td-hide-on-add')).map((el) => el.innerHTML = '')
             tr.parentNode.insertAdjacentHTML('beforeend', `<tr class="form-index">${el.innerHTML}</tr>`);
-            Array.from(tr.parentNode.children).forEach((el, i) => {
-                if (i > 0 && !el.classList.contains('has-add-button')) {
-                    el.querySelector('.btn-remove').classList.remove('d-none');
-                    el.querySelector('.btn-add').classList.add('d-none');
-                }
-                if (i == tr.parentNode.children.length - 1) {
-                    el.querySelector('[data-name="component_id"]').selectedIndex = 0;
-                    renderUnitComponent(el.querySelector('[data-name="component_id"]'));
-                }
-            });
+
+            let lastRow = tr.parentNode.lastElementChild;
+            lastRow.querySelector('.btn-remove').classList.remove('d-none');
+            lastRow.querySelector('.btn-add').classList.add('d-none');
+            lastRow.querySelector('[data-name="component_id"]').selectedIndex = 0;
+            renderUnitComponent(lastRow.querySelector('[data-name="component_id"]'));
+
             renderNameAttribute();
         }
 
         const removeRow = (e) => {
-            e.target.parentNode.closest('tr').remove()
+            e.currentTarget.closest('tr').remove()
             renderNameAttribute();
         }
 
@@ -184,82 +213,85 @@
         const renderUnitComponent = (el) => {
             let checked = el.querySelector(':checked');
             let row = el.closest('.form-index');
+            let amountInput = row.querySelector('[data-name="amount"]');
+            let unitAddon = row.querySelector('.input-group-text');
 
             if (checked && checked.dataset.unit) {
-                let currency = row.querySelector('[data-name="amount"]');
-                currency.setAttribute('isCurrency', checked.dataset.currency)
-
-                let unit = el.parentNode.nextElementSibling.querySelector('.input-group-text');
-                unit.classList.remove('d-none');
-                unit.innerHTML = checked.dataset.unit;
+                amountInput.setAttribute('iscurrency', checked.dataset.currency);
+                unitAddon.classList.remove('d-none');
+                unitAddon.innerHTML = checked.dataset.unit;
             } else {
-                el.parentNode.nextElementSibling.querySelector('.input-group-text').classList.add('d-none');
+                unitAddon.classList.add('d-none');
             }
 
-            let def = (checked && (checked.dataset.templateDefault || checked.dataset.default));
-            el.parentNode.nextElementSibling.querySelector('input[type="text"][data-name="amount"]').value = def;
-            validatedRupiah(el.parentNode.nextElementSibling.querySelector('input[type="text"][data-name="amount"]'))
+            let name = (checked && checked.value) ? checked.text : '';
+            row.querySelector('[data-name="name"]').value = name;
+            row.querySelector('[data-name="description"]').value = checked ? checked.dataset.description : '';
 
-            let description = (checked && checked.dataset.description);
-            el.parentNode.nextElementSibling.nextElementSibling.querySelector('input[type="text"]').value = description;
+            let disabled = (checked && checked.dataset.disabled == "1");
+            amountInput.toggleAttribute('disabled', disabled);
+            row.querySelector('[data-name="description"]').toggleAttribute('disabled', disabled);
 
-            let name = (checked && checked.text);
-            el.parentNode.querySelector('[data-name="name"]').value = name || ''
-
-            if (disabled = (checked && checked.dataset.disabled)) {
-                Array.from(el.parentNode.parentNode.querySelectorAll('input:not([type="hidden"])')).forEach(el => (el.value = ''));
-            }
-
-            if (checked) {
+            if (checked && checked.value) {
                 let p = getPrimarySalary();
-                for (let index = 0; index < settings.length; index++) {
-                    if (checked && checked.value == settings[index].meta.component) {
-                        let l = eval(settings[index].meta.calculation);
-                        row.querySelector('[data-name="amount"]').value = Math.round(parseFloat(l));
+                settings.forEach(setting => {
+                    if (checked.value == setting.meta.component) {
+                        let l = eval(setting.meta.calculation);
+                        amountInput.value = Math.round(parseFloat(l));
+                        validatedRupiah(amountInput);
                     }
-                }
+                });
             }
-            Array.from(el.parentNode.parentNode.querySelectorAll('input:not([type="hidden"])')).forEach(el => el.toggleAttribute('disabled', disabled));
         }
 
-        // Function get primary salary
         function getPrimarySalary() {
-            let amt = '';
+            let amt = 0;
             let parent = document.querySelector(`[data-slip-ctgname="${primarySlip.name}"]`);
-            Array.from(parent.querySelectorAll('.form-index')).map((tr, index) => {
-                Array.from(tr.querySelectorAll('[data-name="component_id"]')).map((select, i) => {
-                    Array.from(select.selectedOptions).filter(el => el.text == `${defaultComponent.name}` && el.value == `${defaultComponent.id}`).map((opt, k) => {
-                        amt = parseFloat(opt.parentNode.closest('.form-index').querySelector('[data-name="amount"]').value);
-                    })
-                })
+            if(!parent) return 0;
+
+            Array.from(parent.querySelectorAll('.form-index')).forEach(tr => {
+                let select = tr.querySelector('[data-name="component_id"]');
+                if (select && select.value == defaultComponent.id) {
+                    let val = tr.querySelector('[data-name="amount"]').value.replace(/\D/g, '');
+                    amt = parseFloat(val) || 0;
+                }
             });
             return amt;
         }
 
         const newComponentRender = (e) => {
             let secondaryParent = document.querySelector(`[data-slip-ctgname="${secondarySlip.name}"]`);
-            Array.from(secondaryParent.querySelectorAll('.form-index')).map((tr, index) => {
-                Array.from(tr.querySelectorAll('[data-name="component_id"]')).filter(sl => cmptid.includes(sl.value)).map((select, i) => {
-                    let p = e.currentTarget.value;
-                    for (let index = 0; index < settings.length; index++) {
-                        if (select.value == settings[index].meta.component) {
-                            let l = eval(settings[index].meta.calculation);
-                            select.parentElement.nextElementSibling.querySelector('[data-name="amount"]').value = Math.round(parseFloat(l));
+            if(!secondaryParent) return;
+
+            Array.from(secondaryParent.querySelectorAll('.form-index')).forEach(tr => {
+                let select = tr.querySelector('[data-name="component_id"]');
+                if (select && cmptid.includes(select.value)) {
+                    let p = e.currentTarget.value.replace(/\D/g, '');
+                    settings.forEach(setting => {
+                        if (select.value == setting.meta.component) {
+                            let l = eval(setting.meta.calculation);
+                            let targetAmount = tr.querySelector('[data-name="amount"]');
+                            targetAmount.value = Math.round(parseFloat(l));
+                            validatedRupiah(targetAmount);
                         }
-                    }
-                })
+                    });
+                }
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            Array.from(document.querySelectorAll('[data-name="component_id"]')).forEach(el => {
+            document.querySelectorAll('[data-name="component_id"]').forEach(el => {
                 if (el.value) {
-                    renderUnitComponent(el);
+                    let checked = el.querySelector(':checked');
+                    let unitAddon = el.closest('tr').querySelector('.input-group-text');
+                    if(checked && checked.dataset.unit) {
+                        unitAddon.classList.remove('d-none');
+                        unitAddon.innerHTML = checked.dataset.unit;
+                    }
                 }
+
                 if (el.value == defaultComponent.id) {
-                    el.parentNode.nextElementSibling.querySelector('[data-name="amount"]').addEventListener('keyup', function(e) {
-                        newComponentRender(e);
-                    })
+                    el.closest('tr').querySelector('[data-name="amount"]').addEventListener('keyup', newComponentRender);
                 }
             });
             renderNameAttribute();

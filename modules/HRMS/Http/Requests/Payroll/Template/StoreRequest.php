@@ -64,7 +64,7 @@ class StoreRequest extends FormRequest
             'items' => array_map(fn ($item) => [
                 ...$item,
                 'component_id'  => $item['component_id'],
-                'amount'        => isset($item['amount']) ? (float) str_replace('.', '', $item['amount']) : 0,
+                'amount'        => isset($item['amount']) ? (float) preg_replace('/[^0-9]/', '', $item['amount']) : 0,
                 'description'   => ($item['description'] ?? null),
             ], array_filter($this->input('items'), fn ($item) => isset($item['component_id'])))
         ];
