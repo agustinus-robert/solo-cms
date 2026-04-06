@@ -27,34 +27,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-         Gate::before(function (User $user, $ability) {
-            if(isset($user->roles->first()->id) && $user->roles->first()->id == 1){
-                return true;
+        \Illuminate\Support\Facades\Gate::before(function ($user) {
+            if (method_exists($user, 'hasRole')) {
+                if ($user->hasRole('administrator')) {
+                    return true;
+                }
             }
-
-            if ($user->level == 1) {
-                return true;
-            }
-        });
-
-        Gate::define('is-casier', function(User $user){
-            return true;
-        });
-
-        Gate::define('is-supplier', function(User $user){
-            $employee = $user->regularEmp;
-
-            if ($employee && $employee->contract) {
-                $positionType = $employee->position->position->type;
-
-                $allowedTypes = [
-                    \Modules\Core\Enums\PositionTypeEnum::SUPPLIER
-                ];
-
-                return in_array($positionType, $allowedTypes, true);
-            }
-
-            return false;
+            return null;
         });
     }
 }

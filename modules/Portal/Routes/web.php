@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\PortalMiddleware;
 
-Route::middleware(['auth', \Modules\Portal\Http\Middleware\ShopMiddleware::class])->group(function () {
+Route::middleware(['auth', \Modules\Portal\Http\Middleware\AccessMiddleware::class])->group(function () {
     Route::resource('dashboard', 'HomeController');
     Route::resource('dashboard-msdm', 'DashboardMsdmController');
 

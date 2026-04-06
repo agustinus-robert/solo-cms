@@ -55,30 +55,39 @@ class SubmissionController extends Controller
 	 * Store a newly created resource in storage.
 	 */
 	public function store(StoreRequest $request)
-	{
-		$employee = $request->user()->employee;
+    {
+        $user = $request->user();
+        $employee = $user->employee;
 
-		$leave = $employee->leaves()->create($request->transform());
+        $leave = $employee->leaves()->create($request->transform());
+        if ($user->hasRole('administrator')) {
+            return redirect()->route('portal::leave.submission.index')
+                ->with('success', 'Pengajuan Administrator otomatis disetujui oleh sistem.');
+        }
 
-		// Assign approvable based approvable_steps configuration
-		foreach (config('modules.core.features.services.leaves.approvable_steps', []) as $model) {
-			if ($model['type'] == 'parent_position_level') {
-                //PositionLevelEnum::MANAGER
-				if ($position = $employee->position->position->parents->firstWhere('level.value', PositionLevelEnum::MANAGER)?->employeePositions()->active()->first()) {
-				    if(in_array($employee->position?->position?->level?->value, $model['only'])) {
-					    $leave->createApprovable($position);
-				    }
-				}
-			}
-		}
+        $parentPositions = $employee->position->position->parents;
 
-		// Handle notifications
-		if ($approvable = $leave->approvables()->orderBy('level')->first()) {
-			$approvable->userable->getUser()->notify(new SubmissionNotification($leave, null));
-		}
+        if ($parentPositions->isNotEmpty()) {
+            foreach ($parentPositions as $parentPosition) {
+                $approverEmployee = $parentPosition->employeePositions()
+                    ->active()
+                    ->first();
 
-		return redirect()->route('portal::leave.submission.index')->with('success', isset($position) ? 'Pengajuan izin sudah terkirim, silakan tunggu notifikasi selanjutnya dari atasan!' : 'Pengajuan sudah tersimpan dan sudah disetujui otomatis oleh sistem, terima kasih!');
-	}
+                if ($approverEmployee) {
+                    $leave->createApprovable($approverEmployee);
+                }
+            }
+        }
+
+        if ($approvable = $leave->approvables()->orderBy('level')->first()) {
+            $approvable->userable->getUser()->notify(new SubmissionNotification($leave, null));
+            $message = 'Pengajuan izin sudah terkirim ke atasan.';
+        } else {
+            $message = 'Pengajuan sudah tersimpan dan disetujui otomatis (tidak ada hirarki atasan).';
+        }
+
+        return redirect()->route('portal::leave.submission.index')->with('success', $message);
+    }
 
 	/**
 	 * Display the specified resource.

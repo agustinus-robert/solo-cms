@@ -134,11 +134,12 @@ class Employee extends Model
      * This has many contract.
      */
     public function contract()
-    {
-        return $this->hasOne(EmployeeContract::class, 'empl_id')
-            ->whereNull('deleted_at')
-            ->latestOfMany();
-    }
+{
+    return $this->hasOne(EmployeeContract::class, 'empl_id')
+        // Tambahkan prefix 'empl_contracts.' secara manual
+        ->whereNull('empl_contracts.deleted_at')
+        ->latestOfMany();
+}
 
     /**
      * This has many contract within 7 days.
