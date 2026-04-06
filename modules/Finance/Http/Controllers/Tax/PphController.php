@@ -13,6 +13,7 @@ use Modules\HRMS\Models\Employee;
 use Modules\HRMS\Models\EmployeeTax;
 use Modules\Finance\Http\Requests\Tax\Pph\StoreRequest;
 use Modules\Finance\Repositories\TaxYearlyRepository;
+use App\Services\TaxYearly;
 
 class PphController extends Controller
 {
@@ -22,65 +23,44 @@ class PphController extends Controller
      */
     public function index(Request $request)
     {
+        $year = $request->get('year', date('Y'));
+        $date = Carbon::createFromDate($year);
+
+        $start_at = $date->copy()->startOfYear();
+        $end_at = $date->copy()->endOfYear();
+
         return view('finance::tax.pph.index', [
-            'start_at'    => $start_at = Carbon::parse($request->get('start_at', now()->startOfYear()->format('Y-m-d')) . ' 00:00:00'),
-            'end_at'      => $end_at = Carbon::parse($request->get('end_at', now()->endOfYear()->format('Y-m-d')) . ' 23:59:59'),
+            'year'        => $year,
+            'start_at'    => $start_at,
+            'end_at'      => $end_at,
             'departments' => CompanyDepartment::visible()->with('positions')->get(),
             'types'       => collect(TaxTypeEnum::cases()),
-            'employees' => Employee::with([
-                'taxs' => fn($tax) => $tax->where('type', TaxTypeEnum::YEARLY)->whereDate('start_at', $start_at->format('Y-m-d'))->whereDate('end_at', $end_at->format('Y-m-d')),
+            'employees'   => Employee::with([
+                'taxs' => fn($tax) => $tax->where('type', TaxTypeEnum::YEARLY)
+                    ->where('start_at', $start_at->toDateTimeString())
+                    ->where('end_at', $end_at->toDateTimeString()),
                 'user',
                 'position.position'
             ])
-                ->has('contract')
-                ->search($request->get('search'))
-                ->whenWithTrashed($request->get('trashed'))
-                ->paginate($request->get('limit', 10)),
+            ->paginate($request->get('limit', 10)),
         ]);
     }
 
-
-    public function create(Request $request)
+    public function create(Request $request, TaxYearly $taxService)
     {
-        $defaults = setting('cmp_pph_components');
+        $year = $request->get('year', date('Y'));
+        $emplId = $request->get('empl_id');
 
-        if (!$defaults) {
-            return redirect()->next()->with(['error' => 'arap membuat template pajak tahunan terlebih dahulu!']);
-
+        if (!$emplId) {
+            return redirect()->back()->with('error', 'Pilih karyawan terlebih dahulu.');
         }
 
-        if (!$request->filled(['start_at', 'end_at'])) {
-           return redirect()->back()->with('error', 'Harap tambahkan periode tahunan');
-        }
+        $taxData = $taxService->prepareYearlyTaxData($emplId, (int) $year);
 
-        $start_at = Carbon::parse($request->get('start_at', cmp_cutoff(0)->format('Y-m-d')) . ' 00:00:00');
-        $end_at   = Carbon::parse($request->get('end_at', cmp_cutoff(1)->format('Y-m-d')) . ' 23:59:59');
-
-
-        $employee = Employee::with([
-            'salaryTemplates.items.component',
-            'user',
-            'position.position'
-        ])->has('contract')->find($request->get('empl_id'));
-
-        $months = $employee->joined_at->diffInMonths(now())  <= 12 ? $employee->joined_at->diffInMonths(now()) : 12;
-        $is_npwp = $employee->user->getMeta('tax_number') ? true : false;
-
-        $ptkp = $this->getPtkp($employee->user);
-        $data = $this->getYearComponentValue($employee, $start_at, $end_at, $months);
-
-        return view('finance::tax.pph.create', [
-            'start_at'   => $start_at,
-            'end_at'     => $end_at,
+        return view('finance::tax.pph.create', array_merge($taxData, [
             'types'      => [TaxTypeEnum::YEARLY],
             'categories' => collect(TaxCategoryEnum::cases()),
-            'employee'   => $employee,
-            'earnings'   => collect($data)->whereIn('ctg_az', [1, 2]),
-            'reductions' => collect($data)->where('ctg_az', 3),
-            'ptkp'       => $ptkp,
-            'months'     => $months,
-            'is_npwp'    => $is_npwp,
-        ]);
+        ]));
     }
 
     public function store(StoreRequest $request)

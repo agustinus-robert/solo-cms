@@ -95,9 +95,9 @@
                                         <div class="card card-body border-info mb-0">
                                             <small class="text-info fw-bold text-uppercase">Potongan Per Bulan</small>
                                             <h4 class="mb-0">Rp <span class="pph-monthly-text text-info">0</span></h4>
-                                            
+
                                             <input type="number" name="pphtotal" class="d-none calc-pph-monthly-hidden" value="0">
-                                            
+
                                             <div class="small text-muted"><cite>Nilai ini yang akan masuk ke rekap gaji</cite></div>
                                         </div>
                                     </div>
@@ -143,7 +143,6 @@
             margin: 0;
         }
 
-        /* Firefox */
         input[type=number] {
             -moz-appearance: textfield;
         }
@@ -152,14 +151,8 @@
 
 @push('scripts')
 <script>
-    // 1. Fungsi format rupiah untuk tampilan teks (dengan titik)
-    const formatRupiah = (angka) => {
-        return new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 0
-        }).format(angka);
-    }
+    const formatRupiah = (angka) => new Intl.NumberFormat('id-ID').format(Math.floor(angka));
 
-    // 2. Fungsi Terbilang Indonesia
     const terbilang = (angka) => {
         const bilne = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
         if (angka < 12) return bilne[angka];
@@ -173,160 +166,110 @@
         return "";
     }
 
-    // 3. Fungsi Utama: Hitung Subtotal & Baris Tahunan
-    const sumSubTotal = (event) => {
-        const el = event.target || event;
-        const tbody = el.closest('.calc-income-tbody');
-        if (!tbody) return;
+   const calculateAll = () => {
+    let grandTotalIncomeYear = 0;
 
-        // Update angka tahunan (x12) di baris yang sedang diedit
-        const row = el.closest('.calc-row');
-        if (row) {
-            const monthlyVal = parseFloat(el.value) || 0;
-            const yearlyDisplay = row.querySelector('.item-yearly-display');
-            if (yearlyDisplay) {
-                yearlyDisplay.value = formatRupiah(monthlyVal * 12);
+    document.querySelectorAll('.calc-income-tbody').forEach(tbody => {
+        let subtotalIncome = 0;
+        tbody.querySelectorAll('.calc-row').forEach(row => {
+            const input = row.querySelector('.items-yearly');
+            const checkbox = row.querySelector('.form-check-input');
+            if(input && (checkbox ? checkbox.checked : true)) {
+                subtotalIncome += parseFloat(input.value) || 0;
             }
-        }
-
-        const items = tbody.querySelectorAll('.items-monthly');
-        let subtotalValue = 0;
-
-        items.forEach(input => {
-            subtotalValue += parseFloat(input.value) || 0;
         });
 
-        // Update Input Subtotal Bulanan (Angka murni buat DB)
-        const subtotalInput = tbody.querySelector('.calc-income-month-subtotal-input');
-        if (subtotalInput) subtotalInput.value = subtotalValue;
+        const subInput = tbody.querySelector('.calc-income-year-subtotal-input');
+        if(subInput) subInput.value = subtotalIncome;
 
-        // Update Display Subtotal Tahunan (x12)
-        const subtotalYearDisplay = tbody.querySelector('.calc-income-year-subtotal-display');
-        if (subtotalYearDisplay) {
-            subtotalYearDisplay.value = formatRupiah(subtotalValue * 12);
-        }
+        const subDisplay = tbody.querySelector('.calc-income-year-subtotal-display');
+        if(subDisplay) subDisplay.value = formatRupiah(subtotalIncome);
 
-        // Update Teks Terbilang & Label Rupiah Bulanan
-        const subtotalInword = tbody.querySelector('.items-monthly-inword');
-        if (subtotalInword) {
-            const labelRupiah = formatRupiah(subtotalValue);
-            subtotalInword.innerHTML = `<strong>Rp ${labelRupiah}</strong> (${subtotalValue > 0 ? terbilang(subtotalValue) : "nol"} rupiah)`;
-        }
+        grandTotalIncomeYear += subtotalIncome;
+    });
 
-        updateGrandTotalIncome();
-    }
-
-    // 4. Update Total Keseluruhan Pendapatan
-    const updateGrandTotalIncome = () => {
-        const allCategorySubtotals = document.querySelectorAll('.calc-income-month-subtotal-input');
-        let grandTotal = 0;
-
-        allCategorySubtotals.forEach(input => {
-            grandTotal += parseFloat(input.value) || 0;
-        });
-
-        // Update Field Total Akhir Bulanan
-        const totalIncomeInput = document.querySelector('.calc-totalincome-month-subtotal-input');
-        if (totalIncomeInput) totalIncomeInput.value = grandTotal;
-
-        // Update Display Total Akhir Tahunan
-        const totalYearDisplay = document.querySelector('.calc-totalincome-year-subtotal-display');
-        if (totalYearDisplay) {
-            totalYearDisplay.value = formatRupiah(grandTotal * 12);
-        }
-
-        // Update Terbilang Total Akhir
-        const totalInword = document.querySelector('.totalincome-month-inword');
-        if (totalInword) {
-            const labelRupiah = formatRupiah(grandTotal);
-            totalInword.innerHTML = `<strong>Rp ${labelRupiah}</strong> (${grandTotal > 0 ? terbilang(grandTotal) : "nol"} rupiah)`;
-        }
-
-        // Sinkron ke PPh (Input bruto biasanya tahunan)
-        const brutoYearlyInput = document.querySelector('.calc-bruto-month-subtotal-input');
-        if (brutoYearlyInput) {
-            brutoYearlyInput.value = grandTotal * 12;
-            calculatePph();
-        }
-    }
-
-    // 5. Kalkulasi PPh 21
-    const calculatePph = () => {
-        const ptkpAmount = @json($ptkp); 
-        const isNpwp = @json($is_npwp);
-        const brutoInput = document.querySelector('.calc-bruto-month-subtotal-input');
-        if (!brutoInput) return;
-
-        const brutoTahun = parseFloat(brutoInput.value) || 0;
-        const pkpTahun = Math.max(0, brutoTahun - ptkpAmount);
-
-        // Update PKP Displays
-        if(document.querySelector('.calc-pkp-value-input')) 
-            document.querySelector('.calc-pkp-value-input').value = Math.floor(pkpTahun);
-        
-        if(document.querySelector('.calc-bruto-monthly-display'))
-            document.querySelector('.calc-bruto-monthly-display').value = formatRupiah(Math.floor(brutoTahun / 12));
-        
-        if(document.querySelector('.calc-pkp-monthly-display'))
-            document.querySelector('.calc-pkp-monthly-display').value = formatRupiah(Math.floor(pkpTahun / 12));
-
-        const categories = [
-            @foreach ($categories as $cat)
-            {
-                idx: {{ $loop->iteration }},
-                min: {{ $cat->getMin() }},
-                max: {{ $cat->getMax() }},
-                rate: {{ $is_npwp ? $cat->getPercentage() : $cat->getPercentageNonNpwp() }} / 100
-            },
-            @endforeach
-        ];
-
-        let remainingPkp = pkpTahun;
-        let totalPphTahun = 0;
-
-        categories.forEach(c => {
-            const range = c.max - c.min;
-            const taxable = Math.min(remainingPkp, range);
-            let layerPphTahun = 0;
-
-            if (taxable > 0) {
-                layerPphTahun = Math.floor(taxable * c.rate);
-                totalPphTahun += layerPphTahun;
-                remainingPkp -= taxable;
+    let grandTotalReductionYear = 0;
+    document.querySelectorAll('.calc-reduction-tbody').forEach(tbody => {
+        tbody.querySelectorAll('.calc-row').forEach(row => {
+            const input = row.querySelector('.reduction-year-amount');
+            const checkbox = row.querySelector('.form-check-input');
+            if(input && (checkbox ? checkbox.checked : true)) {
+                grandTotalReductionYear += parseFloat(input.value) || 0;
             }
-
-            const layerTahunEl = document.querySelector(`.calc-pph${c.idx}-value-input`);
-            if (layerTahunEl) layerTahunEl.value = layerPphTahun;
-
-            const layerBulanEl = document.querySelector(`.calc-pph${c.idx}-monthly-display`);
-            if (layerBulanEl) layerBulanEl.value = formatRupiah(Math.floor(layerPphTahun / 12));
-        });
-
-        const totalPphBulanan = Math.floor(totalPphTahun / 12);
-
-        // Update UI Akhir
-        const pphTotalHidden = document.querySelector('.calc-pph-monthly-hidden');
-        if (pphTotalHidden) pphTotalHidden.value = totalPphBulanan;
-
-        const pphMonthText = document.querySelector('.pph-monthly-text');
-        if (pphMonthText) pphMonthText.innerText = formatRupiah(totalPphBulanan);
-
-        const pphTahunText = document.querySelector('.pph-input');
-        if (pphTahunText) pphTahunText.innerText = formatRupiah(totalPphTahun);
-
-        const pphInwords = document.querySelector('.pph-inwords');
-        if (pphInwords) {
-            pphInwords.innerText = totalPphBulanan > 0 ? terbilang(totalPphBulanan) : "nol";
-        }
-    }
-
-    // Init awal pas halaman kelar loading
-    document.addEventListener('DOMContentLoaded', () => {
-        const allInputs = document.querySelectorAll('.items-monthly');
-        allInputs.forEach(input => {
-            // Trigger hitungan buat setiap baris awal
-            sumSubTotal(input);
         });
     });
+
+    const ptkp = {{ (int) $ptkp }};
+    const pkpYearly = Math.max(0, grandTotalIncomeYear - grandTotalReductionYear - ptkp);
+
+    const brutoInput = document.querySelector('.calc-bruto-month-subtotal-input');
+    if(brutoInput) {
+        brutoInput.value = grandTotalIncomeYear;
+        const brutoMonthlyDisplay = document.querySelector('.calc-bruto-monthly-display');
+        if(brutoMonthlyDisplay) brutoMonthlyDisplay.value = formatRupiah(grandTotalIncomeYear / 12);
+    }
+
+    const pengurangDisplay = document.querySelector('.calc-total-pengurang-display');
+    if(pengurangDisplay) pengurangDisplay.value = formatRupiah(ptkp + grandTotalReductionYear);
+
+    const pkpInput = document.querySelector('.calc-pkp-value-input');
+    if(pkpInput) {
+        pkpInput.value = Math.floor(pkpYearly);
+        const pkpMonthlyDisplay = document.querySelector('.calc-pkp-monthly-display');
+        if(pkpMonthlyDisplay) pkpMonthlyDisplay.value = formatRupiah(pkpYearly / 12);
+    }
+
+    calculateTaxLayers(pkpYearly);
+}
+
+const calculateTaxLayers = (pkp) => {
+    const isNpwp = {{ $is_npwp ? 'true' : 'false' }};
+    const categories = @json($categories->map(fn($c) => [
+        'min' => $c->getMin(),
+        'max' => $c->getMax(),
+        'rate' => $is_npwp ? $c->getPercentage() : $c->getPercentageNonNpwp()
+    ]));
+
+    let remainingPkp = pkp;
+    let totalPphYear = 0;
+
+    categories.forEach((c, index) => {
+        const idx = index + 1;
+        const range = c.max - c.min;
+        const taxable = Math.min(remainingPkp, range);
+        let layerPph = 0;
+
+        if (taxable > 0) {
+            layerPph = Math.floor(taxable * (c.rate / 100));
+            totalPphYear += layerPph;
+            remainingPkp -= taxable;
+        }
+
+        const inputLayer = document.querySelector(`.calc-pph${idx}-value-input`);
+        if(inputLayer) inputLayer.value = layerPph;
+
+        const displayLayer = document.querySelector(`.calc-pph${idx}-monthly-display`);
+        if(displayLayer) displayLayer.value = formatRupiah(layerPph / 12);
+    });
+
+    const pphMonthly = Math.floor(totalPphYear / 12);
+    const monthlyText = document.querySelector('.pph-monthly-text');
+    if(monthlyText) monthlyText.innerText = formatRupiah(pphMonthly);
+
+    const hiddenTotal = document.querySelector('.calc-pph-monthly-hidden');
+    if(hiddenTotal) hiddenTotal.value = pphMonthly;
+
+    const yearlyText = document.querySelector('.pph-input');
+    if(yearlyText) yearlyText.innerText = formatRupiah(totalPphYear);
+
+    const terMonthly = document.querySelector('.calc-ter-amount-monthly-display');
+    if(terMonthly) terMonthly.value = formatRupiah(pphMonthly);
+
+    const terYearly = document.querySelector('.calc-ter-amount-input');
+    if(terYearly) terYearly.value = totalPphYear;
+
+    const inwords = document.querySelector('.pph-inwords');
+    if(inwords) inwords.innerText = terbilang(pphMonthly);
+}
 </script>
 @endpush

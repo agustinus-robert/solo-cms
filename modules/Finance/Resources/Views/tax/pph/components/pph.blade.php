@@ -22,8 +22,8 @@
                 <td>
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
-                        <input type="number" name="bruto_total_input" class="form-control calc-bruto-month-subtotal-input text-end fw-bold" 
-                            value="97938000" 
+                        <input type="number" name="bruto_total_input" class="form-control calc-bruto-month-subtotal-input text-end fw-bold"
+                            value="97938000"
                             oninput="calculatePph()">
                     </div>
                 </td>

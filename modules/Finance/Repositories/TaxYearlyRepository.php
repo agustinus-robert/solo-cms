@@ -14,6 +14,7 @@ use Modules\HRMS\Enums\DataRecapitulationTypeEnum;
 use Modules\HRMS\Enums\TaxTypeEnum;
 use Modules\HRMS\Models\EmployeeDataRecapitulation;
 use Modules\HRMS\Models\EmployeeTax;
+use Modules\HRMS\Models\EmployeeSalary;
 
 trait TaxYearlyRepository
 {
@@ -22,16 +23,29 @@ trait TaxYearlyRepository
     /**
      * Get PTKP from curent user
      * @param: user
-     *  
+     *
      * @return int
      */
-    public function getPtkp(User $user)
+   public function getPtkp(User $user)
     {
-        return $user->getMeta('profile_sex') == SexEnum::FEMALE
-            ? CompanyPtkp::whereSex(SexEnum::FEMALE)->whereMariage(MariageEnum::SINGLE)->whereChild(0)->first()->value
-            : CompanyPtkp::whereSex($user->getMeta('profile_sex', SexEnum::MALE))
-            ->whereMariage($user->getMeta('profile_mariage', MariageEnum::SINGLE))
-            ->whereChild($user->getMeta('profile_child') > 3 ? 3 : $user->getMeta('profile_child', 0))->first()->value;
+        $sex = $user->getMeta('profile_sex', SexEnum::MALE);
+        $mariage = $user->getMeta('profile_mariage', MariageEnum::SINGLE);
+        $child = (int) $user->getMeta('profile_child', 0);
+        $child = $child > 3 ? 3 : $child;
+
+        if ($sex == SexEnum::FEMALE) {
+            $ptkp = CompanyPtkp::whereSex(SexEnum::FEMALE)
+                ->whereMariage(MariageEnum::SINGLE)
+                ->whereChild(0)
+                ->first();
+        } else {
+            $ptkp = CompanyPtkp::whereSex($sex)
+                ->whereMariage($mariage)
+                ->whereChild($child)
+                ->first();
+        }
+
+        return $ptkp->value ?? 54000000;
     }
 
     /**
@@ -40,77 +54,52 @@ trait TaxYearlyRepository
      * @param: start_at
      * @param: end_at
      * @param: months
-     *  
+     *
      */
     public function getYearComponentValue(Employee $employee, $start_at, $end_at, $months)
     {
         $defaults = CompanySalarySlipComponent::with('category.slip')->get();
         $components = collect(setting('cmp_pph_components'));
-        $items = $employee->salaryTemplates()
-            ->with('items.component',)
-            ->where('cmp_template_id', $this->defaultTemplate)
-            ->where('start_at', '>=', $start_at)
-            ->where('end_at', '<=', $end_at)
-            ->latest()
-            ->first()?->items ?? [];
+
+        $paidSalaries = EmployeeSalary::where('empl_id', $employee->id)
+            ->whereBetween('start_at', [$start_at->format('Y-m-d'), $end_at->format('Y-m-d')])
+            ->get();
 
         $data = [];
         foreach ($components as $key => $component) {
             $default = $defaults->firstWhere('id', $component['component_id']);
-            // $items = $employee->lastSalaryTemplate?->items;
 
-            if ($items && $default) {
-                $amount = 0;
-                $is_mutiplier = $default->meta?->as_multiplier ?? false;
-                $multiplier = $is_mutiplier ? ($items->firstWhere('component_id', $default->id)?->amount ?? 0) : 1;
+            if ($default) {
+                $totalAmountInYear = 0;
 
-                switch ($default->meta?->algorithm?->method ?? null) {
-                    case 'MODEL':
-                        foreach (($default->meta->algorithm?->models ?? []) as $model => $x) {
-                            $query = new $model;
-                            foreach ($x->conditions as $clauses) {
-                                foreach ($clauses->p as $i => $clause) {
-                                    $clauses->p[$i] = match ($clause) {
-                                        '%CURRENT_EMPL_ID%' => $employee->id,
-                                        '%START_AT%' => $start_at->format('Y-m-d'),
-                                        '%END_AT%' => $end_at->format('Y-m-d'),
-                                        '%COMPONENT_ID%' => $default->id,
-                                        default => $clause
-                                    };
+                foreach ($paidSalaries as $salary) {
+                    $details = is_array($salary->details) ? $salary->details : json_decode($salary->details, true);
+
+                    if (!$details) continue;
+
+                    foreach ($details as $slip) {
+                        if (!isset($slip['ctgs'])) continue;
+
+                        foreach ($slip['ctgs'] as $ctg) {
+                            if (!isset($ctg['i'])) continue;
+
+                            foreach ($ctg['i'] as $item) {
+                                if ($item['component_id'] == $default->id) {
+                                    $totalAmountInYear += (float) ($item['amount'] ?? 0);
                                 }
-                                $query = $query->{$clauses->f}(...$clauses->p);
-                            }
-
-                            if (isset($x->after)) {
-                                foreach ($query->get() as $recap) {
-                                    $amount += match ($x->after) {
-                                        'multiply_by_self_overdays' => $query->{$x->action}($x->action_column) * $employee->getOverdaysSalary(),
-                                        default => $query->{$x->action}($x->action_column)
-                                    };
-                                }
-                            } else {
-                                $amount += $query->{$x->action}($x->action_column);
                             }
                         }
-                        break;
-
-                    default:
-                        $amount = $items->firstWhere('component_id', $default->id)?->amount ?? 0;
-                        break;
+                    }
                 }
 
-                $processingResult = $is_mutiplier ? $this->days : $amount;
-                $processingMonth = isset($component['multiplier']) ? $months : 1;
-
-                $data[$key] = $component;
-                $data[$key]['salary_multiplier'] = $multiplier;
-                $data[$key]['salary_amount'] = $processingResult;
-                $data[$key]['real_salary'] = $processingResult * $multiplier;
-                $data[$key]['real_multiplier'] = $processingMonth;
+                $data[$key] = array_merge($component, [
+                    'salary_multiplier' => 1,
+                    'salary_amount'     => $totalAmountInYear,
+                    'real_salary'       => $totalAmountInYear,
+                    'real_multiplier'   => 1,
+                ]);
             }
         }
-
-        unset($component);
 
         return $data;
     }
@@ -177,7 +166,7 @@ trait TaxYearlyRepository
         // PPh TER
         $pphTer = floor($rateDecimal * $totalMonth);
 
-        // Transform data yang akan disimpan ke database 
+        // Transform data yang akan disimpan ke database
         $dataTax = [
             'empl_id'   => $employee->id,
             'start_at'  => $start_at,
