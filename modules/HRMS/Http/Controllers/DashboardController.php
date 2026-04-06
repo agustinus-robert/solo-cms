@@ -27,8 +27,10 @@ class DashboardController extends Controller
 
         $users = Employee::with('user.meta', 'contract.contract', 'position.position.department')->whereHas('contract')->get();
 
-        $employee_by_genders = collect($users)->mapToGroups(fn($e) => [
-            !is_null($e->user->getMeta('profile_sex')) ? SexEnum::tryFrom($e->user->getMeta('profile_sex'))->label() : 'Kosong' => $e
+      $employee_by_genders = collect($users)->mapToGroups(fn($e) => [
+            !is_null($e->user?->getMeta('profile_sex'))
+                ? (SexEnum::tryFrom((int) $e->user->getMeta('profile_sex'))?->label() ?? 'Kosong')
+                : 'Kosong' => $e
         ])->map(fn($group) => $group->count())->toArray();
 
         $employee_by_religions = collect($users)->mapToGroups(fn($e) => [

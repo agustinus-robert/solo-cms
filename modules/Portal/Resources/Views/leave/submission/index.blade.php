@@ -100,29 +100,42 @@
                     </div>
 
                     {{-- Admin Quick Access --}}
-                    @php use Modules\Core\Enums\PositionTypeEnum; @endphp
-                    @if (isset($employee->position->position_id) && in_array($employee->position->position_id, [PositionTypeEnum::KEPALASEKOLAH->value, PositionTypeEnum::HUMAS->value], true))
-                    <div class="col-xl-8 col-md-6">
-                        <div class="card bg-dark card-soft overflow-hidden">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-8">
-                                        <div class="text-white">
-                                            <h5 class="text-white fw-bold mb-1">Pusat Persetujuan</h5>
-                                            <p class="text-white-50 mb-0 font-size-12">Anda memiliki wewenang untuk memvalidasi izin staf di bawah koordinasi Anda.</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
-                                        <a href="{{ route('portal::leave.manage.index', ['next' => url()->current()]) }}" class="btn btn-light btn-sm px-3 shadow-none">
-                                            Periksa Sekarang <i class="mdi mdi-arrow-right ms-1"></i>
-                                        </a>
+                 @php
+                    $hasSubordinates = false;
+                    if (isset($employee->position->position)) {
+                        $hasSubordinates = $employee->position->position->children()->exists();
+                    }
+
+                @endphp
+
+                @if ($hasSubordinates || auth()->user()->hasRole('administrator'))
+                <div class="col-xl-8 col-md-6">
+                    <div class="card bg-dark card-soft overflow-hidden">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-sm-8">
+                                    <div class="text-white">
+                                        <h5 class="text-white fw-bold mb-1">Pusat Persetujuan</h5>
+                                        <p class="text-white-50 mb-0 font-size-12">
+                                            @if(auth()->user()->hasRole('administrator'))
+                                                Anda memiliki akses penuh untuk memvalidasi seluruh izin staf.
+                                            @else
+                                                Anda memiliki wewenang untuk memvalidasi izin staf di bawah koordinasi Anda.
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
-                                <i class="mdi mdi-shield-check-outline position-absolute text-white" style="right: -10px; bottom: -10px; font-size: 80px; opacity: 0.1;"></i>
+                                <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+                                    <a href="{{ route('portal::leave.manage.index', ['next' => url()->current()]) }}" class="btn btn-light btn-sm px-3 shadow-none">
+                                        Periksa Sekarang <i class="mdi mdi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
                             </div>
+                            <i class="mdi mdi-shield-check-outline position-absolute text-white" style="right: -10px; bottom: -10px; font-size: 80px; opacity: 0.1;"></i>
                         </div>
                     </div>
-                    @endif
+                </div>
+                @endif
                 </div>
 
                 {{-- Table History --}}

@@ -80,9 +80,9 @@
                         @forelse($recent_activities as $activity)
                             <div class="list-group-item">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <div class="rounded-circle" style="height: 36px; min-width: 36px; background: url('{{ $activity->user->profile_avatar_path }}') center center no-repeat; background-size: cover;"></div>
+                                    <div class="rounded-circle" style="height: 36px; min-width: 36px; background: url('{{ $activity->user?->profile_avatar_path }}') center center no-repeat; center center no-repeat; background-size: cover;"></div>
                                     <div class="flex-grow-1 ms-3">
-                                        <strong>{{ $activity->user->display_name }}</strong> {!! $activity->message !!}
+                                        <strong>{{ $activity->user?->display_name ?? 'Sistem' }}</strong> {!! $activity->message !!}
                                     </div>
                                     <div class="ms-3 text-end">
                                         <small class="text-muted">{{ $activity->created_at }}</small>

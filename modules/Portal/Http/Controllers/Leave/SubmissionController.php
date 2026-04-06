@@ -59,6 +59,8 @@ class SubmissionController extends Controller
         $user = $request->user();
         $employee = $user->employee;
 
+        $parentPositions = $employee->position->position->parents;
+
         $leave = $employee->leaves()->create($request->transform());
         if ($user->hasRole('administrator')) {
             return redirect()->route('portal::leave.submission.index')
@@ -80,7 +82,7 @@ class SubmissionController extends Controller
         }
 
         if ($approvable = $leave->approvables()->orderBy('level')->first()) {
-            $approvable->userable->getUser()->notify(new SubmissionNotification($leave, null));
+            // $approvable->userable->getUser()->notify(new SubmissionNotification($leave, null));
             $message = 'Pengajuan izin sudah terkirim ke atasan.';
         } else {
             $message = 'Pengajuan sudah tersimpan dan disetujui otomatis (tidak ada hirarki atasan).';

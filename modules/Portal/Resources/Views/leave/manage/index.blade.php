@@ -59,53 +59,6 @@
                                 </div>
                             @endif
 
-                            @if (env('DEMO') == 0)
-                                <div class="row g-0">
-                                    <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('core::dashboard') }}">
-                                            <i class="bx bxs-wrench" style='font-size:30px;'></i>
-                                            <span>Setting</span>
-                                        </a>
-                                    </div>
-                                    {{-- <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('portal::dashboard.index') }}">
-                                            <i class="bx bx-cart-alt" style='font-size:30px;'></i>
-                                            <span>Dashboard POS</span>
-                                        </a>
-                                    </div> --}}
-
-                                    <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('administration::dashboard') }}">
-                                            <i class="bx bxs-buildings" style='font-size:30px;'></i>
-                                            <span>Tata Usaha</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if (env('DEMO') == 0)
-                                <div class="row no-gutters">
-                                    <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('teacher::home') }}">
-                                            <i class="bx bxs-book-content" style='font-size:30px;'></i>
-                                            <span>Guru</span>
-                                        </a>
-                                    </div>
-
-                                    <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('academic::home') }}">
-                                            <i class="bx bxs-chalkboard" style='font-size:30px;'></i>
-                                            <span>Akademik</span>
-                                        </a>
-                                    </div>
-                                    <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('counseling::home') }}">
-                                            <i class="bx bx-user-voice" style='font-size:30px;'></i>
-                                            <span>Konseling</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
 
                             @if (env('DEMO') == 0)
                                 <div class="row no-gutters">
@@ -216,7 +169,7 @@
                                         <div>{{ $leave->category->name }}</div>
                                         <small class="text-muted">{{ $leave->description }}</small>
                                     </td>
-                                    <td class="small">{{ $leave->created_at->formatLocalized('%d %B %Y') }}</td>
+                                    <td class="small">{{ $leave->created_at->isoFormat('D MMMM YYYY') }}</td>
                                     <td style="min-width: 200px;">
                                         @foreach (collect($leave->dates)->take(3) as $date)
                                             <span class="badge bg-soft-secondary text-dark fw-normal user-select-none {{ isset($date['c']) ? 'text-decoration-line-through' : '' }}" @isset($date['f']) data-bs-toggle="tooltip" title="Sebagai freelancer" @endisset>
