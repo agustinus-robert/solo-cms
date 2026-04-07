@@ -75,7 +75,6 @@
         <div class="page-content">
             <div class="container-fluid">
 
-                {{-- Header & Aksi --}}
                 <div class="row align-items-center mb-4 mt-2">
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
@@ -106,7 +105,6 @@
                 @endif
 
                 <div class="row">
-                    {{-- Sisi Kiri: Informasi Izin --}}
                     <div class="col-xl-8">
                         <div class="card card-detail">
                             <div class="card-header bg-transparent border-bottom">
@@ -177,7 +175,6 @@
                             </div>
                         </div>
 
-                        {{-- Persetujuan Berjenjang --}}
                         @if ($leave->approvables->count())
                             <div class="card card-detail">
                                 <div class="card-header bg-transparent border-bottom">
@@ -222,7 +219,6 @@
                         @endif
                     </div>
 
-                    {{-- Sisi Kanan: Profil Karyawan & Aksi Hapus --}}
                     <div class="col-xl-4">
                         <div class="card card-detail overflow-hidden">
                             <div class="bg-primary bg-soft p-4">
@@ -262,7 +258,6 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Batalkan --}}
                         @unless(!$leave->hasApprovables() || $leave->trashed())
                             @if ($leave->hasAllApprovableResultIn('PENDING') || $leave->hasAnyApprovableResultIn('REVISION') || $leave->hasAnyApprovableResultIn('REJECT'))
                                 <div class="card card-detail border-danger-subtle bg-danger-subtle bg-opacity-10 mt-4">

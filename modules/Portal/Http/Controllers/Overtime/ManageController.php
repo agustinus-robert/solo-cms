@@ -66,17 +66,17 @@ class ManageController extends Controller
 
         // Handle notifications
         if ($approved) {
-            $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
-            $approvable->modelable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
+        //    $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
+        //    $approvable->modelable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
             if ($superior = $approvable->modelable->approvables->sortBy('level')->filter(fn($a) => $a->level > $approvable->level)->first()) {
-                $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
-                $superior->userable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.manage.show', ['overtime' => $approvable->modelable->id]), $superior->userable->employee->user));
+        //        $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
+        //        $superior->userable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.manage.show', ['overtime' => $approvable->modelable->id]), $superior->userable->employee->user));
             }
         }
 
         if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-            $approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
-            $approvable->modelable->employee->user->notify(new AccountNotification('Maaf, pengajuan lembur ' . $approvable->modelable->name . ' ditolak, silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
+    //        $approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
+     //       $approvable->modelable->employee->user->notify(new AccountNotification('Maaf, pengajuan lembur ' . $approvable->modelable->name . ' ditolak, silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
         }
 
         $approvable->modelable->update(['paidable_at' => $approved && $approvable->is($approvable->modelable->approvables->sortByDesc('level')->first()) ? now() : null]);

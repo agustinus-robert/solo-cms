@@ -60,14 +60,14 @@ class ManageController extends Controller
 
         // Handle notifications
         if ($request->input('result') == ApprovableResultEnum::APPROVE->value) {
-            $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
+           // $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
             if ($superior = $approvable->modelable->approvables->sortBy('level')->filter(fn($a) => $a->level > $approvable->level)->first()) {
-                $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
+             //   $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
             }
         }
 
         if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-            $approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
+            //$approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');

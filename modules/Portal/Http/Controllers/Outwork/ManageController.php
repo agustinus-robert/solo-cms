@@ -98,7 +98,6 @@ class ManageController extends Controller
             }
         }
 
-        // 4. Jika DITOLAK
         if ($isRejected) {
             $outwork->update(['paidable_at' => null]);
 

@@ -111,7 +111,6 @@ class SubmissionController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Simpan data lembur utama menggunakan StoreRequest transform
             $overtime = $employee->overtimes()->create($request->transform());
 
             $selectedApprovers = $request->input('approvables', []);
