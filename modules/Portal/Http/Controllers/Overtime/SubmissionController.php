@@ -13,6 +13,8 @@ use Modules\Portal\Http\Requests\Overtime\Submission\StoreRequest;
 use Modules\Portal\Http\Requests\Overtime\Submission\UpdateRequest;
 use Modules\Portal\Notifications\Overtime\Submission\SubmissionNotification;
 use Modules\Portal\Notifications\Overtime\Submission\CanceledNotification;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SubmissionController extends Controller
 {
@@ -23,21 +25,46 @@ class SubmissionController extends Controller
      */
     public function index(Request $request)
     {
-        $employee = $request->user()->employee;
-        $start_at = $request->get('start_at', cmp_cutoff(0)->format('Y-m-d'));
-        $end_at   = $request->get('end_at', cmp_cutoff(1)->format('Y-m-d'));
+        $user = $request->user();
+        $employee = $user->employee;
+        $view = $request->get('view', 'mine');
 
-        $overtimes = $employee->overtimes()
+        $start_at = $request->get('start_at', date('Y-m-d'));
+        $end_at   = $request->get('end_at', date('Y-m-d'));
+
+        $query = EmployeeOvertime::query()
             ->withTrashed()
-            ->with('approvables.userable.position')
-            ->search($request->get('search'))
-            ->whenPeriod($start_at, $end_at)
-            ->latest()
-            ->paginate($request->get('limit', 10));
+            ->with(['employee.user', 'approvables.userable.position']);
 
-        $approvers = EmployeePosition::active()->whereHas('position', fn($position) => $position->whereIn('level', array_column(config('modules.core.features.services.overtimes.approvable_steps'), 'value')))->get();
+        if ($view === 'approvals') {
+            $myPositionIds = $user->employee->positions()->pluck('id')->toArray();
 
-        return view('portal::overtime.submission.index', compact('employee', 'overtimes', 'approvers', 'start_at', 'end_at'));
+            $query->whereHas('approvables', function($q) use ($myPositionIds) {
+                $q->where('userable_type', EmployeePosition::class)
+                ->whereIn('userable_id', $myPositionIds);
+            });
+        } else {
+            $query->where('empl_id', $employee->id);
+        }
+
+        if ($request->filled('start_at')) {
+            $query->where(function($q) use ($start_at, $end_at) {
+                $q->whereDate('created_at', '>=', $start_at)
+                ->whereDate('created_at', '<=', $end_at)
+                ->orWhereRaw("exists (select 1 from jsonb_array_elements(dates::jsonb) as elem where (elem->>'d')::date >= ? and (elem->>'d')::date <= ?)", [$start_at, $end_at]);
+            });
+        }
+
+        $overtimes = $query->latest()->paginate($request->get('limit', 10));
+
+        $isApprover = false;
+        if ($employee->position && $employee->position->position) {
+            $isApprover = $employee->position->position->children()->exists();
+        }
+
+        return view('portal::overtime.submission.index', compact(
+            'employee', 'overtimes', 'start_at', 'end_at', 'view', 'isApprover'
+        ));
     }
 
     /**
@@ -45,29 +72,31 @@ class SubmissionController extends Controller
      */
     public function create(Request $request)
     {
-        $employee = $request->user()->employee;
+        $employee = $request->user()->employee->load([
+            'position.position.parents' => function ($query) {
+                // Kita urutkan level dari yang TERBESAR ke TERKECIL (Atasan langsung dulu)
+                $query->orderBy('level', 'desc')->with(['employeePositions' => function ($ep) {
+                    $ep->active()->with('employee.user');
+                }]);
+            }
+        ]);
 
-        $steps = array_filter(
-            config('modules.core.features.services.overtimes.approvable_steps', []),
-            fn($step) => empty($step['hide_from_input'])
-        );
+        $superiors = [];
 
-        foreach ($steps as $step => $model) {
-            switch ($model['type']) {
-                case 'parent_position_level':
-                    array_push($this->superiors, [
-                        'step' => $step,
-                        'required' =>  $model['required'],
-                        'label' => PositionLevelEnum::tryFrom($model['value'])->label(),
-                        'positions' => $employee->position->position->load(['parents.employeePositions' => fn($position) => $position->active()->with('position', 'employee.user')])->parents->where('level.value', $model['value'])
-                    ]);
-                    break;
-                default:
-                    break;
+        $parentPositions = $employee->position->position->parents->sortByDesc('level');
+
+        foreach ($parentPositions as $index => $position) {
+            $hasEmployee = $position->employeePositions->isNotEmpty();
+
+            if ($hasEmployee) {
+                $superiors[] = [
+                    'step'      => count($superiors) + 1,
+                    'required'  => true,
+                    'label'     => $position->name,
+                    'positions' => collect([$position])
+                ];
             }
         }
-
-        $superiors = array_filter($this->superiors, fn($superior) => count($superior['positions']));
 
         return view('portal::overtime.submission.create', compact('employee', 'superiors'));
     }
@@ -79,29 +108,60 @@ class SubmissionController extends Controller
     {
         $employee = $request->user()->employee;
 
-        $overtime = $employee->overtimes()->create($request->transform());
+        DB::beginTransaction();
 
-        // Assign approvable based approvable_steps configuration
-        foreach (config('modules.core.features.services.overtimes.approvable_steps', []) as $index => $model) {
-            if ($model['type'] == 'parent_position_level') {
-                $employee->position->position->parents->where('level.value', $model['value'])->each(
-                    fn($position) =>
-                    $overtime->createApprovable(empty($model['hide_from_input']) ? $position->employeePositions()->active()->find($request->input('approvables.' . $index)) : $position->employeePositions()->active()->first())
-                );
+        try {
+            // 1. Simpan data lembur utama menggunakan StoreRequest transform
+            $overtime = $employee->overtimes()->create($request->transform());
+
+            $selectedApprovers = $request->input('approvables', []);
+
+            if (!empty($selectedApprovers)) {
+                // Urutkan dari Step TERBESAR ke TERKECIL
+                krsort($selectedApprovers);
+
+                foreach ($selectedApprovers as $employeePositionId) {
+                    $approverPosition = EmployeePosition::active()->find($employeePositionId);
+
+                    if ($approverPosition) {
+                        $overtime->createApprovable($approverPosition, [
+                            'type' => 'approvable'
+                        ]);
+                    }
+                }
             }
-        }
 
-        // Handle notifications
-        if ($approvable = $overtime->approvables()->orderBy('level')->first()) {
-            $approvable->userable->getUser()->notify(new SubmissionNotification($overtime, null));
-            $approvable->userable->getUser()->notify(new AccountNotification($overtime->employee->user->name . ' mengajukan lembur ' . $overtime->name . ', silakan cek pada link berikut ' . route('portal::overtime.manage.show', ['overtime' => $overtime->id]), $approvable->userable->getUser()));
-        } else {
-            $overtime->update(['paidable_at' => now()]);
-        }
+            // 2. Refresh model
+            $overtime->load('approvables.userable');
+            $allApprovables = $overtime->approvables;
 
-        return redirect()->route('portal::overtime.submission.index')->with('success', isset($approvable) ? 'Pengajuan lembur sudah terkirim, silakan tunggu notifikasi selanjutnya dari atasan!' : 'Pengajuan sudah tersimpan dan sudah disetujui otomatis oleh sistem, terima kasih!');
+            if ($allApprovables->count() === 0) {
+                // Jika tidak ada atasan, otomatis langsung disetujui (Paid)
+                $overtime->update(['paidable_at' => now()]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('portal::overtime.submission.index')->with(
+                'success',
+                $allApprovables->count() > 0
+                    ? 'Pengajuan lembur sudah terkirim ke atasan terkait!'
+                    : 'Pengajuan sudah tersimpan dan disetujui otomatis oleh sistem!'
+            );
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Gagal simpan pengajuan lembur: ' . $e->getMessage(), [
+                'employee_id' => $employee->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
     }
-
     /**
      * Display the specified resource.
      */
@@ -110,9 +170,22 @@ class SubmissionController extends Controller
         $user = $request->user();
         $employee = $user->employee;
 
-        $overtime = $overtime->load('approvables.userable.position');
+        $overtime->load(['approvables.userable.position', 'employee.position.position.parents']);
 
-        return view('portal::overtime.submission.show', compact('user', 'employee', 'overtime'));
+        $superiors = [];
+        if ($overtime->employee->position && $overtime->employee->position->position) {
+            $parents = $overtime->employee->position->position->parents;
+            foreach ($parents as $index => $parent) {
+                $superiors[] = [
+                    'step'  => $index + 1,
+                    'id'    => $parent->id,
+                    'label' => $parent->name
+                ];
+            }
+        }
+
+
+        return view('portal::overtime.submission.show', compact('user', 'employee', 'overtime', 'superiors'));
     }
 
     /**
@@ -163,13 +236,25 @@ class SubmissionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function approve(EmployeeOvertime $overtime)
+    public function approve(EmployeeOvertime $overtime, Request $request)
     {
-        $overtime->fill(['accepted_at' => now()]);
-        if ($overtime->save()) {
-            return redirect()->back()->with('success', 'Anda telah menerima instruksi lembur, silakan melakukan lembur!');
+        $employee = $request->user()->employee;
+        $myApproval = $overtime->approvables()
+            ->where('userable_id', $employee->position->id)
+            ->first();
+
+        if (!$myApproval || $myApproval->result->value != 0) {
+            return redirect()->back()->with('error', 'Pengajuan ini sudah diproses atau Anda tidak memiliki akses.');
         }
-        return redirect()->fail();
+
+        $myApproval->update([
+            'result' => 1,
+            'approved_at' => now()
+        ]);
+
+        $overtime->update(['accepted_at' => now()]);
+
+        return redirect()->back()->with('success', 'Berhasil menyetujui pengajuan lembur.');
     }
 
     public function export()

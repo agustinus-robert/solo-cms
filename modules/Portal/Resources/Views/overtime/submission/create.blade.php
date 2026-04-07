@@ -18,16 +18,15 @@
 ])
 
 @section('contents')
-    {{-- Header Topbar - Selalu di paling atas section contents --}}
     <header id="page-topbar">
         <div class="navbar-header">
             <div class="d-flex">
                 <div class="navbar-brand-box">
-                    <a href="index.html" class="logo logo-dark">
+                    <a href="" class="logo logo-dark">
                         <span class="logo-sm"><img src="{{ asset('skote/images/logo.svg') }}" height="22"></span>
                         <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
                     </a>
-                    <a href="index.html" class="logo logo-light">
+                    <a href="" class="logo logo-light">
                         <span class="logo-sm"><img src="{{ asset('skote/images/logo-light.svg') }}" height="22"></span>
                         <span class="logo-lg"><img src="{{ asset('skote/images/logo-light.png') }}" height="39"></span>
                     </a>
@@ -51,8 +50,9 @@
         <div class="page-content">
             <div class="container-fluid">
 
-                {{-- Page Header --}}
                 <div class="row align-items-center mb-4 mt-2">
+                    @include('layouts.component.alert-access')
+
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
                             <a href="{{ request('next', route('portal::overtime.submission.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
@@ -77,12 +77,12 @@
                                     <div class="row mb-4 tg-steps-overtime-name">
                                         <label class="col-md-3 col-form-label fw-bold">Nama Pekerjaan <span class="text-danger">*</span></label>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="Contoh: Perbaikan Bug POS System" required>
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="Contoh: Menghitung stock produk di gudang" required>
                                             @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
 
-                                    {{-- Row 2: Waktu (Repeatable) --}}
+                                    {{-- Row 2: Waktu --}}
                                     <div class="row mb-4 tg-steps-overtime-dates">
                                         <div class="col-md-3 d-flex justify-content-between align-items-start">
                                             <label class="col-form-label fw-bold">Waktu Lembur <span class="text-danger">*</span></label>
@@ -138,24 +138,44 @@
                                             <div class="row mb-3">
                                                 <label class="col-md-3 col-form-label fw-bold">{{ $superior['label'] }} <span class="text-danger">*</span></label>
                                                 <div class="col-md-9">
-                                                    <select class="form-select @error('approvables.' . $superior['step']) is-invalid @enderror" name="approvables[{{ $superior['step'] }}]" @if ($superior['required']) required @endif>
-                                                        @if (count($superior['positions']) > 1)
-                                                            <option value="">-- Pilih Atasan --</option>
-                                                        @endif
-                                                        @foreach ($superior['positions'] as $position)
-                                                            <optgroup label="{{ $position->name }}">
-                                                                @foreach ($position->employeePositions as $pEmp)
-                                                                    <option value="{{ $pEmp->id }}" @selected(count($superior['positions']) == 1)>{{ $pEmp->employee->user->name }}</option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endforeach
-                                                    </select>
+                                                    @php
+                                                        $firstPos = $superior['positions']->first();
+                                                        $isOwner = (count($superior['positions']) == 1 && $firstPos && ($firstPos->level_id ?? $firstPos->level) <= 1);
+                                                    @endphp
+
+                                                    @if ($isOwner)
+                                                        <div class="p-2 bg-light rounded border border-dashed">
+                                                            @foreach ($firstPos->employeePositions as $pEmp)
+                                                                <div class="fw-bold text-primary mb-1">
+                                                                    <i class="mdi mdi-account-check-outline me-1"></i>
+                                                                    {{ $pEmp->employee->user->name }}
+                                                                </div>
+                                                                <input type="hidden" name="approvables[{{ $superior['step'] }}]" value="{{ $pEmp->id }}">
+                                                            @endforeach
+                                                            <small class="text-muted italic">(Otomatis Terpilih)</small>
+                                                        </div>
+                                                    @else
+                                                        <select class="form-select @error('approvables.' . $superior['step']) is-invalid @enderror" name="approvables[{{ $superior['step'] }}]" @if ($superior['required']) required @endif>
+                                                            @if (count($superior['positions']) > 1 || (count($superior['positions']) == 1 && $firstPos->employeePositions->count() > 1))
+                                                                <option value="">-- Pilih Atasan --</option>
+                                                            @endif
+                                                            @foreach ($superior['positions'] as $position)
+                                                                <optgroup label="{{ $position->name }}">
+                                                                    @foreach ($position->employeePositions as $pEmp)
+                                                                        <option value="{{ $pEmp->id }}" @selected(count($superior['positions']) == 1 && $position->employeePositions->count() == 1)>
+                                                                            {{ $pEmp->employee->user->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endforeach
+                                                        </select>
+                                                    @endif
+                                                    @error('approvables.' . $superior['step']) <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
 
-                                    {{-- Submit --}}
                                     <div class="row mt-5">
                                         <div class="col-md-9 offset-md-3">
                                             <div class="d-flex gap-2">
@@ -178,7 +198,6 @@
 @endsection
 
 @push('scripts')
-    {{-- Template Row Tanggal --}}
     <div id="dates-template" class="d-none">
         <div class="date-row p-3 bg-light rounded mb-3 border border-dashed position-relative animate-fade-in">
             <button type="button" class="btn btn-sm btn-soft-danger rounded-circle position-absolute" style="top: -10px; right: -10px;" onclick="this.closest('.date-row').remove()">
@@ -205,12 +224,14 @@
         const max_dates = 5;
 
         let changeMinTime = (e) => {
-            let endTimeInput = e.target.parentNode.querySelector('input[name="dates[e][]"]');
+            let row = e.target.closest('.date-row');
+            let endTimeInput = row.querySelector('input[name="dates[e][]"]');
             if(endTimeInput) endTimeInput.min = e.target.value;
         }
 
         let changeMaxTime = (e) => {
-            let startTimeInput = e.target.parentNode.querySelector('input[name="dates[s][]"]');
+            let row = e.target.closest('.date-row');
+            let startTimeInput = row.querySelector('input[name="dates[s][]"]');
             if(startTimeInput) startTimeInput.max = e.target.value;
         }
 

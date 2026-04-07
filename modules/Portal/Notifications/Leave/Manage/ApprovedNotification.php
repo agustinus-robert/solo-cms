@@ -41,7 +41,7 @@ class ApprovedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Selamat! Pengajuan izin kamu disetujui')
             ->greeting('Selamat! Pengajuan izin kamu disetujui')
-            ->line('Pengajuan izin ' . $this->leave->category->name . ' kamu hari untuk keperluan ' . ($this->leave->description ?: 'istirahat') . ' telah disetujui oleh ' . $this->approvable->userable->position->level->label() . ', klik tombol di bawah untuk lihat detailnya.')
+            ->line('Pengajuan izin ' . $this->leave->category->name . ' kamu hari untuk keperluan ' . ($this->leave->description ?: 'istirahat') . ' telah disetujui oleh , klik tombol di bawah untuk lihat detailnya.')
             ->action('Periksa sekarang', route('portal::leave.submission.show', ['leave' => $this->leave->id]))
             ->line('Jika Anda membutuhkan informasi lebih lanjut, segera hubungi kami untuk menindak lanjuti.')
             ->line('Terima kasih telah menggunakan layanan kami.');

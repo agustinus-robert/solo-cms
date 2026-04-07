@@ -8,27 +8,19 @@ use Modules\HRMS\Models\EmployeePosition;
 class StoreRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return isset($this->user()->employee);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()
     {
         return [
             'name'              => 'required|string|max:191',
-            'dates.d.*'         => 'required|date_format:Y-m-d|before_or_equal:now',
+            'dates.d.*'         => 'required|date_format:Y-m-d|before_or_equal:' . date('Y-m-d'),
             'dates.s.*'         => 'required|date_format:H:i',
             'dates.e.*'         => 'required|date_format:H:i',
-            'description'       => 'nullable',
+            'description'       => 'nullable|string',
             'attachment'        => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'approvables'       => 'array',
-            'approvables.*'     => 'nullable|exists:' . (new EmployeePosition())->getTable() . ',id'
+            'approvables'       => 'required|array|min:1', // Minimal ada 1 approver jika bukan owner
+            'approvables.*'     => 'required|exists:' . (new EmployeePosition())->getTable() . ',id'
         ];
     }
 
@@ -38,13 +30,13 @@ class StoreRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name'              => 'pekerjaan',
-            'dates.d.*'         => 'tanggal',
+            'name'              => 'nama pekerjaan',
+            'dates.d.*'         => 'tanggal lembur',
             'dates.s.*'         => 'jam mulai',
             'dates.e.*'         => 'jam selesai',
             'description'       => 'deskripsi',
             'attachment'        => 'lampiran',
-            'approvables.*'     => 'karyawan'
+            'approvables.*'     => 'atasan penanggung jawab'
         ];
     }
 
@@ -55,21 +47,22 @@ class StoreRequest extends FormRequest
     {
         $dates = [];
 
-        foreach ($this->input('dates.d') as $index => $date) {
-            $dates[] = array_filter([
-                'd' => $date,
-                't_s' => $this->input('dates.s.' . $index),
-                't_e' => $this->input('dates.e.' . $index)
-            ]);
+        if ($this->has('dates.d')) {
+            foreach ($this->input('dates.d') as $index => $date) {
+                $dates[] = array_filter([
+                    'd'   => $date,
+                    't_s' => $this->input('dates.s.' . $index),
+                    't_e' => $this->input('dates.e.' . $index)
+                ]);
+            }
         }
 
-        return array_merge(
-            $this->only('name', 'description', 'approvables'),
-            [
-                'dates' => $dates,
-                'attachment' => $this->handleUploadedFile()
-            ]
-        );
+        return [
+            'name'        => $this->input('name'),
+            'description' => $this->input('description'),
+            'dates'       => $dates,
+            'attachment'  => $this->handleUploadedFile()
+        ];
     }
 
     /**
@@ -77,6 +70,10 @@ class StoreRequest extends FormRequest
      */
     public function handleUploadedFile()
     {
-        return $this->has('attachment') ? $this->file('attachment')->store('users/' . $this->user()->id . '/employees/overtimes') : null;
+        if ($this->hasFile('attachment')) {
+            return $this->file('attachment')->store('users/' . $this->user()->id . '/employees/overtimes');
+        }
+
+        return null;
     }
 }
