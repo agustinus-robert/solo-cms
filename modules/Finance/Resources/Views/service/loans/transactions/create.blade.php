@@ -98,7 +98,7 @@
             @php
                 $list = [
                     'karyawan' => $loan->employee->user->name,
-                    'Tanggal pengajuan' => $loan->submission_at->formatLocalized('%A, %d %B %Y'),
+                    'Tanggal pengajuan' => $loan->submission_at->translatedFormat('d F Y'),
                     'Kategori pinjaman' => $loan->category->name,
                     'Nominal pinjaman' => 'Rp ' . Str::money($loan->amount_total),
                     'Tenor' => implode(' ', [$loan->tenor, strtolower($loan->tenor_by->label())]),
@@ -133,7 +133,7 @@
                                     <strong>Rp {{ Str::money($transaction->amount) }}</strong>
                                 </div>
                                 <div class="col-sm-4 text-sm-end">
-                                    <div class="text-muted">{{ $transaction->paid_at->formatLocalized('%A, %d %B %Y') }}</div>
+                                    <div class="text-muted">{{ $transaction->paid_at->translatedFormat('d F Y') }}</div>
                                 </div>
                             </div>
                         </div>

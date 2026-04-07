@@ -38,14 +38,14 @@
                                         <small class="text-muted">{{ $deduction->name }}</small>
                                     </td>
                                     <td>
-                                        <div>{{ $deduction->created_at->formatLocalized('%d %B %Y') }}</div>
+                                        <div>{{ $deduction->created_at->translatedFormat('d F Y') }}</div>
                                         <small class="text-muted">Pukul {{ $deduction->created_at->format('H:i') }}</small>
                                     </td>
                                     <td class="text-center">
                                         Rp{{ number_format($deduction->amount, 2) }}
                                     </td>
                                     <td nowrap>
-                                        <div>{{ $deduction->paid_at ? $deduction->paid_at->formatLocalized('%d %B %Y') : '' }}</div>
+                                        <div>{{ $deduction->paid_at ? $deduction->paid_at->translatedFormat('d F Y') : '' }}</div>
                                         <small class="text-muted">{{ $deduction->paid_at ? 'Pukul ' . $deduction->paid_at->format('H:i') : '' }}</small>
                                     </td>
                                     <td nowrap class="py-1 text-end">

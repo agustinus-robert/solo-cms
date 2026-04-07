@@ -118,7 +118,7 @@
                             @forelse($holidays as $holiday)
                                 <tr @if ($holiday->trashed()) class="text-muted" @endif>
                                     <td class="text-center">{{ $loop->iteration + $holidays->firstItem() - 1 }}</td>
-                                    <td class="small">{{ $holiday->created_at->formatLocalized('%d %B %Y') }}</td>
+                                    <td class="small">{{ $holiday->created_at->translatedFormat('d F Y') }}</td>
                                     <td style="min-width: 200px;" class="py-3">
                                         <div class="justify-content-center align-items-center d-flex">
                                             @if (!$holiday->start_at->isSameDay($holiday->end_at))

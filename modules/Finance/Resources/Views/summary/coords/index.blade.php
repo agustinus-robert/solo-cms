@@ -50,7 +50,7 @@
                                     </td>
                                     <td nowrap>
                                         @if (count($employee->recapSubmissions))
-                                            <div>{{ $employee->recapSubmissions ? $employee->recapSubmissions->first()->created_at->formatLocalized('%d %B %Y') : '' }}</div>
+                                            <div>{{ $employee->recapSubmissions ? $employee->recapSubmissions->first()->created_at->translatedFormat('d F Y') : '' }}</div>
                                         @else
                                             -
                                         @endif

@@ -61,7 +61,7 @@
                     <div class="row mb-3">
                         <label class="col-lg-3 col-xl-2 col-form-label required">Nama slip gaji</label>
                         <div class="col-lg-8 col-xl-7 col-xxl-6">
-                            <input class="form-control" type="text" name="name" value="{{ $selectedTemplate->prefix == 'Bonus' ? $selectedTemplate->name : $selectedTemplate->prefix . ' ' . $end_at->formatLocalized('%B %Y') }}">
+                            <input class="form-control" type="text" name="name" value="{{ $selectedTemplate->prefix == 'Bonus' ? $selectedTemplate->name : $selectedTemplate->prefix . ' ' . $end_at->translatedFormat('F Y') }}">
                         </div>
                     </div>
                 @endif

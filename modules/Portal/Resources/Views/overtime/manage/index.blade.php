@@ -123,7 +123,7 @@
                                                     <div>{{ $overtime->name }}</div>
                                                     <small class="text-muted">{{ Str::words($overtime->description, 6) }}</small>
                                                 </td>
-                                                <td class="small">{{ $overtime->created_at->formatLocalized('%d %B %Y') }}</td>
+                                                <td class="small">{{ $overtime->created_at->translatedFormat('d F Y') }}</td>
                                                 <td style="min-width: 200px;">
                                                     @if ($overtime->dates)
                                                         @foreach ($overtime->dates?->take(3) as $date)

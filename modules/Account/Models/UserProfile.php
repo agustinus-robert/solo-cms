@@ -104,7 +104,7 @@ class UserProfile extends Model
 
     public function getDobNameAttribute()
     {
-        return $this->dob ? Carbon::parse($this->dob)->formatLocalized('%d %B %Y') : null;
+        return $this->dob ? Carbon::parse($this->dob)->translatedFormat('d F Y') : null;
     }
 
     /**

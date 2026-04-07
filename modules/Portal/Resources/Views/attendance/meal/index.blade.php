@@ -158,7 +158,7 @@
                 </div>
                 @if ($current_schedule)
                     <div class="card-body">
-                        Hari efektif kerja kamu bulan {{ $month->formatLocalized('%B %Y') }} adalah <strong>{{ $count_schedule }} hari</strong>
+                        Hari efektif kerja kamu bulan {{ $month->translatedFormat('F Y') }} adalah <strong>{{ $count_schedule }} hari</strong>
                     </div>
                 @endif
             </div>

@@ -168,7 +168,7 @@
                                 <div class="row gy-4 mb-4">
                                     <div class="col-md-6">
                                         <div class="small text-muted">Tanggal pengajuan</div>
-                                        <div class="fw-bold"> {{ $vacation->created_at->formatLocalized('%A, %d %B %Y') }}</div>
+                                        <div class="fw-bold"> {{ $vacation->created_at->translatedFormat('d F Y') }}</div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="small text-muted">Kategori cuti</div>

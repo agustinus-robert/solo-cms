@@ -62,7 +62,7 @@
                                             Rp {{ Str::money($transaction->installment->loan->amount_total) }}
                                         </td>
                                         <td> Rp {{ Str::money($transaction->amount) }}</td>
-                                        <td>{{ $transaction->paid_at->formatLocalized('%A, %d %B %Y') }}</td>
+                                        <td>{{ $transaction->paid_at->translatedFormat('d F Y') }}</td>
                                         <td>{{ $transaction->installment->status }}</td>
                                         <td class="text-end py-2" nowrap>
                                             @if ($transaction->trashed())

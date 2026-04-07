@@ -40,7 +40,7 @@
                                         <div>{{ $vacation->quota->category->name }}</div>
                                         <small class="text-muted">{{ $vacation->description }}</small>
                                     </td>
-                                    <td class="small">{{ $vacation->created_at->formatLocalized('%d %B %Y') }}</td>
+                                    <td class="small">{{ $vacation->created_at->translatedFormat('d F Y') }}</td>
                                     <td style="min-width: 200px;">
                                         @if ($cashable)
                                             <span class="badge bg-dark fw-normal user-select-none text-white">{{ $vacation->dates->count() }} dikompensasikan</span>

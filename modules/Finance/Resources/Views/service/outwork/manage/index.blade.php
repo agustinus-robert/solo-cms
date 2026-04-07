@@ -37,7 +37,7 @@
                                         <div class="fw-bold">{{ $outwork->category->name }}</div>
                                         <div>{{ $outwork->name }}</div>
                                         <div class="small text-muted">{{ Str::words($outwork->description, 6) }}</div>
-                                        <div class="small cite badge bg-soft-secondary fw-normal text-dark">Diajukan: {{ $outwork->created_at->formatLocalized('%d %B %Y') }}</div>
+                                        <div class="small cite badge bg-soft-secondary fw-normal text-dark">Diajukan: {{ $outwork->created_at->translatedFormat('d F Y') }}</div>
                                     </td>
                                     <td style="max-width: 280px;" class="small">
                                         @foreach ($outwork->dates->take(3) as $date)

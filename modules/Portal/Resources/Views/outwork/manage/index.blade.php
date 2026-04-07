@@ -146,7 +146,7 @@
                                                         @endisset
                                                     </small>
                                                 </td>
-                                                <td class="small">{{ $outwork->created_at->formatLocalized('%d %B %Y') }}</td>
+                                                <td class="small">{{ $outwork->created_at->translatedFormat('d F Y') }}</td>
                                                 <td style="min-width: 200px;">
                                                     @foreach ($outwork->dates->take(3) as $date)
                                                         <span class="badge bg-soft-secondary text-dark fw-normal user-select-none {{ isset($date['c']) ? 'text-decoration-line-through' : '' }}" @isset($date['f']) data-bs-toggle="tooltip" title="Sebagai freelancer" @endisset>
