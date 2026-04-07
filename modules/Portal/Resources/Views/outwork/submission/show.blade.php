@@ -8,10 +8,23 @@
     <header id="page-topbar">
         <div class="navbar-header">
             <div class="d-flex">
-                <div class="navbar-brand-box">
-                    <a href="" class="logo logo-dark">
-                        <span class="logo-sm"><img src="{{ asset('skote/images/logo.svg') }}" height="22"></span>
-                        <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
+                 <div class="navbar-brand-box">
+                    <a href="index.html" class="logo logo-dark">
+                        <span class="logo-sm">
+                            <img src="{{ asset('skote/images/logo.svg') }}" alt="" height="22">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="{{ asset('skote/images/logo-dark.png') }}" alt="" height="17">
+                        </span>
+                    </a>
+
+                    <a href="index.html" class="logo logo-light">
+                        <span class="logo-sm">
+                            <img src="{{ asset('skote/images/logo-light.svg') }}" alt="" height="22">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="{{ asset('skote/images/logo-light.png') }}" alt="" height="39">
+                        </span>
                     </a>
                 </div>
             </div>
