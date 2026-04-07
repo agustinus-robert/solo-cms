@@ -51,7 +51,6 @@ class StoreRequest extends FormRequest
             'approvables.*'     => 'karyawan'
         ];
     }
-
     /**
      * Transform request into expected output.
      */
@@ -60,21 +59,21 @@ class StoreRequest extends FormRequest
         $dates = [];
         foreach ($this->input('dates.d') as $index => $date) {
             $dates[] = array_filter([
-                'd' => $date,
+                'd'   => $date,
                 't_s' => $this->input('dates.s.' . $index),
                 't_e' => $this->input('dates.e.' . $index),
-                'b' => $this->input('dates.b.' . $index),
-                'p' => (bool) $this->input('prepare')
+                'b'   => $this->input('dates.b.' . $index),
+                'p'   => (bool) $this->input('prepare')
             ]);
         }
 
-        return array_merge(
-            $this->only('name', 'ctg_id', 'description', 'approvables'),
-            [
-                'dates' => $dates,
-                'attachment' => $this->handleUploadedFile()
-            ]
-        );
+        return [
+            'name'        => $this->input('name'),
+            'ctg_id'      => $this->input('ctg_id'),
+            'description' => $this->input('description'),
+            'dates'       => $dates,
+            'attachment'  => $this->handleUploadedFile()
+        ];
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Modules\Portal\Http\Controllers\Outwork;
 
 use Illuminate\Http\Request;
-use Modules\Core\Enums\PositionLevelEnum;
 use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\CompanyOutworkCategory;
 use Modules\HRMS\Models\EmployeeOutwork;
@@ -12,61 +11,61 @@ use Modules\Portal\Http\Controllers\Controller;
 use Modules\Portal\Http\Requests\Outwork\Submission\StoreRequest;
 use Modules\Portal\Notifications\Outwork\Submission\SubmissionNotification;
 use Modules\Portal\Notifications\Outwork\Cancelation\CanceledNotification;
-use Modules\Account\Notifications\AccountNotification;
 use Modules\Portal\Notifications\Outwork\Submission\SubmissionWaNotification;
 
 class SubmissionController extends Controller
 {
-    private $superiors = [];
-
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $employee = $request->user()->employee;
+        $user = $request->user();
+        $employee = $user->employee;
+        $view = $request->get('view', 'mine');
+        $myPositionIds = $employee->positions()->pluck('id')->toArray();
 
-        $outworks = $employee->outworks()
+        $query = EmployeeOutwork::query()
             ->withTrashed()
-            ->with('approvables.userable.position', 'category')
+            ->with(['approvables.userable.position', 'category', 'employee.user'])
             ->search($request->get('search'))
-            ->whenPeriod($request->get('start_at'), $request->get('end_at'))
-            ->latest()
-            ->paginate($request->get('limit', 10));
+            ->whenPeriod($request->get('start_at'), $request->get('end_at'));
 
-        $approvers = EmployeePosition::active()->whereHas('position', fn($position) => $position->whereIn('level', array_column(config('modules.core.features.services.outworks.approvable_steps'), 'value')))->get();
+        if ($view == 'approvals') {
+            $query->whereHas('approvables', function ($q) use ($myPositionIds) {
+                $q->whereIn('userable_id', $myPositionIds);
+            });
+        } else {
+            $query->where('empl_id', $employee->id);
+        }
 
-        return view('portal::outwork.submission.index', compact('employee', 'outworks', 'approvers'));
+        $outworks = $query->latest()->paginate($request->get('limit', 10));
+
+        $isApprover = EmployeeOutwork::whereHas('approvables', function ($q) use ($myPositionIds) {
+             $q->whereIn('userable_id', $myPositionIds);
+        })->exists();
+
+        return view('portal::outwork.submission.index', compact('employee', 'outworks', 'view', 'isApprover'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
+
     public function create(Request $request)
     {
         $employee = $request->user()->employee;
 
-        $steps = array_filter(
-            config('modules.core.features.services.outworks.approvable_steps', []),
-            fn($step) => empty($step['hide_from_input'])
-        );
+        $superiors = $employee->position->position->parents()
+            ->with(['employeePositions' => fn($q) => $q->active()->with('employee.user')])
+            ->get()
+            ->map(function($parent) {
+                return [
+                    'level_value' => $parent->level,
+                    'positions' => $parent->employeePositions
+                ];
+            })->filter(fn($item) => $item['positions']->count() > 0);
 
-        foreach ($steps as $step => $model) {
-            switch ($model['type']) {
-                case 'parent_position_level':
-                    array_push($this->superiors, [
-                        'step' => $step,
-                        'label' => PositionLevelEnum::tryFrom($model['value'])->label(),
-                        'positions' => $employee->position->position->load(['parents.employeePositions' => fn($position) => $position->active()->with('position', 'employee.user')])->parents->where('level.value', $model['value'])
-                    ]);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-
-        $superiors = array_filter($this->superiors, fn($superior) => count($superior['positions']));
         $categories = CompanyOutworkCategory::all()->groupBy('name');
 
         return view('portal::outwork.submission.create', compact('employee', 'superiors', 'categories'));
@@ -79,33 +78,41 @@ class SubmissionController extends Controller
     {
         $employee = $request->user()->employee;
 
+        // 1. Create data outwork (menggunakan data yang sudah di-transform tanpa approvables)
         $outwork = $employee->outworks()->create($request->transform());
 
-        // Assign approvable based approvable_steps configuration
-        foreach (config('modules.core.features.services.outworks.approvable_steps', []) as $index => $model) {
-            if ($model['type'] == 'parent_position_level') {
-                $positions = $employee->position->position->parents->where('level.value', $model['value'])->each(
-                    fn($position) =>
-                    $outwork->createApprovable(empty($model['hide_from_input']) ? $position->employeePositions()->active()->find($request->input('approvables.' . $index)) : $position->employeePositions()->active()->first())
-                );
+        // 2. Simpan Approver ke tabel relasi
+        if ($request->has('approvables')) {
+            foreach ($request->input('approvables') as $index => $positionId) {
+                if ($positionId) {
+                    $outwork->approvables()->create([
+                        'userable_type' => EmployeePosition::class,
+                        'userable_id'   => $positionId,
+                        'result'        => ApprovableResultEnum::PENDING,
+                        'level'         => $index + 1, // Kita buat level dinamis berdasarkan urutan input (1, 2, dst)
+                    ]);
+                }
             }
         }
 
-        // Handle notifications
-        if ($approvable = $outwork->approvables()->orderBy('level')->first()) {
-            $approvable->userable->getUser()->notify(new SubmissionNotification($outwork, null));
-            $approvable->userable->getUser()->notify(new SubmissionWaNotification(
-                'Anda mendapatkan notifikasi pengajuan insentif dari ' . $employee->user->name .
-                    ', silakan cek pada link berikut: ' . route('portal::outwork.submission.show', ['outwork' => $outwork->id]),
-                $approvable->userable->getUser()
-            ));
+        // 3. Ambil approver pertama (Level 1) untuk dikirim notifikasi
+        $firstApprover = $outwork->approvables()->orderBy('level')->first();
+
+        if ($firstApprover) {
+            $approverUser = $firstApprover->userable->employee->user;
+
+            // $approverUser->notify(new SubmissionNotification($outwork, null));
+            // $approverUser->notify(new SubmissionWaNotification(
+            //     "Halo, Anda mendapatkan pengajuan insentif dari {$employee->user->name}. Silakan cek di sini: " . route('portal::outwork.submission.show', $outwork->id),
+            //     $approverUser
+            // ));
         } else {
             $outwork->update(['paidable_at' => now()]);
         }
 
-        return redirect()->route('portal::outwork.submission.index')->with('success', isset($approvable) ? 'Pengajuan kegiatan sudah terkirim, silakan tunggu notifikasi selanjutnya dari atasan!' : 'Pengajuan sudah tersimpan dan sudah disetujui otomatis oleh sistem, terima kasih!');
+        return redirect()->route('portal::outwork.submission.index', ['view' => 'mine'])
+            ->with('success', 'Pengajuan berhasil dikirim!');
     }
-
     /**
      * Display the specified resource.
      */
@@ -113,21 +120,25 @@ class SubmissionController extends Controller
     {
         $user = $request->user();
         $employee = $user->employee;
-
-        $outwork = $outwork->load('approvables.userable.position', 'category');
+        $outwork->load('approvables.userable.position', 'category', 'employee.user');
 
         return view('portal::outwork.submission.show', compact('user', 'employee', 'outwork'));
     }
 
     public function destroy(EmployeeOutwork $outwork)
     {
-        $outwork->delete();
+        // Notifikasi pembatalan ke atasan yang sudah merespons (jika ada)
+        $notifiedApprover = $outwork->approvables()
+            ->where('result', '!=', ApprovableResultEnum::PENDING)
+            ->first();
 
-        // Handle notifications
-        if ($approvable = $outwork->approvables()->whereNotIn('result', [ApprovableResultEnum::PENDING])->orderBy('level')->first()) {
-            $approvable->userable->employee->user->notify(new CanceledNotification($outwork));
+        if ($notifiedApprover) {
+            $notifiedApprover->userable->employee->user->notify(new CanceledNotification($outwork));
         }
 
-        return redirect()->route('portal::outwork.submission.index')->with('success', 'Pengajuan telah dibatalkan dan kami telah mengirim notifikasi ke atasan!');
+        $outwork->delete();
+
+        return redirect()->route('portal::outwork.submission.index', ['view' => 'mine'])
+            ->with('success', 'Pengajuan telah dibatalkan.');
     }
 }

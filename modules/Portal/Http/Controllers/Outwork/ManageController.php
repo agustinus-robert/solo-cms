@@ -58,37 +58,55 @@ class ManageController extends Controller
     public function update(CompanyApprovable $approvable, UpdateRequest $request)
     {
         $approvable->update($request->transformed()->toArray());
-        $approved = $request->input('result') == ApprovableResultEnum::APPROVE->value;
+        $outwork = $approvable->modelable;
 
-        $approvable->modelable->update(['paidable_at' => $approved && $approvable->is($approvable->modelable->approvables->sortByDesc('level')->first()) ? now() : null]);
+        if (!$outwork) {
+            return redirect()->back()->with('error', 'Data pengajuan tidak ditemukan.');
+        }
 
-        // Handle notifications
-        if ($approved) {
-            //$approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
-            $approvable->modelable->employee->user->notify(new ManageWaNotification(
-                'Pengajuan insentif anda sudah disetujui ' .
-                    ', silakan cek pada link berikut: ' . route('portal::outwork.submission.show', ['outwork' => $approvable->id]),
-                $approvable->modelable->employee->user
-            ));
+        $result = (int) $request->input('result');
+        $isApproved = $result === ApprovableResultEnum::APPROVE->value;
+        $isRejected = $result === ApprovableResultEnum::REJECT->value;
 
-            if ($superior = $approvable->modelable->approvables->sortBy('level')->filter(fn($a) => $a->level > $approvable->level)->first()) {
-                //  $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
+        $allApprovers = $outwork->approvables()->orderBy('level', 'asc')->get();
+        $lastApprover = $allApprovers->last();
 
-                $superior->userable->employee->user->notify(new ManageWaNotification(
-                    'Pengajuan insentif atas nama ' . $approvable->modelable->employee->user->name . ' sudah disetujui oleh ' . $superior->userable->employee->user->name .
-                        ', silakan cek pada link berikut: ' . route('portal::outwork.submission.show', ['outwork' => $approvable->id]),
-                    $superior->userable->employee->user
-                ));
+        $nextSuperior = $allApprovers->where('level', '>', $approvable->level)
+                                    ->where('result', ApprovableResultEnum::PENDING)
+                                    ->first();
+
+        // 3. Jika DISETUJUI
+        if ($isApproved) {
+            // Jika ini adalah pemberi persetujuan terakhir
+            if ($approvable->id === $lastApprover->id) {
+                $outwork->update(['paidable_at' => now()]);
+
+                // Notifikasi Selesai ke Pembuat Pengajuan
+                // $outwork->employee->user->notify(new ManageWaNotification(
+                //     "Halo {$outwork->employee->user->name}, pengajuan insentif Anda telah DISETUJUI SEPENUHNYA. Cek detail: " . route('portal::outwork.submission.show', $outwork->id),
+                //     $outwork->employee->user
+                // ));
+            } else {
+                // Jika masih ada atasan selanjutnya, kirim WA ke atasan berikutnya
+                if ($nextSuperior) {
+                    $nextUser = $nextSuperior->userable->employee->user;
+                    // $nextUser->notify(new ManageWaNotification(
+                    //     "Halo, ada pengajuan insentif dari {$outwork->employee->user->name} yang menunggu persetujuan Anda. Link: " . route('portal::outwork.submission.show', $outwork->id),
+                    //     $nextUser
+                    // ));
+                }
             }
         }
 
-        if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-            //$approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
-            $approvable->modelable->employee->user->notify(new ManageWaNotification(
-                'Pengajuan insentif anda ditolak' .
-                    ', silakan cek pada link berikut: ' . route('portal::outwork.submission.show', ['outwork' => $approvable->id]),
-                $approvable->modelable->employee->user
-            ));
+        // 4. Jika DITOLAK
+        if ($isRejected) {
+            $outwork->update(['paidable_at' => null]);
+
+            // Notifikasi Penolakan ke Pembuat Pengajuan
+            // $outwork->employee->user->notify(new ManageWaNotification(
+            //     "Halo {$outwork->employee->user->name}, pengajuan insentif Anda DITOLAK. Silakan cek catatan di sini: " . route('portal::outwork.submission.show', $outwork->id),
+            //     $outwork->employee->user
+            // ));
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
