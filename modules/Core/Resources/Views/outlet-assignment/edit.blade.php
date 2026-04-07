@@ -71,7 +71,7 @@
                                                        style="width: 22px; height: 22px;">
                                             </div>
                                             <div class="ms-1">
-                                                <span class="fw-bold d-block text-dark small">{{ strtoupper($user->name) }}</span>
+                                                <span class="fw-bold d-block text-dark small">{{ strtoupper($user->user->name) }}</span>
                                                 <small class="text-muted">{{ $user->email }}</small>
                                             </div>
                                         </div>

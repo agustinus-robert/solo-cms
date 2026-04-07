@@ -40,4 +40,9 @@ class Outlet extends Model
             'empl_id'
         )->with('user');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_casier_outlets', 'outlet_id', 'empl_id');
+    }
 }
