@@ -104,33 +104,41 @@ class SubmissionController extends Controller
 
         return DB::transaction(function () use ($employee, $request) {
             $vacation = $employee->vacations()->create($request->transformed()->toArray());
+
+            // 2. Generate Alur Persetujuan (Approvables)
             if ($employee->position && $employee->position->position) {
-                $parents = $employee->position->position->parents->reverse()->values();
+                // JANGAN PAKAI .reverse()!
+                // Kita mau urutan dari yang TERDEKAT (Manager) ke yang TERTINGGI (Owner).
+                $parents = $employee->position->position->parents->values();
 
                 foreach ($parents as $index => $parent) {
+                    // Ambil posisi karyawan yang aktif untuk parent (jabatan atasan) ini
                     $approverPosition = $parent->employeePositions()->active()->first();
 
                     if ($approverPosition) {
                         $vacation->createApprovable($approverPosition, [
+                            // Index 0 jadi Level 1 (Atasan Langsung)
+                            // Index 1 jadi Level 2 (Atasan di atasnya lagi)
                             'level' => $index + 1
                         ]);
                     }
                 }
             }
 
+            // 3. Ambil approver pertama (Level 1) untuk dikirim notifikasi
             $firstApprover = $vacation->approvables()->orderBy('level', 'asc')->first();
 
             if ($firstApprover && $firstApprover->userable) {
                 $targetUser = $firstApprover->userable->getUser();
 
                 if ($targetUser) {
-                    // $targetUser->notify(new SubmissionNotification($vacation, false, null));
-
+                    // Notifikasi ke Manager (Level 1)
                     $message = $employee->user->name . ' mengajukan cuti ' .
                             ($vacation->quota->category->name ?? 'Tahunan') .
                             ', silakan cek pada link berikut: ' .
                             route('portal::vacation.manage.show', ['vacation' => $vacation->id]);
 
+                    // Aktifkan notifikasi jika perlu
                     // $targetUser->notify(new AccountNotification($message, $targetUser));
                 }
             }
@@ -153,9 +161,17 @@ class SubmissionController extends Controller
     {
         $user = $request->user();
         $employee = $user->employee;
+
         $myPositionIds = $employee->positions()->pluck('id')->toArray();
 
-        $vacation = $vacation->load(['approvables.userable.position', 'quota.employee.user', 'quota.category']);
+        $vacation->load([
+            'approvables' => function($query) {
+                $query->orderBy('level', 'asc');
+            },
+            'approvables.userable.position',
+            'quota.employee.user',
+            'quota.category'
+        ]);
 
         return view('portal::vacation.submission.show', compact('user', 'employee', 'vacation', 'myPositionIds'));
     }

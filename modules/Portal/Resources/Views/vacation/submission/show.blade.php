@@ -5,6 +5,16 @@
 @section('navtitle', 'Cuti')
 
 @section('contents')
+    <style>
+        .card-detail { border-radius: 12px; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .label-muted { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #74788d; margin-bottom: 4px; }
+        .value-bold { font-weight: 600; color: #495057; font-size: 0.9rem; }
+        .info-section { padding: 1.25rem; border-bottom: 1px solid #eff2f7; }
+        .info-section:last-child { border-bottom: none; }
+        .avatar-title-custom { background-color: rgba(85, 110, 230, 0.1); color: #556ee6; font-weight: bold; }
+        .bg-light-soft { background-color: #f8f9fa; }
+    </style>
+
     {{-- Header Topbar --}}
     <header id="page-topbar">
         <div class="navbar-header">
@@ -15,19 +25,10 @@
                         <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
                     </a>
                 </div>
-                <button type="button" class="btn btn-sm font-size-16 d-lg-none header-item waves-effect waves-light px-3" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-                    <i class="fa fa-fw fa-bars"></i>
-                </button>
             </div>
-
             <div class="d-flex">
-                @php
-                    $user = auth()->user();
-                @endphp
-
                 @include('portal::layouts.components.notifications')
                 @include('layouts.shortcut_menu')
-
                 <div class="dropdown d-none d-lg-inline-block ms-1">
                     @include('layouts.nav_name')
                 </div>
@@ -41,239 +42,237 @@
 
                 {{-- Header Section --}}
                 <div class="row align-items-center mb-4 mt-2">
-                    @include('layouts.component.alert-access')
-
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
                             <a href="{{ request('next', route('portal::vacation.submission.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
                                 <i class="mdi mdi-arrow-left font-size-18"></i>
                             </a>
                             <div>
-                                <h4 class="mb-0 fw-bold text-dark">Informasi Pengajuan Cuti</h4>
-                                <p class="text-muted mb-0 font-size-13">Detail riwayat dan status pengajuan karyawan.</p>
+                                <h4 class="mb-0 fw-bold text-dark">Detail Pengajuan Cuti</h4>
+                                <p class="text-muted mb-0 font-size-13">ID Pengajuan: #VAC-{{ $vacation->id }}</p>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                        @if (!$vacation->trashed())
+                            <a class="btn btn-light waves-effect me-2" href="{{ route('portal::vacation.print', ['vacation' => $vacation->id]) }}" target="_blank">
+                                <i class="mdi mdi-printer-outline me-1"></i> Cetak Dokumen
+                            </a>
+                        @endif
                     </div>
                 </div>
 
                 @if ($vacation->trashed())
-                    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-                        <i class="mdi mdi-alert-outline me-2"></i>
-                        <strong>Perhatian!</strong> Pengajuan ini telah dihapus. Anda tidak dapat lagi mengelola data ini.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                        <i class="mdi mdi-block-helper me-2"></i>
+                        <strong>Pengajuan Dibatalkan:</strong> Data ini telah dihapus.
                     </div>
                 @endif
 
                 <div class="row">
                     <div class="col-xl-8">
-                        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center justify-content-between mb-4">
-                                    <h5 class="card-title mb-0 fw-bold text-primary">
-                                        <i class="mdi mdi-text-box-search-outline me-1"></i> Rincian Pengajuan
-                                    </h5>
-                                    @if (!$vacation->trashed())
-                                        <a class="btn btn-soft-success btn-sm waves-effect waves-light" href="{{ route('portal::vacation.print', ['vacation' => $vacation->id]) }}" target="_blank">
-                                            <i class="mdi mdi-printer me-1"></i> Cetak PDF
-                                        </a>
-                                    @endif
+                        {{-- Kartu Informasi Utama --}}
+                        <div class="card card-detail">
+                            <div class="card-header bg-transparent border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <i class="mdi mdi-information-outline text-primary font-size-20 me-2"></i>
+                                    <h5 class="card-title mb-0">Informasi Utama</h5>
                                 </div>
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="text-muted font-size-12 text-uppercase fw-bold mb-1 d-block">Tanggal Pengajuan</label>
-                                        <p class="mb-0 text-dark fw-medium">{{ $vacation->created_at->translatedFormat('l, d F Y') }}</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="text-muted font-size-12 text-uppercase fw-bold mb-1 d-block">Kategori Cuti</label>
-                                        <p class="mb-0 text-dark fw-medium">{{ $vacation->quota->category->name }}</p>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <label class="text-muted font-size-12 text-uppercase fw-bold mb-2 d-block">Daftar Tanggal Cuti</label>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @isset(collect($vacation->dates)->first()['cashable'])
-                                                <span class="badge bg-dark px-3 py-2 fw-medium text-white">{{ $vacation->dates->count() }} Hari dikompensasikan</span>
-                                            @else
-                                                @foreach ($vacation->dates as $date)
-                                                    <span class="badge bg-soft-secondary text-dark px-3 py-2 fw-medium {{ isset($date['c']) ? 'text-decoration-line-through' : '' }}" @isset($date['f']) data-bs-toggle="tooltip" title="Freelance Mode" @endisset>
-                                                        @isset($date['f'])
-                                                            <i class="mdi mdi-account-network text-danger me-1"></i>
-                                                        @endisset
-                                                        {{ \Carbon\Carbon::parse($date['d'])->translatedFormat('d M Y') }}
-                                                    </span>
-                                                @endforeach
-                                            @endisset
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="info-section">
+                                    <div class="row gy-3">
+                                        <div class="col-md-6">
+                                            <p class="label-muted">Kategori Cuti</p>
+                                            <span class="badge badge-soft-primary font-size-12 px-2 py-1">{{ $vacation->quota->category->name }}</span>
                                         </div>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <label class="text-muted font-size-12 text-uppercase fw-bold mb-1 d-block">Alasan / Deskripsi</label>
-                                        <p class="mb-0 text-dark">{{ $vacation->description ?: '-' }}</p>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="text-muted font-size-12 text-uppercase fw-bold mb-2 d-block">Status Saat Ini</label>
-                                        <div>@include('portal::vacation.components.status', ['vacation' => $vacation])</div>
+                                        <div class="col-md-6 text-md-end">
+                                            <p class="label-muted">Tanggal Pengajuan</p>
+                                            <p class="value-bold mb-0">{{ $vacation->created_at->translatedFormat('l, d F Y') }}</p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                @if ($vacation->approvables->count())
-                                    <div class="mt-5">
-                                        <h6 class="text-muted font-size-12 text-uppercase fw-bold mb-3">Alur Persetujuan</h6>
-                                        <div class="table-responsive">
-                                            <table class="table table-nowrap align-middle table-borderless bg-light rounded-3 overflow-hidden">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th class="ps-3">Penanggungjawab</th>
-                                                        <th>Level</th>
-                                                        <th>Keputusan</th>
-                                                        <th>Catatan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($vacation->approvables as $approvable)
-                                                        <tr>
-                                                            <td class="ps-3">
-                                                                <span class="d-block fw-bold text-dark">{{ $approvable->userable->getApproverLabel() }}</span>
-                                                                <small class="text-muted">{{ ucfirst($approvable->type) }}</small>
-                                                            </td>
-                                                            <td><span class="badge bg-soft-info text-info">Lv. {{ $approvable->level }}</span></td>
-                                                            <td>
-                                                                <span class="badge bg-{{ $approvable->result->color() }} text-white">
-                                                                    <i class="{{ $approvable->result->icon() }} me-1"></i> {{ $approvable->result->label() }}
-                                                                </span>
-                                                            </td>
-                                                            <td class="text-wrap" style="min-width: 200px;">
-                                                                {{ $approvable->reason ?: '-' }}
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
+                                <div class="info-section bg-light-soft">
+                                    <p class="label-muted mb-2">Tanggal Cuti Yang Diajukan</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @isset(collect($vacation->dates)->first()['cashable'])
+                                            <div class="p-2 border rounded bg-white shadow-sm d-flex align-items-center w-100 text-center">
+                                                <h6 class="mb-0 text-dark fw-bold w-100">{{ $vacation->dates->count() }} Hari dikompensasikan (Cashable)</h6>
+                                            </div>
+                                        @else
+                                            @foreach ($vacation->dates as $date)
+                                                <div class="p-2 border rounded bg-white shadow-sm d-flex align-items-center" style="min-width: 180px;">
+                                                    <div class="avatar-xs me-2">
+                                                        <span class="avatar-title rounded-circle bg-soft-info text-info">
+                                                            <i class="mdi mdi-calendar-check"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 font-size-13 fw-bold {{ isset($date['c']) ? 'text-decoration-line-through text-muted' : '' }}">
+                                                            {{ \Carbon\Carbon::parse($date['d'])->translatedFormat('d M Y') }}
+                                                        </p>
+                                                        <small class="text-muted">@isset($date['f']) Freelance Mode @else Full Day @endisset</small>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endisset
+                                    </div>
+                                </div>
+
+                                <div class="info-section">
+                                    <p class="label-muted">Alasan / Deskripsi</p>
+                                    <p class="text-dark bg-light p-3 rounded border-start border-primary border-3">{{ $vacation->description ?: '-' }}</p>
+                                </div>
+
+                                <div class="info-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <p class="label-muted">Status Saat Ini</p>
+                                            @include('portal::vacation.components.status', ['vacation' => $vacation])
                                         </div>
                                     </div>
-                                @endif
+                                </div>
                             </div>
                         </div>
+
+                        @php
+                            $user = auth()->user();
+                            $myPositionIds = $user->employee->positions()->pluck('id')->toArray();
+
+                            $approvalArray = $vacation->approvables->sortBy('level');
+                            $currentActiveId = null;
+                            $pendingApprovals = $approvalArray->where('result', 0)->sortByDesc('level');
+
+                            if($pendingApprovals->count() > 0) {
+                                $currentActiveId = $pendingApprovals->first()->id;
+                            }
+                        @endphp
+
+                        @if ($approvalArray->count() > 0)
+                            <div class="card card-detail">
+                                <div class="card-header bg-transparent border-bottom">
+                                    <h5 class="card-title mb-0">Alur Persetujuan</h5>
+                                </div>
+                                <div class="card-body">
+                                    @foreach ($approvalArray as $approvable)
+                                        @php
+                                            $statusValue = is_object($approvable->result) ? $approvable->result->value : $approvable->result;
+                                            $isMyTurn = ($approvable->id === $currentActiveId) && in_array($approvable->userable_id, $myPositionIds);
+                                        @endphp
+
+                                        <div class="d-flex mb-4">
+                                            <div class="flex-shrink-0 me-3 text-center">
+                                                <div class="avatar-sm mx-auto">
+                                                    <span class="avatar-title rounded-circle bg-{{ $statusValue == 0 ? ($approvable->id === $currentActiveId ? 'warning' : 'light') : $approvable->result->color() }} {{ $statusValue == 0 && $approvable->id !== $currentActiveId ? 'text-muted' : 'text-white' }} shadow-sm">
+                                                        <i class="mdi {{ $statusValue == 0 ? 'mdi-clock-outline' : 'mdi-check-bold' }}"></i>
+                                                    </span>
+                                                </div>
+                                                @if (!$loop->last)
+                                                    <div class="border-start border-2 border-light mx-auto mt-2" style="height: 20px; width: 1px;"></div>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold {{ $statusValue == 0 && $approvable->id !== $currentActiveId ? 'text-muted' : 'text-dark' }}">
+                                                            {{ $approvable->userable->getApproverLabel() }}
+                                                        </h6>
+                                                        <p class="text-muted font-size-12 mb-0">Level <strong>{{ $approvable->level }}</strong></p>
+                                                    </div>
+                                                    <span class="badge badge-soft-{{ $approvable->result->color() }} font-size-11 px-2 py-1">
+                                                        {{ $approvable->result->label() }}
+                                                    </span>
+                                                </div>
+
+                                                @if ($isMyTurn && !$vacation->trashed())
+                                                    <div class="mt-3 bg-light p-3 rounded border border-warning border-opacity-20 shadow-sm">
+                                                        <form action="{{ route('portal::vacation.manage.update', $approvable->id) }}" method="post">
+                                                            @csrf @method('put')
+                                                            <input type="hidden" name="approvable_id" value="{{ $approvable->id }}">
+                                                            <input type="hidden" name="next" value="{{ url()->current() }}">
+
+                                                            <div class="row g-2">
+                                                                <div class="col-sm-8">
+                                                                    <input type="text" name="reason" class="form-control form-control-sm" placeholder="Tulis catatan (opsional)..." autofocus>
+                                                                </div>
+                                                                <div class="col-sm-4 text-end">
+                                                                    <div class="btn-group btn-group-sm">
+                                                                        <button type="submit" name="result" value="1" class="btn btn-success px-3">Setuju</button>
+                                                                        <button type="submit" name="result" value="2" class="btn btn-danger px-3">Tolak</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                @elseif($approvable->reason)
+                                                    <div class="mt-2 p-2 bg-light rounded font-size-13 italic text-secondary border-start border-3 border-primary">
+                                                        "{{ $approvable->reason }}"
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="col-xl-4">
-                        {{-- Logic Pencarian Approval --}}
+                        {{-- Data Karyawan --}}
                         @php
-                            $myPositionIds = auth()->user()->employee->positions()->pluck('id')->toArray();
-
-                            $myApprovals = $vacation->approvables->filter(function ($item) use ($myPositionIds) {
-                                // Samakan namespace dengan hasil DD Robert
-                                $isCorrectType = ($item->userable_type === 'Modules\HRMS\Models\EmployeePosition' ||
-                                                $item->userable_type === \Modules\Portal\Models\EmployeePosition::class);
-
-                                $isMyPosition = in_array($item->userable_id, $myPositionIds);
-
-                                // Ambil value integer dari result
-                                $statusValue = is_object($item->result) ? $item->result->value : $item->result;
-                                $isPending = ($statusValue == 0);
-
-                                return $isCorrectType && $isMyPosition && $isPending;
-                            });
-
-                            $hasDecisionByAnyone = $vacation->approvables->where('result', '!=', 0)->count() > 0;
+                            $emp = $vacation->quota->employee;
+                            $pos = $emp->position->position ?? null;
                         @endphp
-
-                        @forelse ($myApprovals as $approval)
-                            <div class="card border-0 shadow-sm mb-3" style="border-radius: 12px; background-color: #fff9f0; border: 1px solid #ffeeba !important;">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="avatar-xs me-3">
-                                            <span class="avatar-title rounded-circle bg-warning text-white">
-                                                <i class="mdi mdi-account-check-outline"></i>
+                        <div class="card card-detail overflow-hidden">
+                            <div class="bg-primary bg-soft p-4">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar-md">
+                                            <span class="avatar-title rounded-circle avatar-title-custom font-size-24">
+                                                {{ strtoupper(substr($emp->user->name, 0, 1)) }}
                                             </span>
                                         </div>
-                                        <h6 class="fw-bold mb-0">Konfirmasi Persetujuan</h6>
                                     </div>
-                                    <p class="text-muted font-size-13 mb-3">
-                                        Sebagai: <strong>{{ $approval->userable->getApproverLabel() }}</strong><br>
-                                        Level: <span class="badge bg-soft-info text-info">Lv. {{ $approval->level }}</span>
-                                    </p>
-
-                                    <form action="{{ route('portal::vacation.manage.update', ['vacation' => $vacation->id]) }}" method="post" class="form-block">
-                                        @csrf
-                                        @method('put')
-
-                                        <input type="hidden" name="next" value="{{ request('next') }}">
-
-                                        <input type="hidden" name="approvable_id" value="{{ $approval->id }}">
-
-                                        <div class="mb-3">
-                                            <textarea class="form-control" name="reason" rows="2" placeholder="Tulis catatan (opsional)..."></textarea>
+                                    <div class="flex-grow-1 align-self-center">
+                                        <div class="text-primary">
+                                            <h5 class="text-primary mb-1">{{ $emp->user->name }}</h5>
+                                            <p class="text-primary opacity-75 mb-0 font-size-13">{{ $emp->kd ?: 'NIP -' }}</p>
                                         </div>
-                                        <div class="row g-2">
-                                            <div class="col-6">
-                                                <button type="submit" name="result" value="1" class="btn btn-success w-100 waves-effect waves-light">
-                                                    <i class="mdi mdi-check-all me-1"></i> Setuju
-                                                </button>
-                                            </div>
-                                            <div class="col-6">
-                                                <button type="submit" name="result" value="2" class="btn btn-danger w-100 waves-effect waves-light">
-                                                    <i class="mdi mdi-close-circle-outline me-1"></i> Tolak
-                                                </button>
-                                            </div>
-                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row mt-3">
+                                    <div class="col-12 mb-3">
+                                        <p class="label-muted">Jabatan</p>
+                                        <p class="value-bold">{{ $pos->name ?? '-' }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <p class="label-muted">Departemen</p>
+                                        <p class="value-bold mb-0">{{ $pos->department->name ?? '-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Tombol Batalkan --}}
+                        @php $hasDecisionByAnyone = $vacation->approvables->where('result', '!=', 0)->count() > 0; @endphp
+                        @if ($vacation->can('deleted') && !$hasDecisionByAnyone && !$vacation->trashed())
+                            <div class="card card-detail border-danger-subtle bg-danger-subtle bg-opacity-10 mt-4">
+                                <div class="card-body p-3">
+                                    <form class="form-confirm" action="{{ route('portal::vacation.submission.destroy', ['vacation' => $vacation->id]) }}" method="post">
+                                        @csrf @method('delete')
+                                        <h6 class="text-danger mb-2 font-size-14 fw-bold">Batalkan Pengajuan?</h6>
+                                        <p class="text-muted font-size-12 mb-3">Hapus data ini sebelum diproses oleh atasan.</p>
+                                        <button type="submit" class="btn btn-danger w-100">
+                                            <i class="mdi mdi-trash-can-outline me-1"></i> Batalkan & Hapus
+                                        </button>
                                     </form>
                                 </div>
                             </div>
-                        @empty
-                        @endforelse
-
-                        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-                            <div class="card-body p-4">
-                                <h5 class="card-title mb-4 fw-bold text-dark">
-                                    <i class="mdi mdi-account-circle-outline me-1"></i> Data Karyawan
-                                </h5>
-                                <div class="list-group list-group-flush">
-                                    @php
-                                        $emp = $vacation->quota->employee;
-                                        $pos = $emp->position->position ?? null;
-                                    @endphp
-                                    <div class="list-group-item px-0 py-2 border-light">
-                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Nama Karyawan</small>
-                                        <span class="text-dark fw-medium">{{ $emp->user->name }}</span>
-                                    </div>
-                                    <div class="list-group-item px-0 py-2 border-light">
-                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">NIP</small>
-                                        <span class="text-dark fw-medium">{{ $emp->kd ?: '-' }}</span>
-                                    </div>
-                                    <div class="list-group-item px-0 py-2 border-light">
-                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Jabatan</small>
-                                        <span class="text-dark fw-medium">{{ $pos->name ?? '-' }}</span>
-                                    </div>
-                                    <div class="list-group-item px-0 py-2 border-light">
-                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Departemen</small>
-                                        <span class="text-dark fw-medium">{{ $pos->department->name ?? '-' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Action Buttons --}}
-                        <div class="mt-3">
-                            {{-- Syarat: Tombol Batal hilang jika Robert sedang di posisi approve ATAU sudah ada atasan yang ambil tindakan --}}
-                            @if ($vacation->can('deleted') && $myApprovals->isEmpty() && !$hasDecisionByAnyone)
-                                <form class="form-block form-confirm mb-2" action="{{ route('portal::vacation.submission.destroy', ['vacation' => $vacation->id]) }}" method="post">
-                                    @csrf @method('delete')
-                                    <button type="submit" class="btn btn-light w-100 border text-start p-3 shadow-sm" style="border-radius: 10px;">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-xs me-3">
-                                                <span class="avatar-title rounded-circle bg-soft-danger text-danger font-size-18">
-                                                    <i class="mdi mdi-trash-can-outline"></i>
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 text-danger fw-bold font-size-14">Batalkan Pengajuan</h6>
-                                                <small class="text-muted">Hapus data pengajuan.</small>
-                                            </div>
-                                        </div>
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
+                        @endif
                     </div>
                 </div>
 

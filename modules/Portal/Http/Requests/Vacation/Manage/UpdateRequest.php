@@ -41,6 +41,6 @@ class UpdateRequest extends FormRequest
      */
     public function transform()
     {
-        return $this->validated();
+        return collect($this->validated());
     }
 }

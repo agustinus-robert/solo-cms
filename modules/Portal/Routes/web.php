@@ -44,7 +44,7 @@ Route::middleware(['auth', \Modules\Portal\Http\Middleware\AccessMiddleware::cla
         // Manage vacation submissions
         Route::get('/manage', 'ManageController@index')->name('manage.index');
         Route::get('/manage/{vacation}', 'ManageController@show')->name('manage.show');
-        Route::put('/manage/{vacation}', 'ManageController@update')->name('manage.update');
+        Route::put('/manage/{approvable}', 'ManageController@update')->name('manage.update');
         // Cashable
         Route::prefix('cashable')->namespace('Cashable')->name('cashable.')->group(function () {
             Route::get('/', 'CashableController@create')->name('create');

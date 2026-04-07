@@ -62,24 +62,26 @@ class ManageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(EmployeeVacation $vacation, UpdateRequest $request)
-    {
-        $approvable = $vacation->approvables()->findOrFail($request->input('approvable_id'));
-        $approvable->update($request->transformed()->toArray());
 
+    public function update(CompanyApprovable $approvable, UpdateRequest $request)
+    {
+        $data = $request->transform();
+        $approvable->update($data->toArray());
+        $model = $approvable->modelable;
         if ($approvable->cancelable) {
-            $approvable->modelable->approvables()->update($request->transformed()->only('result'));
+
+            $model->approvables()->update($data->only('result')->toArray());
 
             if ($request->input('result') == ApprovableResultEnum::APPROVE->value) {
-                $approvable->modelable->update([
-                    'dates' => $approvable->modelable->dates->filter(fn($d) => empty($d['c']))
+                $model->update([
+                    'dates' => $model->dates->filter(fn($d) => empty($d['c']))
                 ]);
                 $this->sendCancelableNotifications($approvable);
             }
 
             if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-                $approvable->modelable->update([
-                    'dates' => $approvable->modelable->dates->map(function ($date) {
+                $model->update([
+                    'dates' => $model->dates->map(function ($date) {
                         $date['c'] = false;
                         return array_filter($date);
                     })
@@ -87,22 +89,23 @@ class ManageController extends Controller
                 $this->sendRejectionNotifications($approvable, 1);
             }
         } else {
-            if ($request->input('result') == ApprovableResultEnum::APPROVE->value) {
-                $this->sendApprovalNotifications($approvable);
+            $resultValue = (int) $request->input('result');
+
+            if ($resultValue == ApprovableResultEnum::APPROVE->value) {
+             //   $this->sendApprovalNotifications($approvable);
             }
 
-            if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-                $this->sendRejectionNotifications($approvable);
+            if ($resultValue == ApprovableResultEnum::REJECT->value) {
+              //  $this->sendRejectionNotifications($approvable);
             }
 
-            if ($request->input('result') == ApprovableResultEnum::REVISION->value) {
-                $this->sendRevisionNotifications($approvable);
+            if ($resultValue == ApprovableResultEnum::REVISION->value) {
+              //  $this->sendRevisionNotifications($approvable);
             }
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
     }
-
     /**
      * Send approval notifications.
      */
