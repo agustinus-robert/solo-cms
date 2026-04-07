@@ -10,7 +10,7 @@
         <div class="navbar-header">
             <div class="d-flex">
                 <div class="navbar-brand-box">
-                    <a href="index.html" class="logo logo-dark">
+                    <a href="" class="logo logo-dark">
                         <span class="logo-sm"><img src="{{ asset('skote/images/logo.svg') }}" height="22"></span>
                         <span class="logo-lg"><img src="{{ asset('skote/images/logo-dark.png') }}" height="17"></span>
                     </a>
@@ -21,9 +21,13 @@
             </div>
 
             <div class="d-flex">
-                @php($user=auth()->user())
+                @php
+                    $user = auth()->user();
+                @endphp
+
                 @include('portal::layouts.components.notifications')
                 @include('layouts.shortcut_menu')
+
                 <div class="dropdown d-none d-lg-inline-block ms-1">
                     @include('layouts.nav_name')
                 </div>
@@ -31,29 +35,14 @@
         </div>
     </header>
 
-    {{-- Horizontal Navbar --}}
-    <div class="topnav">
-        <div class="container-fluid">
-            <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
-                <div class="navbar-collapse collapse" id="topnav-menu-content">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link arrow-none" href="{{ route('portal::dashboard-msdm.index') }}" id="topnav-dashboard" role="button">
-                                <i class="bx bx-home-circle me-2"></i><span key="t-dashboards">Dashboards</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </div>
-
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
 
                 {{-- Header Section --}}
                 <div class="row align-items-center mb-4 mt-2">
+                    @include('layouts.component.alert-access')
+
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
                             <a href="{{ request('next', route('portal::vacation.submission.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">
@@ -93,7 +82,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6 mb-3">
                                         <label class="text-muted font-size-12 text-uppercase fw-bold mb-1 d-block">Tanggal Pengajuan</label>
-                                        <p class="mb-0 text-dark fw-medium">{{ $vacation->created_at->formatLocalized('%A, %d %B %Y') }}</p>
+                                        <p class="mb-0 text-dark fw-medium">{{ $vacation->created_at->translatedFormat('l, d F Y') }}</p>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="text-muted font-size-12 text-uppercase fw-bold mb-1 d-block">Kategori Cuti</label>
@@ -110,7 +99,7 @@
                                                         @isset($date['f'])
                                                             <i class="mdi mdi-account-network text-danger me-1"></i>
                                                         @endisset
-                                                        {{ strftime('%d %B %Y', strtotime($date['d'])) }}
+                                                        {{ \Carbon\Carbon::parse($date['d'])->translatedFormat('d M Y') }}
                                                     </span>
                                                 @endforeach
                                             @endisset
@@ -154,11 +143,6 @@
                                                             </td>
                                                             <td class="text-wrap" style="min-width: 200px;">
                                                                 {{ $approvable->reason ?: '-' }}
-                                                                @if ($approvable->history)
-                                                                    <div class="mt-1 small text-muted font-italic">
-                                                                        <strong>Riwayat:</strong> {{ $approvable->history->reason }}
-                                                                    </div>
-                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -172,34 +156,109 @@
                     </div>
 
                     <div class="col-xl-4">
+                        {{-- Logic Pencarian Approval --}}
+                        @php
+                            $myPositionIds = auth()->user()->employee->positions()->pluck('id')->toArray();
+
+                            $myApprovals = $vacation->approvables->filter(function ($item) use ($myPositionIds) {
+                                // Samakan namespace dengan hasil DD Robert
+                                $isCorrectType = ($item->userable_type === 'Modules\HRMS\Models\EmployeePosition' ||
+                                                $item->userable_type === \Modules\Portal\Models\EmployeePosition::class);
+
+                                $isMyPosition = in_array($item->userable_id, $myPositionIds);
+
+                                // Ambil value integer dari result
+                                $statusValue = is_object($item->result) ? $item->result->value : $item->result;
+                                $isPending = ($statusValue == 0);
+
+                                return $isCorrectType && $isMyPosition && $isPending;
+                            });
+
+                            $hasDecisionByAnyone = $vacation->approvables->where('result', '!=', 0)->count() > 0;
+                        @endphp
+
+                        @forelse ($myApprovals as $approval)
+                            <div class="card border-0 shadow-sm mb-3" style="border-radius: 12px; background-color: #fff9f0; border: 1px solid #ffeeba !important;">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar-xs me-3">
+                                            <span class="avatar-title rounded-circle bg-warning text-white">
+                                                <i class="mdi mdi-account-check-outline"></i>
+                                            </span>
+                                        </div>
+                                        <h6 class="fw-bold mb-0">Konfirmasi Persetujuan</h6>
+                                    </div>
+                                    <p class="text-muted font-size-13 mb-3">
+                                        Sebagai: <strong>{{ $approval->userable->getApproverLabel() }}</strong><br>
+                                        Level: <span class="badge bg-soft-info text-info">Lv. {{ $approval->level }}</span>
+                                    </p>
+
+                                    <form action="{{ route('portal::vacation.manage.update', ['vacation' => $vacation->id]) }}" method="post" class="form-block">
+                                        @csrf
+                                        @method('put')
+
+                                        <input type="hidden" name="next" value="{{ request('next') }}">
+
+                                        <input type="hidden" name="approvable_id" value="{{ $approval->id }}">
+
+                                        <div class="mb-3">
+                                            <textarea class="form-control" name="reason" rows="2" placeholder="Tulis catatan (opsional)..."></textarea>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <button type="submit" name="result" value="1" class="btn btn-success w-100 waves-effect waves-light">
+                                                    <i class="mdi mdi-check-all me-1"></i> Setuju
+                                                </button>
+                                            </div>
+                                            <div class="col-6">
+                                                <button type="submit" name="result" value="2" class="btn btn-danger w-100 waves-effect waves-light">
+                                                    <i class="mdi mdi-close-circle-outline me-1"></i> Tolak
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                        @endforelse
+
                         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                             <div class="card-body p-4">
                                 <h5 class="card-title mb-4 fw-bold text-dark">
                                     <i class="mdi mdi-account-circle-outline me-1"></i> Data Karyawan
                                 </h5>
                                 <div class="list-group list-group-flush">
-                                    @foreach (array_filter([
-                                        'Nama Karyawan' => $vacation->quota->employee->user->name,
-                                        'NIP' => $vacation->quota->employee->kd ?: '-',
-                                        'Jabatan' => $vacation->quota->employee->position->position->name ?? '-',
-                                        'Departemen' => $vacation->quota->employee->position->position->department->name ?? '-',
-                                        'Manajer' => $vacation->quota->employee->position->position->parents->firstWhere('level.value', 4)?->employees->first()->user->name,
-                                    ]) as $label => $value)
-                                        <div class="list-group-item px-0 py-3 border-light">
-                                            <small class="text-muted d-block font-size-11 text-uppercase fw-bold">{{ $label }}</small>
-                                            <span class="text-dark fw-medium">{{ $value }}</span>
-                                        </div>
-                                    @endforeach
+                                    @php
+                                        $emp = $vacation->quota->employee;
+                                        $pos = $emp->position->position ?? null;
+                                    @endphp
+                                    <div class="list-group-item px-0 py-2 border-light">
+                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Nama Karyawan</small>
+                                        <span class="text-dark fw-medium">{{ $emp->user->name }}</span>
+                                    </div>
+                                    <div class="list-group-item px-0 py-2 border-light">
+                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">NIP</small>
+                                        <span class="text-dark fw-medium">{{ $emp->kd ?: '-' }}</span>
+                                    </div>
+                                    <div class="list-group-item px-0 py-2 border-light">
+                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Jabatan</small>
+                                        <span class="text-dark fw-medium">{{ $pos->name ?? '-' }}</span>
+                                    </div>
+                                    <div class="list-group-item px-0 py-2 border-light">
+                                        <small class="text-muted d-block font-size-11 text-uppercase fw-bold">Departemen</small>
+                                        <span class="text-dark fw-medium">{{ $pos->department->name ?? '-' }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Action Buttons --}}
                         <div class="mt-3">
-                            @if ($vacation->can('deleted'))
+                            {{-- Syarat: Tombol Batal hilang jika Robert sedang di posisi approve ATAU sudah ada atasan yang ambil tindakan --}}
+                            @if ($vacation->can('deleted') && $myApprovals->isEmpty() && !$hasDecisionByAnyone)
                                 <form class="form-block form-confirm mb-2" action="{{ route('portal::vacation.submission.destroy', ['vacation' => $vacation->id]) }}" method="post">
                                     @csrf @method('delete')
-                                    <button type="submit" class="btn btn-white w-100 border text-start p-3 shadow-sm hover-shadow transition" style="border-radius: 10px;">
+                                    <button type="submit" class="btn btn-light w-100 border text-start p-3 shadow-sm" style="border-radius: 10px;">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-xs me-3">
                                                 <span class="avatar-title rounded-circle bg-soft-danger text-danger font-size-18">
@@ -208,27 +267,11 @@
                                             </div>
                                             <div>
                                                 <h6 class="mb-0 text-danger fw-bold font-size-14">Batalkan Pengajuan</h6>
-                                                <small class="text-muted">Hapus data sebelum diproses atasan.</small>
+                                                <small class="text-muted">Hapus data pengajuan.</small>
                                             </div>
                                         </div>
                                     </button>
                                 </form>
-                            @endif
-
-                            @if ($vacation->can('canceled'))
-                                <a href="{{ route('portal::vacation.cancelation.show', ['vacation' => $vacation->id]) }}" class="btn btn-white w-100 border text-start p-3 shadow-sm hover-shadow transition" style="border-radius: 10px;">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-xs me-3">
-                                            <span class="avatar-title rounded-circle bg-soft-warning text-warning font-size-18">
-                                                <i class="mdi mdi-progress-upload"></i>
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 text-dark fw-bold font-size-14">Ajukan Pembatalan</h6>
-                                            <small class="text-muted">Untuk cuti yang sudah disetujui.</small>
-                                        </div>
-                                    </div>
-                                </a>
                             @endif
                         </div>
                     </div>

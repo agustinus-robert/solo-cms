@@ -10,24 +10,21 @@ use Modules\Core\Enums\ApprovableResultEnum;
 class UpdateRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize()
-    {
-        return isset($this->user()->employee);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      */
     public function rules()
     {
         return [
-            'result'            => ['required', new Enum(ApprovableResultEnum::class)],
-            'reason'            => Rule::requiredIf(ApprovableResultEnum::tryFrom($this->input('result'))->reasonRequirement())
+            'result' => ['required', new Enum(ApprovableResultEnum::class)],
+            'reason' => [
+                'nullable',
+                Rule::requiredIf(function() {
+                    $result = ApprovableResultEnum::tryFrom((int) $this->input('result'));
+                    return $result ? $result->reasonRequirement() : false;
+                })
+            ]
         ];
     }
-
     /**
      * Get custom attributes for validator errors.
      */

@@ -115,7 +115,6 @@ class RoleController extends Controller
         return view('account::role.upsert', compact('role', 'menus'));
     }
 
-    // 4. Proses Simpan (Store/Update)
     public function store(Request $request)
     {
         $request->validate([
@@ -131,10 +130,9 @@ class RoleController extends Controller
         $role->syncPermissions($request->permissions ?? []);
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        return redirect()->route('core::manage-role.index')->with('success', 'Berhasil simpan, Cok!');
+        return redirect()->route('core::manage-role.index')->with('success', 'Berhasil simpan!');
     }
 
-    // 5. Proses Hapus
     public function destroy($id)
     {
         $role = Role::findOrFail($id);

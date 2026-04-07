@@ -62,11 +62,11 @@ class ManageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CompanyApprovable $approvable, UpdateRequest $request)
+    public function update(EmployeeVacation $vacation, UpdateRequest $request)
     {
+        $approvable = $vacation->approvables()->findOrFail($request->input('approvable_id'));
         $approvable->update($request->transformed()->toArray());
 
-        // Handle notifications
         if ($approvable->cancelable) {
             $approvable->modelable->approvables()->update($request->transformed()->only('result'));
 
@@ -99,6 +99,7 @@ class ManageController extends Controller
                 $this->sendRevisionNotifications($approvable);
             }
         }
+
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
     }
 

@@ -36,7 +36,7 @@ class UpdateRequest extends StoreRequest
         $dates = [];
         foreach($this->input('dates') as $i => $date) {
             $dates[] = array_filter([
-                'd' => $date, 
+                'd' => $date,
                 'f' => ($this->input('as_freelances')[$i] ?? 0) == 1
             ]);
         }

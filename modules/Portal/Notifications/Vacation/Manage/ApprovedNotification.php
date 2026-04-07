@@ -43,7 +43,7 @@ class ApprovedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Selamat! Pengajuan ' . $this->label . ' kamu disetujui')
             ->greeting('Selamat! Pengajuan ' . $this->label . ' kamu disetujui')
-            ->line('Pengajuan ' . $this->label . ' kamu sebanyak ' . collect($this->vacation->dates)->count() . ' hari untuk keperluan ' . ($this->vacation->description ?: 'istirahat') . ' telah disetujui oleh ' . $this->approvable->userable->position->level->label() . ', klik tombol di bawah untuk lihat detailnya.')
+            ->line('Pengajuan ' . $this->label . ' kamu sebanyak ' . collect($this->vacation->dates)->count() . ' hari untuk keperluan ' . ($this->vacation->description ?: 'istirahat') . ' telah disetujui, klik tombol di bawah untuk lihat detailnya.')
             ->action('Periksa sekarang', route('portal::vacation.submission.show', ['vacation' => $this->vacation->id]))
             ->line('Jika Anda membutuhkan informasi lebih lanjut, segera hubungi kami untuk menindak lanjuti.')
             ->line('Terima kasih telah menggunakan layanan kami.');
