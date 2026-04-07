@@ -148,37 +148,34 @@ return new class extends Migration
             $table->string('email');
             $table->text('description');
             $table->integer('rating')->default(5);
+            $table->softDeletesTz();
             $table->timestamps();
         });
 
-        // Tabel Utama untuk Judul Journey (misal: "Proses Produksi Sepatu Kulit A")
         Schema::create('product_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
-            $table->string('title'); // Judul journey
+            $table->string('title');
             $table->text('slug');
             $table->text('description')->nullable();
             $table->boolean('is_published')->default(true);
             $table->timestampsTz();
         });
 
-        // Tabel Detail Kronologis (Langkah-langkahnya)
         Schema::create('product_history_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_history_id')->constrained('product_histories')->cascadeOnDelete();
 
-            $table->string('step_name'); // Contoh: "Pemilihan Bahan", "Penjahitan"
-            $table->date('occurred_at'); // Tanggal kejadian/proses
+            $table->string('step_name');
+            $table->date('occurred_at');
             $table->text('description')->nullable();
 
-            // Media & Metadata Dinamis
             $table->string('image_path')->nullable();
-            $table->jsonb('metadata')->nullable(); // Untuk simpan data unik seperti: {"suhu": "30C", "lokasi": "Garut"}
+            $table->jsonb('metadata')->nullable();
 
-            $table->integer('order')->default(0); // Urutan kronologi
+            $table->integer('order')->default(0);
             $table->timestampsTz();
 
-            // Index agar sorting kronologi di Postgre ngebut
             $table->index(['product_history_id', 'order', 'occurred_at']);
         });
     }
