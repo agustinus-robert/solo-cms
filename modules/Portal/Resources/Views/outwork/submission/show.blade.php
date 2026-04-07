@@ -6,7 +6,6 @@
 
 @section('contents')
     <header id="page-topbar">
-        {{-- Header tetap sama --}}
         <div class="navbar-header">
             <div class="d-flex">
                 <div class="navbar-brand-box">
@@ -45,14 +44,13 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-xl-9"> {{-- Diperlebar sedikit agar form dalam tabel muat --}}
+                    <div class="col-xl-9">
                         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                             <div class="card-body p-4">
                                 <h5 class="card-title mb-4 fw-bold text-primary">
                                     <i class="mdi mdi-text-box-search-outline me-1"></i> Rincian Laporan
                                 </h5>
 
-                                {{-- Informasi Rincian Tetap Sama --}}
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3">
                                         <label class="text-muted font-size-11 text-uppercase fw-bold mb-1 d-block">Nama Kegiatan</label>
@@ -94,7 +92,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Approval Tracking (Form di sini) --}}
                                 <div class="mt-5">
                                     <h6 class="text-muted font-size-11 text-uppercase fw-bold mb-3">Alur Persetujuan</h6>
                                     <div class="table-responsive">
@@ -112,7 +109,6 @@
                                                     $allApprovals = $outwork->approvables->sortBy('level');
                                                     $myPositionIds = $employee->positions()->pluck('id')->toArray();
 
-                                                    // Logic Antrean: Cari Level TERBESAR yang masih pending
                                                     $currentActiveId = null;
                                                     $pendingOnes = $outwork->approvables->where('result', 0)->sortByDesc('level');
                                                     if($pendingOnes->count() > 0) {
@@ -137,7 +133,6 @@
                                                         </td>
                                                         <td>
                                                             @if ($isMyTurn && !$outwork->trashed())
-                                                                {{-- Form Approval Langsung di Baris --}}
                                                                 <form action="{{ route('portal::outwork.manage.update', $approvable->id) }}" method="post" class="row gx-2 gy-1 align-items-center">
                                                                     @csrf @method('put')
                                                                     <input type="hidden" name="approvable_id" value="{{ $approvable->id }}">
@@ -166,7 +161,6 @@
                         </div>
                     </div>
 
-                    {{-- Sidebar Hanya Info Pembuat --}}
                     <div class="col-xl-3">
                         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                             <div class="card-body p-4 text-center">
