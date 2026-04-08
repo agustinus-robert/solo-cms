@@ -9,9 +9,7 @@ use Modules\HRMS\Models\EmployeeOutwork;
 use Modules\HRMS\Models\EmployeePosition;
 use Modules\Portal\Http\Controllers\Controller;
 use Modules\Portal\Http\Requests\Outwork\Submission\StoreRequest;
-use Modules\Portal\Notifications\Outwork\Submission\SubmissionNotification;
-use Modules\Portal\Notifications\Outwork\Cancelation\CanceledNotification;
-use Modules\Portal\Notifications\Outwork\Submission\SubmissionWaNotification;
+use App\Notifications\GlobalGenericNotification;
 
 class SubmissionController extends Controller
 {
@@ -77,11 +75,11 @@ class SubmissionController extends Controller
     public function store(StoreRequest $request)
     {
         $employee = $request->user()->employee;
+        $category = CompanyOutworkCategory::find($request->input('category_id'));
+        $categoryName = $category->name ?? 'Kegiatan Luar';
 
-        // 1. Create data outwork (menggunakan data yang sudah di-transform tanpa approvables)
         $outwork = $employee->outworks()->create($request->transform());
 
-        // 2. Simpan Approver ke tabel relasi
         if ($request->has('approvables')) {
             foreach ($request->input('approvables') as $index => $positionId) {
                 if ($positionId) {
@@ -89,23 +87,25 @@ class SubmissionController extends Controller
                         'userable_type' => EmployeePosition::class,
                         'userable_id'   => $positionId,
                         'result'        => ApprovableResultEnum::PENDING,
-                        'level'         => $index + 1, // Kita buat level dinamis berdasarkan urutan input (1, 2, dst)
+                        'level'         => $index + 1,
                     ]);
                 }
             }
         }
 
-        // 3. Ambil approver pertama (Level 1) untuk dikirim notifikasi
         $firstApprover = $outwork->approvables()->orderBy('level')->first();
 
-        if ($firstApprover) {
+        if ($firstApprover && $firstApprover->userable) {
             $approverUser = $firstApprover->userable->employee->user;
 
-            // $approverUser->notify(new SubmissionNotification($outwork, null));
-            // $approverUser->notify(new SubmissionWaNotification(
-            //     "Halo, Anda mendapatkan pengajuan insentif dari {$employee->user->name}. Silakan cek di sini: " . route('portal::outwork.submission.show', $outwork->id),
-            //     $approverUser
-            // ));
+            $approverUser->notify(new GlobalGenericNotification([
+                'title'   => 'Persetujuan Insentif Baru',
+                'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan insentif untuk kegiatan <strong>{$categoryName}</strong>. Mohon kesediaannya untuk meninjau pengajuan ini.",
+                'link'    => route('portal::outwork.manage.show', $outwork->id),
+                'icon'    => 'bx bx-badge-check',
+                'color'   => 'warning'
+            ]));
+
         } else {
             $outwork->update(['paidable_at' => now()]);
         }
@@ -113,6 +113,37 @@ class SubmissionController extends Controller
         return redirect()->route('portal::outwork.submission.index', ['view' => 'mine'])
             ->with('success', 'Pengajuan berhasil dikirim!');
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(EmployeeOutwork $outwork)
+    {
+        $employeeName = $outwork->employee->user->name;
+        $categoryName = $outwork->category->name ?? 'Kegiatan Luar';
+
+        $notifiedApprover = $outwork->approvables()
+            ->orderBy('level')
+            ->first();
+
+        if ($notifiedApprover && $notifiedApprover->userable) {
+            $targetUser = $notifiedApprover->userable->employee->user;
+
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'   => 'Pengajuan Insentif Dibatalkan',
+                'message' => "Pengajuan insentif <strong>{$categoryName}</strong> oleh <strong>{$employeeName}</strong> telah dibatalkan/dihapus oleh yang bersangkutan.",
+                'link'    => '#',
+                'icon'    => 'bx bx-trash',
+                'color'   => 'secondary'
+            ]));
+        }
+
+        $outwork->delete();
+
+        return redirect()->route('portal::outwork.submission.index', ['view' => 'mine'])
+            ->with('success', 'Pengajuan telah dibatalkan.');
+    }
+
     /**
      * Display the specified resource.
      */
@@ -123,22 +154,5 @@ class SubmissionController extends Controller
         $outwork->load('approvables.userable.position', 'category', 'employee.user');
 
         return view('portal::outwork.submission.show', compact('user', 'employee', 'outwork'));
-    }
-
-    public function destroy(EmployeeOutwork $outwork)
-    {
-        // Notifikasi pembatalan ke atasan yang sudah merespons (jika ada)
-        $notifiedApprover = $outwork->approvables()
-            ->where('result', '!=', ApprovableResultEnum::PENDING)
-            ->first();
-
-        if ($notifiedApprover) {
-            $notifiedApprover->userable->employee->user->notify(new CanceledNotification($outwork));
-        }
-
-        $outwork->delete();
-
-        return redirect()->route('portal::outwork.submission.index', ['view' => 'mine'])
-            ->with('success', 'Pengajuan telah dibatalkan.');
     }
 }

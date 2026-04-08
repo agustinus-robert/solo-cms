@@ -8,9 +8,7 @@ use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\CompanyApprovable;
 use Modules\Portal\Http\Controllers\Controller;
 use Modules\Portal\Http\Requests\Leave\Manage\UpdateRequest;
-use Modules\Portal\Notifications\Leave\Submission\SubmissionNotification;
-use Modules\Portal\Notifications\Leave\Manage\ApprovedNotification;
-use Modules\Portal\Notifications\Leave\Manage\RejectedNotification;
+use App\Notifications\GlobalGenericNotification;
 
 class ManageController extends Controller
 {
@@ -57,17 +55,44 @@ class ManageController extends Controller
     public function update(CompanyApprovable $approvable, UpdateRequest $request)
     {
         $approvable->update($request->transformed()->toArray());
+        $submitter = $approvable->modelable->employee->user;
 
-        // Handle notifications
         if ($request->input('result') == ApprovableResultEnum::APPROVE->value) {
-           // $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
-            if ($superior = $approvable->modelable->approvables->sortBy('level')->filter(fn($a) => $a->level > $approvable->level)->first()) {
-             //   $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
+
+            $submitter->notify(new GlobalGenericNotification([
+                'title'   => 'Pengajuan Disetujui',
+                'message' => "Pengajuan Anda telah disetujui pada level {$approvable->level}. Menunggu proses selanjutnya.",
+                'link'    => route('hrms::service.leave.manage.index'),
+                'icon'    => 'bx bx-check-circle',
+                'color'   => 'success'
+            ]));
+
+            $superiorApprovable = $approvable->modelable->approvables
+                ->sortBy('level')
+                ->filter(fn($a) => $a->level > $approvable->level)
+                ->first();
+
+            if ($superiorApprovable && $superiorApprovable->userable) {
+                $nextApprover = $superiorApprovable->userable->employee->user;
+
+                $nextApprover->notify(new GlobalGenericNotification([
+                    'title'   => 'Perlu Persetujuan',
+                    'message' => "Ada pengajuan baru dari {$submitter->name} yang memerlukan persetujuan Anda.",
+                    'link'    => url()->current(),
+                    'icon'    => 'bx bx-user-voice',
+                    'color'   => 'info'
+                ]));
             }
         }
 
         if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-            //$approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
+            $submitter->notify(new GlobalGenericNotification([
+                'title'   => 'Pengajuan Ditolak',
+                'message' => "Mohon maaf, pengajuan Anda ditolak pada level {$approvable->level}.",
+                'link'    => route('hrms::service.leave.manage.index'),
+                'icon'    => 'bx bx-x-circle',
+                'color'   => 'danger'
+            ]));
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');

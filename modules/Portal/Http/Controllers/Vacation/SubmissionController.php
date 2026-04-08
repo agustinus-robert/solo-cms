@@ -16,6 +16,7 @@ use Modules\Portal\Http\Requests\Vacation\Submission\UpdateRequest;
 use Modules\Portal\Notifications\Vacation\Submission\SubmissionNotification;
 use Modules\Portal\Notifications\Vacation\Submission\RevisedNotification;
 use Modules\Portal\Notifications\Vacation\Submission\CanceledNotification;
+use App\Notifications\GlobalGenericNotification;
 
 class SubmissionController extends Controller
 {
@@ -23,60 +24,60 @@ class SubmissionController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-{
-    $user = $request->user();
-    $employee = $user->employee;
-    $view = $request->get('view', 'mine');
+    {
+        $user = $request->user();
+        $employee = $user->employee;
+        $view = $request->get('view', 'mine');
 
-    $start_at = $request->get('start_at');
-    $end_at   = $request->get('end_at');
+        $start_at = $request->get('start_at');
+        $end_at   = $request->get('end_at');
 
-    $query = EmployeeVacation::query()
-        ->withTrashed()
-        ->with(['quota.employee.user', 'quota.category', 'approvables.userable.position']);
+        $query = EmployeeVacation::query()
+            ->withTrashed()
+            ->with(['quota.employee.user', 'quota.category', 'approvables.userable.position']);
 
-    if ($view === 'approvals') {
-        $myPositionIds = $employee->positions()->pluck('id')->toArray();
+        if ($view === 'approvals') {
+            $myPositionIds = $employee->positions()->pluck('id')->toArray();
 
-        $query->whereHas('approvables', function($q) use ($myPositionIds) {
-            $q->where('userable_type', EmployeePosition::class)
-              ->whereIn('userable_id', $myPositionIds);
-        });
-    } else {
-        $query->whereHas('quota', function($q) use ($employee) {
-            $q->where('empl_id', $employee->id);
-        });
+            $query->whereHas('approvables', function($q) use ($myPositionIds) {
+                $q->where('userable_type', EmployeePosition::class)
+                ->whereIn('userable_id', $myPositionIds);
+            });
+        } else {
+            $query->whereHas('quota', function($q) use ($employee) {
+                $q->where('empl_id', $employee->id);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $query->search($request->get('search'));
+        }
+
+        if ($request->filled('start_at') && $request->filled('end_at')) {
+            $query->where(function($q) use ($start_at, $end_at) {
+                $q->whereDate('created_at', '>=', $start_at)
+                ->whereDate('created_at', '<=', $end_at)
+                ->orWhereRaw("exists (select 1 from jsonb_array_elements(dates::jsonb) as elem where (elem->>'d')::date >= ? and (elem->>'d')::date <= ?)", [$start_at, $end_at]);
+            });
+        }
+
+        $vacations = $query->latest()->paginate($request->get('limit', 10));
+        $isApprover = $employee->position?->position?->children()->exists() ?? false;
+
+        $quotas = collect();
+        if ($view === 'mine') {
+            $quotas = $employee->vacationQuotas()
+                ->with(['category', 'vacations.approvables'])
+                ->active()
+                ->get()
+                ->sortBy('category.type.value')
+                ->filter(fn($quota) => $quota->category?->type?->quotaVisibility());
+        }
+
+        return view('portal::vacation.submission.index', compact(
+            'employee', 'vacations', 'quotas', 'view', 'isApprover', 'start_at', 'end_at'
+        ));
     }
-
-    if ($request->filled('search')) {
-        $query->search($request->get('search'));
-    }
-
-    if ($request->filled('start_at') && $request->filled('end_at')) {
-        $query->where(function($q) use ($start_at, $end_at) {
-            $q->whereDate('created_at', '>=', $start_at)
-              ->whereDate('created_at', '<=', $end_at)
-              ->orWhereRaw("exists (select 1 from jsonb_array_elements(dates::jsonb) as elem where (elem->>'d')::date >= ? and (elem->>'d')::date <= ?)", [$start_at, $end_at]);
-        });
-    }
-
-    $vacations = $query->latest()->paginate($request->get('limit', 10));
-    $isApprover = $employee->position?->position?->children()->exists() ?? false;
-
-    $quotas = collect();
-    if ($view === 'mine') {
-        $quotas = $employee->vacationQuotas()
-            ->with(['category', 'vacations.approvables'])
-            ->active()
-            ->get()
-            ->sortBy('category.type.value')
-            ->filter(fn($quota) => $quota->category?->type?->quotaVisibility());
-    }
-
-    return view('portal::vacation.submission.index', compact(
-        'employee', 'vacations', 'quotas', 'view', 'isApprover', 'start_at', 'end_at'
-    ));
-}
 
     /**
      * Show the form for creating a new resource.
@@ -104,42 +105,34 @@ class SubmissionController extends Controller
 
         return DB::transaction(function () use ($employee, $request) {
             $vacation = $employee->vacations()->create($request->transformed()->toArray());
-
-            // 2. Generate Alur Persetujuan (Approvables)
             if ($employee->position && $employee->position->position) {
-                // JANGAN PAKAI .reverse()!
-                // Kita mau urutan dari yang TERDEKAT (Manager) ke yang TERTINGGI (Owner).
                 $parents = $employee->position->position->parents->values();
 
                 foreach ($parents as $index => $parent) {
-                    // Ambil posisi karyawan yang aktif untuk parent (jabatan atasan) ini
                     $approverPosition = $parent->employeePositions()->active()->first();
 
                     if ($approverPosition) {
                         $vacation->createApprovable($approverPosition, [
-                            // Index 0 jadi Level 1 (Atasan Langsung)
-                            // Index 1 jadi Level 2 (Atasan di atasnya lagi)
                             'level' => $index + 1
                         ]);
                     }
                 }
             }
 
-            // 3. Ambil approver pertama (Level 1) untuk dikirim notifikasi
             $firstApprover = $vacation->approvables()->orderBy('level', 'asc')->first();
 
             if ($firstApprover && $firstApprover->userable) {
-                $targetUser = $firstApprover->userable->getUser();
+                $targetUser = $firstApprover->userable->employee->user;
+                $categoryName = $vacation->quota->category->name ?? 'Cuti Tahunan';
 
                 if ($targetUser) {
-                    // Notifikasi ke Manager (Level 1)
-                    $message = $employee->user->name . ' mengajukan cuti ' .
-                            ($vacation->quota->category->name ?? 'Tahunan') .
-                            ', silakan cek pada link berikut: ' .
-                            route('portal::vacation.manage.show', ['vacation' => $vacation->id]);
-
-                    // Aktifkan notifikasi jika perlu
-                    // $targetUser->notify(new AccountNotification($message, $targetUser));
+                    $targetUser->notify(new GlobalGenericNotification([
+                        'title'   => 'Pengajuan Cuti Baru',
+                        'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan <strong>{$categoryName}</strong>. Mohon kesediaan Anda untuk meninjau pengajuan ini.",
+                        'link'    => route('portal::vacation.manage.show', $vacation->id),
+                        'icon'    => 'bx bx-calendar-event',
+                        'color'   => 'warning'
+                    ]));
                 }
             }
 
@@ -155,49 +148,13 @@ class SubmissionController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(EmployeeVacation $vacation, Request $request)
-    {
-        $user = $request->user();
-        $employee = $user->employee;
-
-        $myPositionIds = $employee->positions()->pluck('id')->toArray();
-
-        $vacation->load([
-            'approvables' => function($query) {
-                $query->orderBy('level', 'asc');
-            },
-            'approvables.userable.position',
-            'quota.employee.user',
-            'quota.category'
-        ]);
-
-        return view('portal::vacation.submission.show', compact('user', 'employee', 'vacation', 'myPositionIds'));
-    }
-
-    /**
-     * Show the form for editing a specified resource.
-     */
-    public function edit(EmployeeVacation $vacation, Request $request)
-    {
-        $employee = $request->user()->employee;
-
-        $quotas = $employee->vacationQuotas()->with('category', 'vacations')->active()->get();
-
-        return view('portal::vacation.submission.edit', compact('employee', 'quotas', 'vacation'));
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (Handling Re-submission after Revision)
      */
     public function update(EmployeeVacation $vacation, UpdateRequest $request)
     {
         $employee = $request->user()->employee;
-
         $vacation->fill($request->transformed()->toArray())->save();
 
-        // Reset approvable
         foreach ($vacation->approvables as $approvable) {
             $approvable->fill([
                 'result' => ApprovableResultEnum::PENDING,
@@ -206,9 +163,16 @@ class SubmissionController extends Controller
             ])->save();
         }
 
-        // Handle notifications
         if ($approvable = $vacation->approvables()->orderBy('level')->first()) {
-            $approvable->userable->employee->user->notify(new RevisedNotification($vacation));
+            $targetUser = $approvable->userable->employee->user;
+
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'   => 'Revisi Cuti Terkirim',
+                'message' => "<strong>{$employee->user->name}</strong> telah mengirimkan revisi pengajuan cuti. Silakan tinjau kembali data yang diperbarui.",
+                'link'    => route('portal::vacation.manage.show', $vacation->id),
+                'icon'    => 'bx bx-refresh',
+                'color'   => 'info'
+            ]));
         }
 
         return redirect()->route('portal::vacation.submission.index')->with('success', 'Pengajuan hasil revisi sudah dikirim ulang, silakan tunggu notifikasi selanjutnya dari atasan!');
@@ -219,12 +183,23 @@ class SubmissionController extends Controller
      */
     public function destroy(EmployeeVacation $vacation)
     {
-        $vacation->delete();
+        $employeeName = $vacation->quota->employee->user->name;
 
-        // Handle notifications
-        if ($approvable = $vacation->approvables()->whereNotIn('result', [ApprovableResultEnum::PENDING])->orderBy('level')->first()) {
-            $approvable->userable->employee->user->notify(new CanceledNotification($vacation));
+        $approvable = $vacation->approvables()->orderBy('level')->first();
+
+        if ($approvable && $approvable->userable) {
+            $targetUser = $approvable->userable->employee->user;
+
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'   => 'Pengajuan Cuti Dibatalkan',
+                'message' => "Pengajuan cuti atas nama <strong>{$employeeName}</strong> telah dibatalkan oleh yang bersangkutan.",
+                'link'    => '#',
+                'icon'    => 'bx bx-trash',
+                'color'   => 'secondary'
+            ]));
         }
+
+        $vacation->delete();
 
         return redirect()->route('portal::vacation.submission.index')->with('success', 'Pengajuan telah dibatalkan dan kami telah mengirim notifikasi ke atasan!');
     }

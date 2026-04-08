@@ -57,6 +57,8 @@
         <div class="page-content">
             <div class="container-fluid">
                 <div class="row align-items-center mb-4 mt-2">
+                    @include('layouts.component.alert-access')
+
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
                             <a href="{{ request('next', route('portal::dashboard-msdm.index')) }}" class="btn btn-sm btn-soft-secondary rounded-circle me-3">

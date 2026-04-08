@@ -10,6 +10,7 @@ use Modules\Core\Models\CompanyLeaveCategory;
 use Modules\HRMS\Models\EmployeeLeave;
 use Modules\Portal\Http\Controllers\Controller;
 use Modules\Portal\Http\Requests\Leave\Submission\StoreRequest;
+use App\Notifications\GlobalGenericNotification;
 use Modules\Portal\Notifications\Leave\Submission\SubmissionNotification;
 use Modules\Portal\Notifications\Leave\Submission\CanceledNotification;
 
@@ -51,17 +52,13 @@ class SubmissionController extends Controller
 		return view('portal::leave.submission.create', compact('employee', 'categories'));
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
 	public function store(StoreRequest $request)
     {
         $user = $request->user();
         $employee = $user->employee;
 
-        $parentPositions = $employee->position->position->parents;
-
         $leave = $employee->leaves()->create($request->transform());
+
         if ($user->hasRole('administrator')) {
             return redirect()->route('portal::leave.submission.index')
                 ->with('success', 'Pengajuan Administrator otomatis disetujui oleh sistem.');
@@ -82,7 +79,16 @@ class SubmissionController extends Controller
         }
 
         if ($approvable = $leave->approvables()->orderBy('level')->first()) {
-            // $approvable->userable->getUser()->notify(new SubmissionNotification($leave, null));
+            $targetUser = $approvable->userable->employee->user;
+
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'   => 'Persetujuan Izin Baru',
+                'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan izin baru. Silakan periksa detailnya untuk memberikan persetujuan.",
+                'link'    => route('hrms::service.leave.manage.index'),
+                'icon'    => 'bx bx-file',
+                'color'   => 'warning'
+            ]));
+
             $message = 'Pengajuan izin sudah terkirim ke atasan.';
         } else {
             $message = 'Pengajuan sudah tersimpan dan disetujui otomatis (tidak ada hirarki atasan).';
@@ -91,31 +97,28 @@ class SubmissionController extends Controller
         return redirect()->route('portal::leave.submission.index')->with('success', $message);
     }
 
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(EmployeeLeave $leave, Request $request)
-	{
-		$user = $request->user();
-		$employee = $user->employee;
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(EmployeeLeave $leave)
+    {
+        $employeeName = $leave->employee->user->name;
+        $leave->delete();
 
-		$leave = $leave->load('approvables.userable.position');
+        $approvable = $leave->approvables()->orderBy('level')->first();
 
-		return view('portal::leave.submission.show', compact('user', 'employee', 'leave'));
-	}
+        if ($approvable && $approvable->userable) {
+            $targetUser = $approvable->userable->employee->user;
 
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(EmployeeLeave $leave)
-	{
-		$leave->delete();
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'   => 'Pengajuan Dibatalkan',
+                'message' => "Pengajuan izin atas nama <strong>{$employeeName}</strong> telah dibatalkan oleh yang bersangkutan.",
+                'link'    => '#',
+                'icon'    => 'bx bx-x-circle',
+                'color'   => 'danger'
+            ]));
+        }
 
-		// Handle notifications
-		if ($approvable = $leave->approvables()->whereNotIn('result', [ApprovableResultEnum::PENDING])->orderBy('level')->first()) {
-			$approvable->userable->employee->user->notify(new CanceledNotification($leave));
-		}
-
-		return redirect()->route('portal::leave.submission.index')->with('success', 'Pengajuan telah dibatalkan dan kami telah mengirim notifikasi ke atasan!');
-	}
+        return redirect()->route('portal::leave.submission.index')->with('success', 'Pengajuan telah dibatalkan dan kami telah mengirim notifikasi ke atasan!');
+    }
 }

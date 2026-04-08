@@ -9,6 +9,7 @@ use Modules\Core\Enums\ApprovableResultEnum;
 use Modules\Core\Models\CompanyApprovable;
 use Modules\Portal\Http\Controllers\Controller;
 use Modules\Portal\Http\Requests\Overtime\Manage\UpdateRequest;
+use App\Notifications\GlobalGenericNotification;
 use Modules\Portal\Notifications\Overtime\Manage\ApprovedNotification;
 use Modules\Portal\Notifications\Overtime\Manage\RejectedNotification;
 use Modules\Portal\Notifications\Overtime\Submission\SubmissionNotification;
@@ -62,35 +63,69 @@ class ManageController extends Controller
     public function update(CompanyApprovable $approvable, UpdateRequest $request)
     {
         $approvable->update($request->transformed()->toArray());
-        $approved = $request->input('result') == ApprovableResultEnum::APPROVE->value;
 
-        // Handle notifications
-        if ($approved) {
-        //    $approvable->modelable->employee->user->notify(new ApprovedNotification($approvable->modelable, $approvable));
-        //    $approvable->modelable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
-            if ($superior = $approvable->modelable->approvables->sortBy('level')->filter(fn($a) => $a->level > $approvable->level)->first()) {
-        //        $superior->userable->employee->user->notify(new SubmissionNotification($approvable->modelable, $approvable->userable));
-        //        $superior->userable->employee->user->notify(new AccountNotification($approvable->modelable->employee->user->name . ' mengajukan lembur ' . $approvable->modelable->name . ', silakan cek pada link berikut ' . route('portal::overtime.manage.show', ['overtime' => $approvable->modelable->id]), $superior->userable->employee->user));
+        $overtime = $approvable->modelable;
+        if (!$overtime) {
+            return redirect()->back()->with('error', 'Data lembur tidak ditemukan.');
+        }
+
+        $submitter = $overtime->employee->user;
+        $result = (int) $request->input('result');
+        $isApproved = $result === ApprovableResultEnum::APPROVE->value;
+        $isRejected = $result === ApprovableResultEnum::REJECT->value;
+
+        if ($isApproved) {
+            $nextSuperior = $overtime->approvables
+                ->sortBy('level')
+                ->filter(fn($a) => $a->level > $approvable->level && $a->result === ApprovableResultEnum::PENDING)
+                ->first();
+
+            if ($nextSuperior && $nextSuperior->userable) {
+                $nextUser = $nextSuperior->userable->employee->user;
+                $nextUser->notify(new GlobalGenericNotification([
+                    'title'   => 'Persetujuan Lembur (Meneruskan)',
+                    'message' => "Ada pengajuan lembur dari <strong>{$submitter->name}</strong> yang telah disetujui di level sebelumnya dan menunggu keputusan Anda.",
+                    'link'    => route('portal::overtime.manage.show', $overtime->id),
+                    'icon'    => 'bx bx-redo',
+                    'color'   => 'info'
+                ]));
+            } else {
+                $overtime->update(['paidable_at' => now()]);
+
+                $submitter->notify(new GlobalGenericNotification([
+                    'title'   => 'Lembur Disetujui',
+                    'message' => "Kabar baik! Pengajuan lembur Anda telah <strong>disetujui sepenuhnya</strong> dan siap diproses ke sistem penggajian.",
+                    'link'    => route('portal::overtime.submission.show', $overtime->id),
+                    'icon'    => 'bx bx-check-double',
+                    'color'   => 'success'
+                ]));
             }
         }
 
-        if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-    //        $approvable->modelable->employee->user->notify(new RejectedNotification($approvable->modelable, $approvable));
-     //       $approvable->modelable->employee->user->notify(new AccountNotification('Maaf, pengajuan lembur ' . $approvable->modelable->name . ' ditolak, silakan cek pada link berikut ' . route('portal::overtime.submission.show', ['overtime' => $approvable->modelable->id]), $approvable->modelable->employee->user));
+        if ($isRejected) {
+            $overtime->update(['paidable_at' => null]);
+            $submitter->notify(new GlobalGenericNotification([
+                'title'   => 'Lembur Ditolak',
+                'message' => "Pengajuan lembur Anda telah ditolak. Silakan cek detail pengajuan untuk melihat alasan atau catatan dari atasan.",
+                'link'    => route('portal::overtime.submission.show', $overtime->id),
+                'icon'    => 'bx bx-x-circle',
+                'color'   => 'danger'
+            ]));
         }
-
-        $approvable->modelable->update(['paidable_at' => $approved && $approvable->is($approvable->modelable->approvables->sortByDesc('level')->first()) ? now() : null]);
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(EmployeeOvertime $overtime)
     {
         $this->authorize('destroy', $overtime);
 
-        $tmp = $overtime;
+        $employeeName = $overtime->employee->user->name;
         $overtime->delete();
 
-        return redirect()->back()->with('success', 'Pengajuan overtime <strong>' . $tmp->employee->user->name . '</strong> berhasil dihapus');
+        return redirect()->back()->with('success', "Pengajuan lembur <strong>{$employeeName}</strong> berhasil dihapus");
     }
 }

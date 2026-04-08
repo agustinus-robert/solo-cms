@@ -90,13 +90,6 @@
                     </div>
                 </div>
 
-                @if (Session::has('success'))
-                    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-                        <i class="mdi mdi-check-circle me-2"></i> {{ Session::get('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
                 <div class="row">
                     {{-- Navigasi View --}}
                     <div class="col-xl-3">
