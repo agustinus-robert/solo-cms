@@ -67,6 +67,7 @@ return new class extends Migration
             $table->text('image_name');
             $table->boolean('is_active')->default(true);
             $table->timestampsTz();
+            $table->softDeletesTz();
         });
 
         Schema::create('product_label_variants', function (Blueprint $table) {

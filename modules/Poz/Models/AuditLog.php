@@ -3,6 +3,7 @@
 namespace Modules\Poz\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Account\Models\User;
 
 class AuditLog extends Model
 {
@@ -28,5 +29,10 @@ class AuditLog extends Model
     public function auditable()
     {
         return $this->morphTo();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
