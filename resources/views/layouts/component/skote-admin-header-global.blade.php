@@ -48,7 +48,6 @@
                 </div>
             </div>
 
-            @include('layouts.component.notifications')
             @include('layouts.shortcut_menu')
             @include('layouts.nav_name')
         </div>

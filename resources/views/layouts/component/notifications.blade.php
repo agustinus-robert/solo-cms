@@ -1,5 +1,5 @@
-@php 
-    $user = request()->user(); 
+@php
+    $user = request()->user();
 @endphp
 
 <div class="dropdown d-inline-block">
@@ -7,7 +7,7 @@
         <i class="bx bx-bell bx-tada"></i>
         <span class="badge bg-danger rounded-pill">{{ $user->notifications->whereNull('read_at')->count() }}</span>
     </button>
-    
+
     <div id="nav-dropdown-notifications" class="dropdown-menu dropdown-menu-end position-absolute rounded border-0 pt-0 shadow-sm" style="min-width: 350px">
         <div class="p-3">
             <div class="row align-items-center">
@@ -51,7 +51,7 @@
         <div class="dropdown-divider my-0"></div>
         <div class="p-2 border-top d-grid">
             <a class="btn btn-sm btn-link font-size-14 text-center" href="{{ route('account::notifications', ['next' => url()->full()]) }}">
-                <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">Lihat Semua..</span> 
+                <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">Lihat Semua..</span>
             </a>
         </div>
     </div>
