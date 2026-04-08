@@ -29,7 +29,6 @@
             </div>
 
             <div class="d-flex">
-                @include('portal::layouts.components.notifications')
                 @include('layouts.shortcut_menu')
                 @include('layouts.nav_name')
             </div>
