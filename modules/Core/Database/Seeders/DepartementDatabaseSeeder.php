@@ -12,9 +12,6 @@ class DepartementDatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // ======================
-        // DEPARTMENTS
-        // ======================
         $departments = [
             ['kd' => 'management', 'name' => 'Management'],
             ['kd' => 'front_office', 'name' => 'Front Office'],
@@ -24,20 +21,21 @@ class DepartementDatabaseSeeder extends Seeder
             ['kd' => 'purchasing', 'name' => 'Purchasing / Gudang'],
             ['kd' => 'hr', 'name' => 'HR / Admin'],
             ['kd' => 'security', 'name' => 'Keamanan'],
+            ['kd' => 'external', 'name' => 'Pihak Luar / Vendor'], // Tambahan untuk Supplier
         ];
 
+        $deptMap = [];
         foreach ($departments as $department) {
-            CompanyDepartment::create($department);
+            $d = CompanyDepartment::create($department);
+            $deptMap[$department['kd']] = $d->id;
         }
 
-        // ======================
-        // POSITION TYPES
-        // ======================
         $types = [
             ['kd' => 'owner', 'name' => 'Owner'],
             ['kd' => 'management', 'name' => 'Management'],
             ['kd' => 'staff', 'name' => 'Staff'],
             ['kd' => 'support', 'name' => 'Support'],
+            ['kd' => 'vendor', 'name' => 'Vendor / Supplier'], // Tambahan tipe vendor
         ];
 
         $typeMap = [];
@@ -46,24 +44,21 @@ class DepartementDatabaseSeeder extends Seeder
             $typeMap[$type['kd']] = $t->id;
         }
 
-        // ======================
-        // POSITIONS + LEVEL
-        // ======================
         $positions = [
             // LEVEL 1 (Top)
             [
                 'kd' => 'owner',
                 'name' => 'Owner',
-                'dept_id' => 1,
+                'dept_id' => $deptMap['management'],
                 'level' => 1,
                 'position_type_id' => $typeMap['owner'],
             ],
 
-            // LEVEL 2
+
             [
                 'kd' => 'manager',
                 'name' => 'Manager',
-                'dept_id' => 1,
+                'dept_id' => $deptMap['management'],
                 'level' => 2,
                 'position_type_id' => $typeMap['management'],
                 'parent_ids' => [1], // owner
@@ -72,7 +67,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'kasir',
                 'name' => 'Kasir',
-                'dept_id' => 2,
+                'dept_id' => $deptMap['front_office'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2], // manager
@@ -80,7 +75,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'waiter',
                 'name' => 'Waiter / Waitress',
-                'dept_id' => 4,
+                'dept_id' => $deptMap['service'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2],
@@ -88,7 +83,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'koki',
                 'name' => 'Koki',
-                'dept_id' => 3,
+                'dept_id' => $deptMap['kitchen'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2],
@@ -96,7 +91,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'admin',
                 'name' => 'Admin',
-                'dept_id' => 7,
+                'dept_id' => $deptMap['hr'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2],
@@ -104,7 +99,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'finance_staff',
                 'name' => 'Finance Staff',
-                'dept_id' => 5,
+                'dept_id' => $deptMap['finance'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2],
@@ -112,17 +107,23 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'purchasing_staff',
                 'name' => 'Purchasing Staff',
-                'dept_id' => 6,
+                'dept_id' => $deptMap['purchasing'],
                 'level' => 3,
                 'position_type_id' => $typeMap['staff'],
                 'parent_ids' => [2],
             ],
-
-            // LEVEL 4 (Support / Helper)
+            [
+                'kd' => 'supplier',
+                'name' => 'Supplier / Vendor',
+                'dept_id' => $deptMap['external'],
+                'level' => 3,
+                'position_type_id' => $typeMap['vendor'],
+                'parent_ids' => [2], // Di bawah manager atau purchasing
+            ],
             [
                 'kd' => 'helper_kitchen',
                 'name' => 'Helper Kitchen',
-                'dept_id' => 3,
+                'dept_id' => $deptMap['kitchen'],
                 'level' => 4,
                 'position_type_id' => $typeMap['support'],
                 'parent_ids' => [5], // koki
@@ -130,7 +131,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'cleaning_service',
                 'name' => 'Cleaning Service',
-                'dept_id' => 4,
+                'dept_id' => $deptMap['service'],
                 'level' => 4,
                 'position_type_id' => $typeMap['support'],
                 'parent_ids' => [2],
@@ -138,7 +139,7 @@ class DepartementDatabaseSeeder extends Seeder
             [
                 'kd' => 'security',
                 'name' => 'Security',
-                'dept_id' => 8,
+                'dept_id' => $deptMap['security'],
                 'level' => 3,
                 'position_type_id' => $typeMap['support'],
                 'parent_ids' => [2],
