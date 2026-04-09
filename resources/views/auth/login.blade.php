@@ -51,7 +51,7 @@
                             <div class="d-flex flex-column h-100">
                                 <div class="mb-md-5 mb-4">
                                     <a href="{{ route('login') }}" class="d-block card-logo">
-                                        <img src="{{ asset('skote/images/logo-dark.png') }}" alt="" width="300" height="80" class="card-logo-dark">
+                                        <img src="{{ asset('skote/images/logo-dark.png') }}" alt="" width="300" height="100" class="card-logo-dark">
                                         {{-- <img src="{{ asset('skote/images/logo-light.png') }}" alt="" height="18" class="card-logo-light"> --}}
                                     </a>
                                 </div>
