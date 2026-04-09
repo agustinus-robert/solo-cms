@@ -31,11 +31,11 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::before(function (User $user, $ability) {
-            if ((int) optional(optional($user->employee)->position)->position_id === 1) {
-                return true;
-            }
-        });
+        // Gate::before(function (User $user, $ability) {
+        //     if ((int) optional(optional($user->employee)->position)->position_id === 1) {
+        //         return true;
+        //     }
+        // });
 
 
         // Disable passport routes

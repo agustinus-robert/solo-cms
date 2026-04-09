@@ -12,16 +12,6 @@ Route::middleware(['auth', \Modules\Portal\Http\Middleware\AccessMiddleware::cla
         Route::get('datatable_outlet', 'ManageController@outletTable')->name('outlet.datatables');
     });
 
-     Route::prefix('attendance')->namespace('Attendance')->name('attendance.')->group(function () {
-        Route::redirect('/', '/attendance/presence');
-        Route::get('/presence', 'PresenceController@index')->name('presence.index');
-        Route::post('/presence', 'PresenceController@store')->name('presence.store');
-    });
-
-      Route::prefix('package')->namespace('Package')->name('package.')->group(function(){
-        Route::resource('manage', 'ManageController');
-    });
-
     Route::prefix('attendance')->namespace('Attendance')->name('attendance.')->group(function () {
         // Presence
         Route::redirect('/', '/attendance/presence');

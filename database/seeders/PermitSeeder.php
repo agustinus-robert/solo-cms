@@ -32,7 +32,8 @@ class PermitSeeder extends Seeder
             'salaray_approval', 'employee_report', 'employee_report_salary', 'ticketing', 'employee_isurance',
             'employee_overtime', 'employee_outwork', 'employee_loan', 'employee_feastday', 'employee_postyear',
             'employee_payroll_template', 'employee_payroll_calculation', 'employee_ter_taxs', 'employee_income_yearly',
-            'employee_validations_salary', 'employee_report_overtime', 'employee_tax'
+            'employee_validations_salary', 'employee_report_overtime', 'employee_tax',
+            'attendance', 'builder', 'configure'
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];

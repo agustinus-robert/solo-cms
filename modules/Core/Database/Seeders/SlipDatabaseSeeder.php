@@ -222,6 +222,80 @@ class SlipDatabaseSeeder extends Seeder
                         ]
                     ],
                 ],
+                'Lain-lain' => [
+                    [
+                        'name' => 'Premi BPJS Tenagakerja & Kesehatan',
+                        'currency' => true,
+                        'allowance' => 99,
+                        'operate' => 2,
+                        'meta' => [
+                            'default' => 0,
+                            'algorithm' => [
+                                'method' => 'MODEL',
+                                'models' => [
+                                    EmployeeInsurance::class => [
+                                        'conditions' => [
+                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                                            ['f' => 'whereIn', 'p' => ['price_id', [2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 16, 17, 18]]]
+                                        ],
+                                        'action' => 'sum',
+                                        'action_column' => 'cmp_price'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'PPh 21 (Bulanan)',
+                        'currency' => true,
+                        'allowance' => 99,
+                        'operate' => 2,
+                        'meta' => [
+                            'default' => 0,
+                            'default_pph' => true,
+                            'algorithm' => [
+                                'method' => 'MODEL',
+                                'models' => [
+                                    EmployeeDataRecapitulation::class => [
+                                        'conditions' => [
+                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::PPH21]],
+                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
+                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
+                                        ],
+                                        'action' => 'sum',
+                                        'action_column' => 'result->pph'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'PPh 21 (Tahunan)',
+                        'currency' => true,
+                        'allowance' => 99,
+                        'operate' => 2,
+                        'meta' => [
+                            'default' => 0,
+                            'default_pph' => true,
+                            'algorithm' => [
+                                'method' => 'MODEL',
+                                'models' => [
+                                    EmployeeDataRecapitulation::class => [
+                                        'conditions' => [
+                                            ['f' => 'where', 'p' => ['empl_id', '%CURRENT_EMPL_ID%']],
+                                            ['f' => 'where', 'p' => ['type', DataRecapitulationTypeEnum::PPH21]],
+                                            ['f' => 'where', 'p' => ['start_at', '%START_AT%']],
+                                            ['f' => 'where', 'p' => ['end_at', '%END_AT%']]
+                                        ],
+                                        'action' => 'sum',
+                                        'action_column' => 'result->pph'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
             ],
             'Slip Reimbursment dan lain-lain' => [
                 'Rekapitulasi' => [
@@ -780,7 +854,7 @@ class SlipDatabaseSeeder extends Seeder
 
         // Salary default
         $settings = [
-            'cmp_payroll_default_components' => json_decode('[{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"1","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"3","amount":0,"description":null,"name":"Tj. Jabatan Struktural"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"4","amount":0,"description":null,"name":"TJ. BPJS"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Kegiatan Tambahan","component_id":"7","amount":0,"description":null,"name":"Kehadiran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Kegiatan Tambahan","component_id":"8","amount":0,"description":null,"name":"Tugas Luar"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","component_id":"10","amount":0,"description":null,"name":"Jasa"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"13","name":"Hari Efektif Periode Penggajian","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"14","name":"Jumlah Presensi","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"15","name":"Jumlah Keterlambatan","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"16","name":"Jumlah Cuti","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"17","name":"Jumlah Izin Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"18","name":"Jumlah Lembur Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","component_id":"19","amount":0,"description":null,"name":"Lembur"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"3","ctg_name":"Potongan Non PPh 21","component_id":"22","amount":0,"description":null,"name":"Potongan lainnya"}]'),
+            'cmp_payroll_default_components' => json_decode('[{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"1","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"2","ctg_name":"Kegiatan Tambahan","component_id":"7","amount":0,"description":null,"name":"Kehadiran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"3","ctg_name":"Potongan","component_id":"12","amount":0,"description":null,"name":"Angsuran"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","component_id":"13","amount":0,"description":null,"name":"Premi BPJS Tenagakerja & Kesehatan"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","component_id":"14","amount":0,"description":null,"name":"PPh 21 (Bulanan)"},{"slip_az":"1","slip_name":"Slip PPh 21","ctg_az":"4","ctg_name":"Lain-lain","component_id":"15","amount":0,"description":null,"name":"PPh 21 (Tahunan)"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"16","name":"Hari Efektif Periode Penggajian","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"17","name":"Jumlah Presensi","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"18","name":"Jumlah Keterlambatan","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"19","name":"Jumlah Cuti","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"20","name":"Jumlah Izin Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"1","ctg_name":"Rekapitulasi","component_id":"21","name":"Jumlah Lembur Periode Ini","amount":0,"description":null},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"2","ctg_name":"Natura dan kenikmatan","component_id":"22","amount":0,"description":null,"name":"Lembur"},{"slip_az":"2","slip_name":"Slip Reimbursment dan lain-lain","ctg_az":"3","ctg_name":"Potongan Non PPh 21","component_id":"25","amount":0,"description":null,"name":"Potongan lainnya"}]'),
             'cmp_payroll_default_postyear_components' => json_decode('[{"slip_az":"4","slip_name":"Slip PPh 21 (Gaji ke-13)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"28","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"4","slip_name":"Slip PPh 21 (Gaji ke-13)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"29","amount":0,"description":null,"name":"Tj. Jabatan"}]'),
             'cmp_payroll_default_feastday_components' => json_decode('[{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"23","amount":0,"description":null,"name":"Gaji Pokok"},{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"24","amount":0,"description":null,"name":"Tj. Jabatan"},{"slip_az":"3","slip_name":"Slip PPh 21 (THR)","ctg_az":"1","ctg_name":"Penghasilan Upah","component_id":"27","amount":0,"description":null,"name":"Tj. Masa Kerja"}]')
         ];

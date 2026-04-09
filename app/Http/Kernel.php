@@ -10,6 +10,7 @@ class Kernel extends HttpKernel
         // Middleware lain...
         'TrackVisitors' => \App\Http\Middleware\TrackVisitors::class,
         'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
+        'permission'  => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'append.outlet' => \App\Http\Middleware\AppendOutletQuery::class,
         'check.permit' => \App\Http\Middleware\EnsureUserHasPermission::class,
     ];
