@@ -22,7 +22,7 @@ class ProductDatabaseSeeder extends Seeder
             'unit.sql', 'outlet_unit.sql',
             'tax_rate.sql', 'outlet_tax_rate.sql',
             'product.sql', 'outlet_product.sql',
-            'user_casier_outlet.sql', 'user_tokens.sql'
+            'user_employee_outlet.sql', 'user_tokens.sql'
         ];
 
         // Matikan Foreign Key Check (PostgreSQL)

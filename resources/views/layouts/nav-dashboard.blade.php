@@ -8,14 +8,21 @@
                         <a class="nav-link arrow-none {{ request()->routeIs('portal::dashboard-msdm.index') ? 'active' : '' }}"
                            href="{{ route('portal::dashboard-msdm.index') }}" id="topnav-uielement" role="button">
                             <i class=" bx bxs-dashboard me-2"></i>
-                            <span key="t-ui-elements"> Dashboard Utama</span>
+                            <span key="t-ui-elements"> Dashboard</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link arrow-none {{ request()->routeIs('portal::dashboard.index') ? 'active' : '' }}"
                            href="{{ route('portal::dashboard.index') }}" id="topnav-dashboard" role="button">
-                            <i class="bx bx-home-circle me-2"></i><span key="t-dashboards">Dashboard Penjualan</span>
+                            <i class="bx bx-home-circle me-2"></i><span key="t-dashboards">Ringkasan Penjualan</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link arrow-none {{ request()->routeIs('portal::dashboard.index') ? 'active' : '' }}"
+                           href="{{ route('portal::dashboard.index') }}" id="topnav-dashboard" role="button">
+                            <i class="bx bxs-business me-2"></i><span key="t-dashboards">Ringkasan Supplier</span>
                         </a>
                     </li>
 

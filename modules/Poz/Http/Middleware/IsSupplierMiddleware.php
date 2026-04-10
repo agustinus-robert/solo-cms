@@ -17,8 +17,10 @@ class IsSupplierMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        return Gate::authorize('supplier::access')
-            ? $next($request)
-            : abort(403);
+        if (Gate::allows('supplier::access')) {
+            return $next($request);
+        }
+
+        abort(403);
     }
 }

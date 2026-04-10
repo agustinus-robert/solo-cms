@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\ProductQuotation;
 use Modules\Poz\Models\ProductQuotationItems;
+use App\Notifications\GlobalGenericNotification;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 trait QuotationRepository
@@ -25,7 +27,7 @@ trait QuotationRepository
         'name',
         'status',
         'price',
-        'location', 
+        'location',
         'image_name'
     ];
 
@@ -59,7 +61,7 @@ trait QuotationRepository
                     $row['location']   = $location;
                     $row['image_name'] = $filename;
                 }
-                
+
                 $productQuotation = new ProductQuotationItems();
                 $productQuotation->product_quotation_id = $productInv->id;
                 $productQuotation->name = $row['name'];
@@ -70,12 +72,24 @@ trait QuotationRepository
                 $productQuotation->save();
             }
 
+            $notifData = [
+                'title'   => 'Penawaran Baru Masuk',
+                'message' => "Supplier <strong>" . Auth::user()->name . "</strong> mengirimkan penawaran baru dengan referensi: <strong>{$productInv->reference}</strong>",
+                'link'    => route('poz::supplierz.quotation.index'),
+                'icon'    => 'bx bx-file-blank',
+                'color'   => 'primary'
+            ];
+
+            $admins = User::role('owner')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new GlobalGenericNotification($notifData));
+            }
+
             DB::commit();
             session()->flash('msg-sukses', 'Quotation berhasil disimpan!');
             return true;
 
         } catch (\Exception $e) {
-            // rollback kalau ada error
             DB::rollBack();
             dd($e->getMessage());
             session()->flash('msg-gagal', 'Terjadi kesalahan saat menyimpan quotation: ' . $e->getMessage());
@@ -116,6 +130,19 @@ trait QuotationRepository
                 $productQuotation->location = $row['location'] ?? null;
                 $productQuotation->image_name = $row['image_name'] ?? null;
                 $productQuotation->save();
+            }
+
+            $notifUpdate = [
+                'title'   => 'Penawaran Diperbarui',
+                'message' => "Supplier <strong>" . Auth::user()->name . "</strong> memperbarui detail penawaran <strong>{$quotation->reference}</strong>",
+                'link'    => route('poz::supplierz.quotation.index'),
+                'icon'    => 'bx bx-revision',
+                'color'   => 'info'
+            ];
+
+            $admins = User::role('administrator')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new GlobalGenericNotification($notifUpdate));
             }
 
             DB::commit();

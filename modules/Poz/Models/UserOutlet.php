@@ -15,7 +15,7 @@ class UserOutlet extends Model
     use HasFactory, HasAuditLog;
 
     public $timestamps = false;
-    public $table = "user_casier_outlets";
+    public $table = "user_employee_outlets";
 
     protected $fillable = [
         'user_id',

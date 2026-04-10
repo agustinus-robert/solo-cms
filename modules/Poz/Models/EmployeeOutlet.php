@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Casier extends Model
+class EmployeeOutlet extends Model
 {
     use HasFactory, HasAuditLog;
 
     public $timestamps = false;
-    public $table = "user_casier_outlets";
+    public $table = "user_employee_outlets";
 
     protected $fillable = [
         'user_id',

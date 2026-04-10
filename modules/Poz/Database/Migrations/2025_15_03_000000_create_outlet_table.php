@@ -32,7 +32,7 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::create('user_casier_outlets', function (Blueprint $table) {
+        Schema::create('user_employee_outlets', function (Blueprint $table) {
             $table->foreignId('empl_id')
                 ->constrained('empls')
                 ->cascadeOnUpdate()

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Models\Product;
 use Modules\Poz\Models\Adjustment;
-use Modules\Poz\Models\Casier;
+use Modules\Poz\Models\EmployeeOutlet;
 use Modules\Poz\Models\Supplier;
 use Modules\Poz\Models\SupplierSchedule;
 use Modules\Core\Enums\SupplierWorkEnum;
@@ -65,7 +65,7 @@ trait StockAdjustmentRepository
                 'shift'  => $enumWorking->value
             ]);
 
-            $casier = Casier::where('user_id', $token)->first();
+            $casier = EmployeeOutlet::where('user_id', $token)->first();
             $adjustment->outlets()->syncWithoutDetaching($casier->outlet_id);
 
             Product::where('id', $id)->update(['price' => $sellOn, 'wholesale' => $buyOn]);

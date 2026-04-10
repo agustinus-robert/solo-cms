@@ -59,6 +59,13 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('poz::supplier.dashboard') }}">
+                        <i class="bx bxs-business" style='font-size:30px;'></i>
+                        <span>Supplier</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun</span>

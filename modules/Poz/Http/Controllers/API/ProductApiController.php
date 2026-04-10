@@ -18,7 +18,7 @@ use Modules\Poz\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Account\Models\UserToken;
-use Modules\Poz\Models\Casier;
+use Modules\Poz\Models\EmployeeOutlet;
 use Modules\Poz\Models\SaleDirectCart;
 
 class ProductApiController extends Controller
@@ -67,12 +67,12 @@ class ProductApiController extends Controller
 
    public function productSupplier($supplier_id = null)
     {
-        $query = Supplier::with('scheduleStock'); 
+        $query = Supplier::with('scheduleStock');
 
         if ($supplier_id) {
             $supplier = $query->find($supplier_id);
             if (!$supplier) {
-                return []; 
+                return [];
             }
 
             return [
@@ -113,7 +113,7 @@ class ProductApiController extends Controller
 
         $user = $request->header('X-API-KEY');
         $userToken = UserToken::where('token', $user)->first();
-        $casier = Casier::where('user_id', $userToken->user_id)->first();
+        $casier = EmployeeOutlet::where('user_id', $userToken->user_id)->first();
 
         $query->whereHas('outlets', function ($q) use ($casier) {
             $q->where('outlet_id', $casier->outlet_id);
@@ -135,7 +135,7 @@ class ProductApiController extends Controller
         $location = 'file_product/' . uniqid();
         $user = $request->header('X-API-KEY');
         $userToken = UserToken::where('token', $user)->first();
-        $casier = Casier::where('user_id', $userToken->user_id)->first();
+        $casier = EmployeeOutlet::where('user_id', $userToken->user_id)->first();
         $cekBarcode = Product::where('code', $request->barcode)->count();
         $shift = $request->shift;
 
@@ -300,7 +300,7 @@ class ProductApiController extends Controller
         $prod = Product::where('id', $product_id);
         $cekProduct = $prod->first();
         $cekBarcode = $prod->count();
-        $casier = Casier::where('user_id', $userToken->user_id)->first();
+        $casier = EmployeeOutlet::where('user_id', $userToken->user_id)->first();
 
         $data = [
             'type' => 1,

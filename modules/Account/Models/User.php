@@ -181,8 +181,8 @@ class User extends Authenticatable
 
     public function getOutletIdAttribute()
     {
-        return \DB::table('user_casier_outlets')
-            ->join('empls', 'user_casier_outlets.empl_id', '=', 'empls.id')
+        return \DB::table('user_employee_outlets')
+            ->join('empls', 'user_employee_outlets.empl_id', '=', 'empls.id')
             ->where('empls.user_id', $this->user_id)
             ->value('outlet_id');
     }

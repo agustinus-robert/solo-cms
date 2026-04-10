@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\Product;
 use Modules\Poz\Models\Purchase;
-use Modules\Poz\Models\Casier;
+use Modules\Poz\Models\EmployeeOutlet;
 use Modules\Poz\Models\SupplierSchedule;
 use Modules\Poz\Models\PurchaseItems;
 use Modules\Poz\Models\ProductStock;
@@ -71,7 +71,7 @@ trait ProductRepository
                     'created_by' => auth()->user()->id
                 ]);
 
-                $casier = Casier::where('user_id', auth()->user()->id)->first();
+                $casier = EmployeeOutlet::where('user_id', auth()->user()->id)->first();
                 $purchase->outlets()->syncWithoutDetaching($casier->outlet_id);
 
                 $purchaseItems = new PurchaseItems();

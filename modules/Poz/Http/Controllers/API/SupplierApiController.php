@@ -7,7 +7,7 @@ use Modules\Poz\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Modules\Account\Models\UserToken;
-use Modules\Poz\Models\Casier;
+use Modules\Poz\Models\EmployeeOutlet;
 
 class SupplierApiController extends Controller
 {
@@ -49,7 +49,7 @@ class SupplierApiController extends Controller
     public function store(Request $request){
         $this->user = $request->header('X-API-KEY');
         $this->userToken = UserToken::where('token', $this->user)->first();
-        $this->casier = Casier::where('user_id', $this->userToken->user_id)->first();
+        $this->casier = EmployeeOutlet::where('user_id', $this->userToken->user_id)->first();
 
         $location = 'file_supplier/' . uniqid();
         $digits = '0123456789';
@@ -91,7 +91,7 @@ class SupplierApiController extends Controller
     public function show($supplier_api, Request $request){
         $this->user = $request->header('X-API-KEY');
         $this->userToken = UserToken::where('token', $this->user)->first();
-        $this->casier = Casier::where('user_id', $this->userToken->user_id)->first();
+        $this->casier = EmployeeOutlet::where('user_id', $this->userToken->user_id)->first();
 
         $supplierShow = Supplier::find($supplier_api);
 
@@ -110,7 +110,7 @@ class SupplierApiController extends Controller
     public function update($supplier_api, Request $request){
         $this->user = $request->header('X-API-KEY');
         $this->userToken = UserToken::where('token', $this->user)->first();
-        $this->casier = Casier::where('user_id', $this->userToken->user_id)->first();
+        $this->casier = EmployeeOutlet::where('user_id', $this->userToken->user_id)->first();
 
         $location = 'file_supplier/' . uniqid();
         $supplier = Supplier::find($supplier_api);

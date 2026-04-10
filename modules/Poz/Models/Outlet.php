@@ -35,7 +35,7 @@ class Outlet extends Model
     {
         return $this->belongsToMany(
             Employee::class,
-            'user_casier_outlets',
+            'user_employee_outlets',
             'outlet_id',
             'empl_id'
         )->with('user');
@@ -43,6 +43,6 @@ class Outlet extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_casier_outlets', 'outlet_id', 'empl_id');
+        return $this->belongsToMany(User::class, 'user_employee_outlets', 'outlet_id', 'empl_id');
     }
 }
