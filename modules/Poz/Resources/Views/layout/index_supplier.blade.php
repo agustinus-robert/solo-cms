@@ -82,6 +82,7 @@
                     </div>
                 </div> --}}
 
+                @include('layouts.shortcut_menu')
                 @include('layouts.nav_name')
 
             </div>

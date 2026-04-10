@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->string('reference');
             $table->tinyInteger('payment_on');
-            $table->tinyInteger('status');
+            $table->tinyInteger('status')->nullable();
             $table->string('comments')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->foreignId('product_quotation_id')->constrained('product_quotations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->decimal('price', 20, 2);
-            $table->tinyInteger('status');
+            $table->tinyInteger('status')->nullable();
             $table->text('location')->nullable();
             $table->text('image_name')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

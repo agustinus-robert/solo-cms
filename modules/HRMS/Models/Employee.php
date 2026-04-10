@@ -99,6 +99,26 @@ class Employee extends Model
         return $this->belongsTo(User::class, 'user_id')->withDefault();
     }
 
+    public function outlets()
+    {
+        return $this->belongsToMany(
+            \Modules\Poz\Models\Outlet::class,
+            'user_employee_outlets',
+            'empl_id',
+            'outlet_id'
+        );
+    }
+
+    /**
+     * Method delegasi notifikasi (tetap perlu supaya bisa panggil langsung)
+     */
+    public function notify($notification)
+    {
+        if ($this->user) {
+            $this->user->notify($notification);
+        }
+    }
+
     /**
      * This has many positions.
      */

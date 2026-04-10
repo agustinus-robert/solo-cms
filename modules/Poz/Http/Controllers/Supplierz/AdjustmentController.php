@@ -20,7 +20,6 @@ class AdjustmentController extends Controller
         $data = [];
         // dbuilder_table untuk membuat generate table pada kolom header dan pemanggilan kolom database
         $data['column'] = [
-            //DT_RowIndex usahakan false karena tidak ada secara fisik pada database
             dbuilder_table('product_id', 'Nama Produk', false, true),
             dbuilder_table('supplier_id', 'Supplier', false, false),
             dbuilder_table('status', 'Status'),
@@ -59,16 +58,24 @@ class AdjustmentController extends Controller
     public function adjustmentTable(Request $request)
     {
         $outletId = $request->outlet;
-        $sup = Supplier::where('user_id', auth()->id())->first();
-
         $today = Carbon::today();
+        $user = auth()->user();
 
-        $adjustment = Adjustment::with('outlets')
+        $adjustment = Adjustment::with(['outlets', 'product', 'supplier'])
             ->whereHas('product.productStockAdjustItems', function ($query) use ($today) {
-              $query->whereDate('created_at', $today);
+                $query->whereDate('created_at', $today);
             })
-            ->whereNull('deleted_at')
-            ->where('supplier_id', $sup->id);
+            ->whereNull('deleted_at');
+
+        if (!$user->hasRole(['owner', 'administrator'])) {
+            $sup = Supplier::where('user_id', $user->id)->first();
+
+            if ($sup) {
+                $adjustment->where('supplier_id', $sup->id);
+            } else {
+                $adjustment->where('supplier_id', 0);
+            }
+        }
 
         if (!empty($search = $request->search)) {
             $adjustment->where(function ($query) use ($search) {
@@ -84,23 +91,18 @@ class AdjustmentController extends Controller
             }
         }
 
-
         return Table::of($adjustment)
             ->addIndexColumn()
-            ->addColumn('product_id', function ($row){
-                return $row->product->name;
+            ->addColumn('product_id', function ($row) {
+                return $row->product->name ?? '-';
             })
-            ->addColumn('supplier_id', function ($row){
-                return $row->supplier->name;
+            ->addColumn('supplier_id', function ($row) {
+                return $row->supplier->name ?? '-';
             })
-            ->addColumn('status', function($row){
-                if($row->status == 'plus'){
-                    return 'Penambahan Stok';
-                } else {
-                    return 'Pengurangan Stok';
-                }
+            ->addColumn('status', function ($row) {
+                return $row->status == 'plus' ? 'Penambahan Stok' : 'Pengurangan Stok';
             })
-            ->addColumn('qty', function($row){
+            ->addColumn('qty', function ($row) {
                 return $row->qty;
             })
             ->make(true);

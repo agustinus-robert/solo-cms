@@ -5,10 +5,11 @@ namespace Modules\Poz\Repositories;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Modules\HRMS\Models\Employee;
 use Modules\Poz\Models\ProductQuotation;
 use Modules\Poz\Models\ProductQuotationItems;
 use App\Notifications\GlobalGenericNotification;
-use App\Models\User;
+use Modules\Account\Models\User;
 use Illuminate\Support\Str;
 
 trait QuotationRepository
@@ -30,6 +31,40 @@ trait QuotationRepository
         'location',
         'image_name'
     ];
+
+    private function sendQuotationNotifications($quotation, $outletId, $type = 'store')
+    {
+        $supplierName = Auth::user()->name;
+        $isStore = $type === 'store';
+
+        $payload = [
+            'title'   => $isStore ? 'Penawaran Baru Masuk' : 'Penawaran Diperbarui',
+            'message' => $isStore
+                ? "Supplier <strong>{$supplierName}</strong> mengirimkan penawaran baru: <strong>{$quotation->reference}</strong>"
+                : "Supplier <strong>{$supplierName}</strong> memperbarui detail penawaran: <strong>{$quotation->reference}</strong>",
+            'link'    => route('poz::supplierz.quotation.index'),
+            'icon'    => $isStore ? 'bx bx-file-blank' : 'bx bx-revision',
+            'color'   => $isStore ? 'primary' : 'info'
+        ];
+
+        $managementUsers = User::role(['administrator'])->get();
+
+        foreach ($managementUsers as $user) {
+            $user->notify(new GlobalGenericNotification($payload));
+        }
+
+        if ($outletId) {
+            $outletEmployees = Employee::whereHas('outlets', function($q) use ($outletId) {
+                $q->where('outlets.id', $outletId);
+            })->with('user')->get();
+
+            foreach ($outletEmployees as $employee) {
+                if ($employee->user) {
+                    $employee->user->notify(new GlobalGenericNotification($payload));
+                }
+            }
+        }
+    }
 
     /**
      * Store newly created resource.
@@ -80,10 +115,7 @@ trait QuotationRepository
                 'color'   => 'primary'
             ];
 
-            $admins = User::role('owner')->get();
-            foreach ($admins as $admin) {
-                $admin->notify(new GlobalGenericNotification($notifData));
-            }
+            $this->sendQuotationNotifications($productInv, $outletId, 'store');
 
             DB::commit();
             session()->flash('msg-sukses', 'Quotation berhasil disimpan!');
@@ -140,10 +172,7 @@ trait QuotationRepository
                 'color'   => 'info'
             ];
 
-            $admins = User::role('administrator')->get();
-            foreach ($admins as $admin) {
-                $admin->notify(new GlobalGenericNotification($notifUpdate));
-            }
+            $this->sendQuotationNotifications($quotation, $outletId, 'update');
 
             DB::commit();
             session()->flash('msg-sukses', 'Quotation berhasil diperbarui!');

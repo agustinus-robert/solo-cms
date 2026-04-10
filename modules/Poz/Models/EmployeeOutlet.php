@@ -17,7 +17,7 @@ class EmployeeOutlet extends Model
     public $table = "user_employee_outlets";
 
     protected $fillable = [
-        'user_id',
+        'empl_id',
         'outlet_id',
     ];
 }

@@ -44,22 +44,27 @@ class ProductReportingController extends Controller
     {
         $outletId = $request->outlet;
         $shift = $request->shift;
+        $user = auth()->user(); // Ambil objek user untuk cek role
 
-        $user = auth()->id();
-        $supplier = Supplier::where('user_id', $user)->first();
-
-        $today = $request->date 
-            ? \Carbon\Carbon::parse($request->date)->startOfDay() 
+        $today = $request->date
+            ? \Carbon\Carbon::parse($request->date)->startOfDay()
             : \Carbon\Carbon::today();
 
-        // Ambil semua ProductStock Adjustment milik supplier
-        $product = ProductStock::with(['outlets', 'product.productStockAdjustItems'])
-            ->where('supplier_id', $supplier->id)
+        $product = ProductStock::with(['outlets', 'product.productStockAdjustItems', 'stockable'])
             ->whereIn('stockable_type', [
                 \Modules\Poz\Models\Adjustment::class,
             ]);
 
-        // Filter report
+        if (!$user->hasRole(['administrator', 'owner'])) {
+            $supplier = Supplier::where('user_id', $user->id)->first();
+
+            if ($supplier) {
+                $product->where('supplier_id', $supplier->id);
+            } else {
+                $product->where('supplier_id', 0);
+            }
+        }
+
         if (!empty($request->report) && $request->report !== 'all') {
             if ($request->report === 'now') {
                 $product->whereDate('created_at', $today);
@@ -74,11 +79,15 @@ class ProductReportingController extends Controller
                 $product->whereYear('created_at', now()->year);
             }
         } else {
-            // default hari ini
             $product->whereDate('created_at', $today);
         }
 
-        // Filter shift
+        if (!empty($outletId)) {
+            $product->whereHas('outlets', function($q) use ($outletId) {
+                $q->where('outlets.id', $outletId);
+            });
+        }
+
         if (in_array($shift, ['morning', 'afternoon', 'evening'])) {
             $product->where('shift', $shift);
         }
@@ -100,36 +109,23 @@ class ProductReportingController extends Controller
             ->addColumn('stock', function($row) use ($today, $request) {
                 $items = $row->product?->productStockAdjustItems ?? collect();
 
-                // Filter report tambahan
                 if (!empty($request->report) && $request->report !== 'all') {
-                    if ($request->report === 'now') {
-                        $items = $items->filter(fn($item) => $item->created_at && \Carbon\Carbon::parse($item->created_at)->isSameDay($today));
-                    } elseif ($request->report === 'yesterday') {
-                        $yesterday = \Carbon\Carbon::yesterday();
-                        $items = $items->filter(fn($item) => $item->created_at && \Carbon\Carbon::parse($item->created_at)->isSameDay($yesterday));
-                    } elseif ($request->report === 'thismonth') {
-                        $items = $items->filter(fn($item) => $item->created_at &&
-                            \Carbon\Carbon::parse($item->created_at)->month === now()->month &&
-                            \Carbon\Carbon::parse($item->created_at)->year === now()->year
-                        );
-                    } elseif ($request->report === 'thisyear') {
-                        $items = $items->filter(fn($item) => $item->created_at &&
-                            \Carbon\Carbon::parse($item->created_at)->year === now()->year
-                        );
-                    }
+                    $items = $items->filter(function($item) use ($request, $today) {
+                        $itemDate = \Carbon\Carbon::parse($item->created_at);
+                        if ($request->report === 'now') return $itemDate->isSameDay($today);
+                        if ($request->report === 'yesterday') return $itemDate->isSameDay(\Carbon\Carbon::yesterday());
+                        if ($request->report === 'thismonth') return $itemDate->month === now()->month;
+                        if ($request->report === 'thisyear') return $itemDate->year === now()->year;
+                        return true;
+                    });
                 } else {
                     $items = $items->filter(fn($item) => $item->created_at && \Carbon\Carbon::parse($item->created_at)->isSameDay($today));
                 }
 
-                // Hanya ambil yang status minus
-                $items = $items->filter(fn($item) => $item->status === 'minus');
-
-                return $items->sum('qty'); // total qty minus
+                return $items->where('status', 'minus')->sum('qty');
             })
             ->addColumn('note', fn($row) => $row->stockable?->note ?? '-')
             ->rawColumns(['image', 'purchase'])
             ->make(true);
     }
-
-
 }

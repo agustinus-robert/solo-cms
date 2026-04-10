@@ -47,11 +47,14 @@ class PermitSeeder extends Seeder
             }
         }
 
+        $ownerRole = Role::firstOrCreate(['name' => 'owner', 'guard_name' => 'web']);
         $adminRole = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
         $outletRole = Role::firstOrCreate(['name' => 'outlet', 'guard_name' => 'web']);
         $supplierRole = Role::firstOrCreate(['name' => 'supplier', 'guard_name' => 'web']);
 
-        $adminRole->syncPermissions(Permission::where('guard_name', 'web')->get());
+        $allPermissions = Permission::where('guard_name', 'web')->get();
+        $ownerRole->syncPermissions($allPermissions);
+        $adminRole->syncPermissions($allPermissions);
 
         $supplierRole->syncPermissions(Permission::whereIn('name', [
             'view_product', 'view_purchase', 'create_purchase', 'view_brand', 'view_category'
@@ -71,6 +74,18 @@ class PermitSeeder extends Seeder
         CmsLiveEditorsAccess::updateOrCreate(['user_id' => $superAdmin->id], ['status' => 1]);
 
         $this->seedHRMSData($superAdmin, 1, 'ADMIN', 0, $superAdmin->id);
+
+        $ownerUser = User::updateOrCreate(
+            ['email' => 'owner@mail.com'],
+            [
+                'username' => 'owner',
+                'name' => 'Main Owner',
+                'password' => 'password',
+                'current_team_id' => 1
+            ]
+        );
+        $ownerUser->syncRoles([$ownerRole]);
+        $this->seedHRMSData($ownerUser, 1, 'OWNER', 99, $superAdmin->id);
 
         $names = [
             'Budi Santoso', 'Siti Aminah', 'Ahmad Hidayat', 'Dewi Lestari', 'Eko Prasetyo',
@@ -122,7 +137,7 @@ class PermitSeeder extends Seeder
             $this->seedHRMSData($user, $posId, $typeCode, $key + 1, $superAdmin->id);
         }
 
-        $this->command->info('PermitSeeder: Selesai! Data Super Admin, Supplier, Manager, dan Staff sudah sinkron.');
+        $this->command->info('PermitSeeder: Selesai! Role Owner telah ditambahkan.');
     }
 
     private function seedHRMSData($user, $positionId, $type, $index, $creatorId)

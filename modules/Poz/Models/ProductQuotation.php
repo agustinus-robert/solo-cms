@@ -44,6 +44,6 @@ class ProductQuotation extends Model
 
     public function outlets()
     {
-        return $this->belongsToMany(Outlet::class, 'outlet_product_quotation', 'quotation_id', 'outlet_id');
+        return $this->belongsToMany(Outlet::class, 'outlet_product_quotations', 'quotation_id', 'outlet_id');
     }
 }
