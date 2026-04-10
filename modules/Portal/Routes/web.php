@@ -6,6 +6,7 @@ use App\Http\Middleware\PortalMiddleware;
 Route::middleware(['auth', \Modules\Portal\Http\Middleware\AccessMiddleware::class])->group(function () {
     Route::resource('dashboard', 'HomeController');
     Route::resource('dashboard-msdm', 'DashboardMsdmController');
+    Route::resource('dashboard-supplier', 'DashboardSupplier');
 
     Route::prefix('outlet')->namespace('Outlet')->name('outlet.')->group(function () {
         Route::resource('manage-outlet', 'ManageController')->parameters(['manages' => 'manage']);

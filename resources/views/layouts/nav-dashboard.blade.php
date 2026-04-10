@@ -20,8 +20,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link arrow-none {{ request()->routeIs('portal::dashboard.index') ? 'active' : '' }}"
-                           href="{{ route('portal::dashboard.index') }}" id="topnav-dashboard" role="button">
+                        <a class="nav-link arrow-none {{ request()->routeIs('portal::dashboard-supplier.index') ? 'active' : '' }}"
+                           href="{{ route('portal::dashboard-supplier.index') }}" id="topnav-dashboard" role="button">
                             <i class="bx bxs-business me-2"></i><span key="t-dashboards">Ringkasan Supplier</span>
                         </a>
                     </li>
