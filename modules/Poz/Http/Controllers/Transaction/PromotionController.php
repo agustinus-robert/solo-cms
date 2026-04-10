@@ -6,11 +6,14 @@ use Modules\Reference\Http\Controllers\Controller;
 use Yajra\DataTables\DataTables as Table;
 use Modules\Poz\Models\ProductPromotion;
 use Modules\Poz\Models\Product;
+use App\Notifications\GlobalGenericNotification;
+use Modules\Account\Models\User;
 use Modules\Poz\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PromotionController extends Controller
 {
@@ -93,16 +96,26 @@ class PromotionController extends Controller
             $promotion = ProductPromotion::create($data);
             $promotion->outlets()->sync($request->outlet_id);
 
+            $details = [
+                'title'   => 'Promosi Baru',
+                'message' => "Promosi '{$promotion->name}' telah berhasil dibuat.",
+                'link'    => '#',
+                'icon'    => 'bx bx-megaphone',
+                'color'   => 'success'
+            ];
+
+            Notification::send(User::all(), new GlobalGenericNotification($details));
+
             DB::commit();
 
             return redirect()
                 ->route('poz::transaction.product-promotion.index', ['outlet' => $request->outlet_id[0] ?? ''])
-                ->with('msg-sukses', 'Promosi berhasil ditambahkan');
+                ->with('success', 'Promosi berhasil ditambahkan');
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Gagal simpan promo: " . $e->getMessage());
-            return redirect()->back()->withInput()->with('msg-error', 'Gagal simpan data: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal simpan data: ' . $e->getMessage());
         }
     }
 
@@ -159,16 +172,26 @@ class PromotionController extends Controller
 
             $promotion->outlets()->sync($request->outlet_id);
 
+            $details = [
+                'title'   => 'Promosi Diperbarui',
+                'message' => "Data promosi '{$promotion->name}' baru saja diubah.",
+                'link'    => '#',
+                'icon'    => 'bx bx-edit-alt',
+                'color'   => 'info'
+            ];
+
+            Notification::send(User::all(), new GlobalGenericNotification($details));
+
             DB::commit();
 
             return redirect()
                 ->route('poz::transaction.product-promotion.index', ['outlet' => $request->outlet_id[0] ?? ''])
-                ->with('msg-sukses', 'Promosi berhasil diperbarui');
+                ->with('success', 'Promosi berhasil diperbarui');
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Gagal update promo ID {$id}: " . $e->getMessage());
-            return redirect()->back()->withInput()->with('msg-error', 'Gagal perbarui data: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal perbarui data: ' . $e->getMessage());
         }
     }
 
