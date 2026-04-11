@@ -5,6 +5,8 @@ namespace Modules\Core\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Modules\Account\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,6 +26,40 @@ class ManageUserController extends Controller
             'roles' => $roles,
             'userRoles' => []
         ]);
+    }
+
+    public function impersonate($id)
+    {
+        $userToImpersonate = User::findOrFail($id);
+        if ($userToImpersonate->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Anda sudah berada di akun ini.');
+        }
+
+        Session::put('impersonate_admin_id', auth()->id());
+        Auth::login($userToImpersonate);
+
+        return redirect()->route('portal::dashboard-msdm.index')
+                ->with('success', "Sekarang Anda login sebagai {$userToImpersonate->name}");    }
+
+    /**
+     * Fitur Kembali ke Akun Administrator
+     */
+    public function leaveImpersonate()
+    {
+        $adminId = Session::get('impersonate_admin_id');
+
+        if ($adminId) {
+            $admin = User::findOrFail($adminId);
+            Auth::logout();
+            Auth::login($admin);
+            request()->session()->regenerate();
+            Session::forget('impersonate_admin_id');
+
+            return redirect()->route('portal::dashboard-msdm.index')
+                ->with('success', "Berhasil kembali! Anda sekarang login sebagai {$admin->name}");
+        }
+
+        return redirect()->route('portal::dashboard-msdm.index');
     }
 
     public function edit($id)

@@ -11,8 +11,12 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     // Dashboard
     Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
+    Route::get('/manage-user/impersonate/{id}', 'ManageUserController@impersonate')->name('manage-user.impersonate');
+    Route::get('/manage-user/leave', 'ManageUserController@leaveImpersonate')->name('manage-user.leave');
+
     Route::resourcePermission('/manage-role', 'RoleController', 'role');
     Route::resourcePermission('/manage-user', 'ManageUserController', 'user');
+
     Route::resourcePermission('/manage-outlet', 'OutletAssignmentController', 'outlet')
         ->only(['index', 'edit', 'update']);
 

@@ -62,6 +62,15 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center" style="gap: 10px;">
+                                    @if(auth()->id() !== $user->id && !session()->has('impersonate_admin_id'))
+                                        <a href="{{ route('core::manage-user.impersonate', $user->id) }}"
+                                           class="btn btn-info btn-sm text-white shadow-sm"
+                                           title="Login Sebagai User Ini"
+                                           onclick="return confirm('Login sebagai {{ $user->name }}?')">
+                                            <i class="fas fa-user-secret"></i>
+                                        </a>
+                                    @endif
+
                                     <a href="{{ route('core::manage-user.edit', $user->id) }}"
                                        class="btn btn-warning btn-sm text-white shadow-sm" title="Edit User & Role">
                                         <i class="fas fa-pencil-alt"></i>

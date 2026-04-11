@@ -1,4 +1,11 @@
 <div class="d-none d-lg-flex align-items-center ms-2">
+    @if(session()->has('impersonate_admin_id'))
+        <a href="{{ route('core::manage-user.leave') }}" class="btn btn-warning btn-sm rounded-pill d-flex align-items-center px-3 me-2" style="height: 34px; border-width: 1.5px; font-weight: 600;" title="Keluar dari Penyamaran">
+            <i class="bx bx-log-out-circle font-size-16 me-2"></i>
+            <span class="d-none d-xl-inline-block">Kembali Ke Administrator</span>
+        </a>
+    @endif
+
     <a href="{{ url('/') }}" class="btn btn-primary btn-sm rounded-pill d-flex align-items-center px-3" style="height: 34px; border-width: 1.5px;" title="Lihat Website">
         <i class="bx bx-globe font-size-16 me-2"></i>
         <span class="d-none d-xl-inline-block fw-medium">Ke Website Utama</span>
