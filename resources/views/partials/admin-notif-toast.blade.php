@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Fungsi Update Badge (Panggil ini di Echo Listener)
     window.updateNotificationBadge = function() {
         const badges = document.querySelectorAll('#notif-count-data');
         badges.forEach(badge => {
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // 2. Handler Klik Dropdown (Mark as Read)
     document.body.addEventListener('click', function (e) {
         const notifBtn = e.target.closest('#page-header-notifications-dropdown');
 
@@ -47,13 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                 .then(() => {
-                    // Reset Badge
                     badges.forEach(badge => {
                         badge.innerText = '0';
                         badge.classList.add('d-none');
                     });
 
-                    // Reset background item di list
                     document.querySelectorAll('#notification-list .bg-light').forEach(item => {
                         item.classList.replace('bg-light', 'bg-white');
                         const pulse = item.querySelector('.pulse-danger');
