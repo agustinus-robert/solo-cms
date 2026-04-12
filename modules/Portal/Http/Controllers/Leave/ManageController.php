@@ -56,17 +56,11 @@ class ManageController extends Controller
     {
         $approvable->update($request->transformed()->toArray());
         $submitter = $approvable->modelable->employee->user;
+        $result = $request->input('result');
 
-        if ($request->input('result') == ApprovableResultEnum::APPROVE->value) {
+        if ($result == ApprovableResultEnum::APPROVE->value) {
 
-            $submitter->notify(new GlobalGenericNotification([
-                'title'   => 'Pengajuan Disetujui',
-                'message' => "Pengajuan Anda telah disetujui pada level {$approvable->level}. Menunggu proses selanjutnya.",
-                'link'    => route('hrms::service.leave.manage.index'),
-                'icon'    => 'bx bx-check-circle',
-                'color'   => 'success'
-            ]));
-
+            $this->sendApprovalNotification($submitter, 'approve', $approvable);
             $superiorApprovable = $approvable->modelable->approvables
                 ->sortBy('level')
                 ->filter(fn($a) => $a->level > $approvable->level)
@@ -75,26 +69,63 @@ class ManageController extends Controller
             if ($superiorApprovable && $superiorApprovable->userable) {
                 $nextApprover = $superiorApprovable->userable->employee->user;
 
-                $nextApprover->notify(new GlobalGenericNotification([
-                    'title'   => 'Perlu Persetujuan',
-                    'message' => "Ada pengajuan baru dari {$submitter->name} yang memerlukan persetujuan Anda.",
-                    'link'    => url()->current(),
-                    'icon'    => 'bx bx-user-voice',
-                    'color'   => 'info'
-                ]));
+                $this->sendApprovalNotification($nextApprover, 'next_level', $approvable, $submitter);
             }
         }
 
-        if ($request->input('result') == ApprovableResultEnum::REJECT->value) {
-            $submitter->notify(new GlobalGenericNotification([
-                'title'   => 'Pengajuan Ditolak',
-                'message' => "Mohon maaf, pengajuan Anda ditolak pada level {$approvable->level}.",
-                'link'    => route('hrms::service.leave.manage.index'),
-                'icon'    => 'bx bx-x-circle',
-                'color'   => 'danger'
-            ]));
+        if ($result == ApprovableResultEnum::REJECT->value) {
+            $this->sendApprovalNotification($submitter, 'reject', $approvable);
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
+    }
+
+    /**
+     * Private function untuk standarisasi notifikasi approval
+     */
+    private function sendApprovalNotification($targetUser, $type, $approvable, $submitter = null)
+    {
+        try {
+            $user = auth()->user();
+
+            $data = match($type) {
+                'approve' => [
+                    'title'   => 'Pengajuan Disetujui',
+                    'message' => "Pengajuan Anda telah disetujui pada level {$approvable->level}. Menunggu proses selanjutnya.",
+                    'action'  => 'Izin Disetujui',
+                    'icon'    => 'bx bx-check-circle',
+                    'color'   => 'success',
+                    'link'    => route('hrms::service.leave.manage.index'),
+                ],
+                'reject' => [
+                    'title'   => 'Pengajuan Ditolak',
+                    'message' => "Mohon maaf, pengajuan Anda ditolak pada level {$approvable->level}.",
+                    'action'  => 'Izin Ditolak',
+                    'icon'    => 'bx bx-x-circle',
+                    'color'   => 'danger',
+                    'link'    => route('hrms::service.leave.manage.index'),
+                ],
+                'next_level' => [
+                    'title'   => 'Perlu Persetujuan',
+                    'message' => "Ada pengajuan baru dari " . ($submitter->name ?? 'Karyawan') . " yang memerlukan persetujuan Anda.",
+                    'action'  => 'Persetujuan Izin',
+                    'icon'    => 'bx bx-user-voice',
+                    'color'   => 'info',
+                    'link'    => url()->current(),
+                ],
+            };
+
+            $targetUser->notify(new GlobalGenericNotification([
+                'title'        => $data['title'],
+                'message'      => $data['message'],
+                'action'       => $data['action'],
+                'link'         => $data['link'],
+                'icon'         => $data['icon'],
+                'color'        => $data['color']
+            ]));
+
+        } catch (\Exception $e) {
+            \Log::error("Realtime Leave Approval Notification Error: " . $e->getMessage());
+        }
     }
 }

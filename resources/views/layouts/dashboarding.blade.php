@@ -15,6 +15,7 @@
     <meta property="og:site_name" content="POS">
     <meta property="og:description" content="Point Of Sale UMKM">
     <meta property="og:type" content="website">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta property="og:url" content="">
     <meta property="og:image" content="">
 
@@ -66,7 +67,6 @@
         });
     </script>
 
-    @stack('scripts')
 
     <script>
         function startProgress(key) {
@@ -89,12 +89,14 @@
             }, 1000);
         }
     </script>
+
     <?php if (session('progress_key')): ?>
         <script>
             startProgress("<?= session('progress_key'); ?>");
         </script>
     <?php endif; ?>
-
+    @include('web::electro.global.echos')
+    @stack('scripts')
 </body>
 
 </html>

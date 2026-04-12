@@ -16,6 +16,36 @@ use Modules\Portal\Notifications\Leave\Submission\CanceledNotification;
 
 class SubmissionController extends Controller
 {
+    private function sendSubmissionNotification($targetUser, $type = 'store')
+    {
+        try {
+            // 1. Pastikan targetUser tidak null dan punya ID
+            if (!$targetUser || !$targetUser->id) {
+                \Log::warning("Notif Izin: Target user null.");
+                return;
+            }
+
+            $user = auth()->user();
+            $isCancel = ($type === 'cancel');
+
+            // 2. Gunakan method yang sama dengan POS
+            $targetUser->sendSystemNotification([
+                'user_id_target' => $targetUser->id,
+                'title'          => $isCancel ? 'Pengajuan Dibatalkan' : 'Persetujuan Izin Baru',
+                'message'        => $isCancel
+                    ? "Membatalkan pengajuan izin yang sebelumnya diajukan."
+                    : "Mengajukan izin baru dari {$user->name}. Silakan periksa detailnya.",
+                'link'           => $isCancel ? '#' : route('hrms::service.leave.manage.index'),
+                'icon'           => $isCancel ? 'bx bx-x-circle' : 'bx bx-file',
+                'color'          => $isCancel ? 'danger' : 'warning',
+                // Tambahkan flag ini jika method sendSystemNotification membutuhkannya
+                'sender_id'      => $user->id
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error("Realtime Leave Notification Error: " . $e->getMessage());
+        }
+    }
 	/**
 	 * Display a listing of the resource.
 	 */
@@ -80,15 +110,7 @@ class SubmissionController extends Controller
 
         if ($approvable = $leave->approvables()->orderBy('level')->first()) {
             $targetUser = $approvable->userable->employee->user;
-
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Persetujuan Izin Baru',
-                'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan izin baru. Silakan periksa detailnya untuk memberikan persetujuan.",
-                'link'    => route('hrms::service.leave.manage.index'),
-                'icon'    => 'bx bx-file',
-                'color'   => 'warning'
-            ]));
-
+            $this->sendSubmissionNotification($targetUser, 'store');
             $message = 'Pengajuan izin sudah terkirim ke atasan.';
         } else {
             $message = 'Pengajuan sudah tersimpan dan disetujui otomatis (tidak ada hirarki atasan).';
@@ -110,13 +132,7 @@ class SubmissionController extends Controller
         if ($approvable && $approvable->userable) {
             $targetUser = $approvable->userable->employee->user;
 
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Pengajuan Dibatalkan',
-                'message' => "Pengajuan izin atas nama <strong>{$employeeName}</strong> telah dibatalkan oleh yang bersangkutan.",
-                'link'    => '#',
-                'icon'    => 'bx bx-x-circle',
-                'color'   => 'danger'
-            ]));
+            $this->sendSubmissionNotification($targetUser, 'cancel');
         }
 
         return redirect()->route('portal::leave.submission.index')->with('success', 'Pengajuan telah dibatalkan dan kami telah mengirim notifikasi ke atasan!');
