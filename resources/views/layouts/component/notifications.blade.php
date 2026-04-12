@@ -6,7 +6,7 @@
     <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="bx bx-bell bx-tada"></i>
         <span id="notif-count-data"
-      class="badge bg-danger rounded-pill {{ $user->notifications->whereNull('read_at')->count() == 0 ? 'd-none' : '' }}">
+      class="js-notif-badge badge bg-danger rounded-pill {{ $user->notifications->whereNull('read_at')->count() == 0 ? 'd-none' : '' }}">
     {{ $user->notifications->whereNull('read_at')->count() }}
 </span>
     </button>

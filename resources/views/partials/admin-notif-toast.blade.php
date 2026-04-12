@@ -17,9 +17,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 });
 
-// ==========================================
-// 1. POPUP NOTIFICATION (TOAST)
-// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Fungsi Update Badge (Panggil ini di Echo Listener)
+    window.updateNotificationBadge = function() {
+        const badges = document.querySelectorAll('#notif-count-data');
+        badges.forEach(badge => {
+            let count = parseInt(badge.innerText.replace(/\D/g, '')) || 0;
+            badge.innerText = count + 1;
+            badge.classList.remove('d-none');
+            badge.style.display = 'inline-block';
+        });
+    };
+
+    // 2. Handler Klik Dropdown (Mark as Read)
+    document.body.addEventListener('click', function (e) {
+        const notifBtn = e.target.closest('#page-header-notifications-dropdown');
+
+        if (notifBtn) {
+            const badges = document.querySelectorAll('#notif-count-data');
+            let hasUnread = false;
+
+            badges.forEach(b => {
+                if (parseInt(b.innerText) > 0) hasUnread = true;
+            });
+
+            if (hasUnread) {
+                fetch("{{ route('account::notifications.read-all') }}", {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(() => {
+                    // Reset Badge
+                    badges.forEach(badge => {
+                        badge.innerText = '0';
+                        badge.classList.add('d-none');
+                    });
+
+                    // Reset background item di list
+                    document.querySelectorAll('#notification-list .bg-light').forEach(item => {
+                        item.classList.replace('bg-light', 'bg-white');
+                        const pulse = item.querySelector('.pulse-danger');
+                        if (pulse) pulse.remove();
+                    });
+                })
+                .catch(err => console.error('Mark read failed:', err));
+            }
+        }
+    });
+});
+
 const MAX_NOTIF = 5;
 
 function getContainer() {
@@ -139,7 +185,6 @@ function enforceLimit(container) {
 function updateNotificationBadge() {
     const badges = document.querySelectorAll('#notif-count-data');
 
-    console.log(badges)
     if (badges.length > 0) {
         badges.forEach(badge => {
             let currentText = badge.innerText.replace(/\D/g, '');
