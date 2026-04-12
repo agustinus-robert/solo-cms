@@ -1,93 +1,219 @@
-# pos
+# 🚀 Laravel Realtime Setup (Reverb + Nginx + Herd)
 
+Dokumentasi ini menjelaskan cara menjalankan fitur realtime pada Laravel menggunakan **Reverb WebSocket Server** dengan **Herd (Valet)** dan **Nginx (SSL / WSS)**.
 
+---
 
-## Getting started
+# 📦 Requirement
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- PHP 8.2+
+- Laravel 10/11+
+- Herd (Valet for Mac)
+- Nginx (auto dari Herd)
+- SSL lokal (`*.test` dari Herd)
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+---
 
-## Add your files
+# ⚙️ 1. Install Reverb
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+```bash
+composer require laravel/reverb
+php artisan reverb:install
+```
+
+---
+
+# ⚙️ 2. Konfigurasi `.env`
+
+```env
+BROADCAST_DRIVER=reverb
+BROADCAST_CONNECTION=reverb
+
+REVERB_APP_ID=slcms-app
+REVERB_APP_KEY=slcmskey
+REVERB_APP_SECRET=slcmssecret
+
+REVERB_HOST=127.0.0.1
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+REVERB_SERVER_HOST=127.0.0.1
+REVERB_SERVER_PORT=8080
+
+# Frontend (Vite / Echo)
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+VITE_REVERB_HOST="slcms.test"
+VITE_REVERB_PORT=443
+VITE_REVERB_SCHEME=https
+```
+
+---
+
+# ⚙️ 3. Konfigurasi Reverb (`config/reverb.php`)
+
+Gunakan TLS dari Herd:
+
+```php
+'tls' => [
+    'local_cert' => '/Users/robert/Library/Application Support/Herd/config/valet/Certificates/slcms.test.crt',
+    'local_pk'   => '/Users/robert/Library/Application Support/Herd/config/valet/Certificates/slcms.test.key',
+    'verify_peer' => false,
+],
+```
+
+---
+
+# ⚙️ 4. Konfigurasi Nginx (Herd)
+
+Edit file:
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/agus07stv/pos.git
-git branch -M main
-git push -uf origin main
+~/Library/Application Support/Herd/config/valet/Nginx/slcms.test
 ```
 
-## Integrate with your tools
+Tambahkan config WebSocket:
 
-- [ ] [Set up project integrations](https://gitlab.com/agus07stv/pos/-/settings/integrations)
+```nginx
+location /app/ {
+    proxy_pass https://0.0.0.0:8080$request_uri;
 
-## Collaborate with your team
+    proxy_http_version 1.1;
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
 
-## Test and Deploy
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
 
-Use the built-in continuous integration in GitLab.
+    proxy_ssl_verify off;
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
+}
+```
 
-***
+---
 
-# Editing this README
+# ⚙️ 5. Jalankan Reverb Server
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```bash
+php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
+```
 
-## Suggestions for a good README
+Output normal:
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```
+Starting secure server on 0.0.0.0:8080
+```
 
-## Name
-Choose a self-explaining name for your project.
+---
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+# ⚙️ 6. Setup Laravel Echo (Frontend)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```js
+import Echo from 'laravel-echo';
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
+});
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+---
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+# 🧪 7. Test Connection
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Buka browser → DevTools → Network → WS
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Harus muncul:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```
+101 Switching Protocols
+CONNECTED (WSS SUCCESS)
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+---
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+# 📡 8. Test Event
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Event Laravel
 
-## License
-For open source projects, say how it is licensed.
+```php
+broadcast(new TestEvent('Hello Realtime'));
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Listen di Frontend
+
+```js
+Echo.channel('test').listen('TestEvent', (e) => {
+    console.log(e);
+});
+```
+
+---
+
+# 🔥 Troubleshooting
+
+## ❌ 502 Bad Gateway
+
+- Salah `proxy_pass`
+- Reverb belum jalan
+- Port 8080 tidak listen
+
+## ❌ WebSocket tidak connect
+
+- Pastikan pakai **https + wss**
+- Cek `VITE_REVERB_HOST`
+- Jangan pakai `localhost`, gunakan domain `.test`
+
+## ❌ Connect tapi event tidak masuk
+
+- Cek `BROADCAST_DRIVER`
+- Cek queue (`sync` vs `redis`)
+- Cek channel name
+
+---
+
+# 🧠 Arsitektur
+
+```
+Browser (WSS)
+    ↓
+Nginx (SSL terminate)
+    ↓
+Reverb Server (127.0.0.1:8080)
+    ↓
+Laravel Broadcast
+```
+
+---
+
+# ✅ Status
+
+- ✅ WebSocket (WSS) aktif
+- ✅ SSL via Herd
+- ✅ Reverb terhubung
+- ✅ Siap realtime (chat, notif, dll)
+
+---
+
+# 🚀 Next Step
+
+- Private Channel (auth)
+- Presence Channel (online user)
+- Redis scaling
+- Queue async
+
+---
+
+# 👨‍💻 Author
+
+Robert Steven
+Laravel Realtime Setup with Reverb + Herd + Nginx
+
+---

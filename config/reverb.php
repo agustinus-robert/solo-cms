@@ -34,7 +34,11 @@ return [
             'path' => env('REVERB_SERVER_PATH', ''),
             'hostname' => env('REVERB_HOST'),
             'options' => [
-                'tls' => [],
+                'tls' => [
+                    'local_cert' => '/Users/robert/Library/Application Support/Herd/config/valet/Certificates/slcms.test.crt',
+                    'local_pk'   => '/Users/robert/Library/Application Support/Herd/config/valet/Certificates/slcms.test.key',
+                    'verify_peer' => false,
+                ],
             ],
             'max_request_size' => env('REVERB_MAX_REQUEST_SIZE', 10_000),
             'scaling' => [
@@ -78,9 +82,9 @@ return [
                 'app_id' => env('REVERB_APP_ID'),
                 'options' => [
                     'host' => env('REVERB_HOST'),
-                    'port' => env('REVERB_PORT', 443),
+                    'port' => env('REVERB_PORT', 8080),
                     'scheme' => env('REVERB_SCHEME', 'https'),
-                    'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                    'useTLS' => false,
                 ],
                 'allowed_origins' => ['*'],
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
