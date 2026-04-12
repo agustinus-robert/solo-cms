@@ -93,37 +93,6 @@ class Product extends Component
         $this->form['outlet'] = request()->query('outlet', auth()->user()->current_outlet_id);
     }
 
-    // public function testNotification()
-    // {
-    //     try {
-    //         $recipients = User::all();
-
-    //         $details = [
-    //             'title'   => 'Test Notifikasi Realtime',
-    //             'message' => 'Halo! Ini adalah notifikasi uji coba dari tombol simulasi.',
-    //             'link'    => '#',
-    //             'icon'    => 'bx bx-rocket',
-    //             'color'   => 'info',
-    //         ];
-
-    //         Notification::send($recipients, new GlobalGenericNotification($details));
-
-    //         $this->alert('success', 'Notifikasi berhasil dikirim ke antrean!');
-    //     } catch (\Exception $e) {
-    //         $this->alert('error', 'Gagal: ' . $e->getMessage());
-    //     }
-    // }
-
-    public function testNotification()
-    {
-        try {
-            broadcast(new \App\Events\TestBroadcastEvent("Halo! Ini tes dummy."));
-            $this->alert('success', 'Event Dummy terkirim!');
-        } catch (\Exception $e) {
-            $this->alert('error', 'Gagal: ' . $e->getMessage());
-        }
-    }
-
     protected function rules()
     {
         $rules = (new ProductStoreRequest())->rules();

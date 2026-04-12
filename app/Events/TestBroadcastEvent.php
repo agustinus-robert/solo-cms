@@ -21,15 +21,7 @@ class TestBroadcastEvent implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        // Kita pakai Public Channel dulu agar tidak perlu urusan login/auth
         return new Channel('test-channel');
-    }
-
-    public function broadcastWith()
-    {
-        return [
-            'message' => $this->message,
-        ];
     }
 
     public function broadcastAs()

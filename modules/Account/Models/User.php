@@ -206,7 +206,7 @@ class User extends Authenticatable
 
         return $this->relationLoaded('meta') && $filename && file_exists($fullPath)
             ? asset('uploads/' . $filename)
-            : asset('/img/default-avatar.svg');
+            : asset('img/users/default-img.png');
     }
     /**
      * get all FCM token from current user
@@ -289,5 +289,15 @@ class User extends Authenticatable
             1, 2 => route('portal::dashboard-msdm.index'),
             default => route('login'),
         };
+    }
+
+    public function sendSystemNotification(array $details)
+    {
+        $recipients = self::where('id', '!=', $this->id)->get();
+
+        foreach ($recipients as $recipient) {
+            $details['user_id_target'] = $recipient->id;
+            $recipient->notify(new \App\Notifications\GlobalGenericNotification($details));
+        }
     }
 }

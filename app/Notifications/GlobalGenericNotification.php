@@ -4,9 +4,9 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class GlobalGenericNotification extends Notification implements ShouldBroadcastNow
 {
@@ -24,25 +24,33 @@ class GlobalGenericNotification extends Notification implements ShouldBroadcastN
         return ['database', 'broadcast'];
     }
 
-    public function toArray($notifiable)
+    public function broadcastOn()
     {
+        return new PrivateChannel('Modules.Account.Models.User.' . $this->details['user_id_target']);
+    }
+
+    public function broadcastAs()
+    {
+        return 'notification.received';
+    }
+
+    public function broadcastWith()
+    {
+        $senderImage = auth()->user()->profile_avatar_path;
+
         return [
-            'message' => $this->details['message'] ?? '',
-            'link'    => $this->details['link'] ?? '#',
-            'icon'    => $this->details['icon'] ?? 'bx bx-bell',
-            'color'   => $this->details['color'] ?? 'primary',
-            'title'   => $this->details['title'] ?? 'Notifikasi Baru',
+            'sender_name'  => auth()->user()->name,
+            'sender_image' => $senderImage,
+            'action'       => $this->details['title'] ?? 'Pembaruan',
+            'message'      => $this->details['message'] ?? '',
+            'link'         => $this->details['link'] ?? '#',
+            'icon'         => $this->details['icon'] ?? 'bx bx-bell',
+            'color'        => $this->details['color'] ?? 'primary',
         ];
     }
 
-    public function toBroadcast($notifiable): BroadcastMessage
+    public function toArray($notifiable)
     {
-        return new BroadcastMessage([
-            'message' => $this->details['message'] ?? '',
-            'title'   => $this->details['title'] ?? 'Notifikasi Baru',
-            'link'    => $this->details['link'] ?? '#',
-            'icon'    => $this->details['icon'] ?? 'bx bx-bell',
-            'color'   => $this->details['color'] ?? 'primary',
-        ]);
+        return $this->broadcastWith();
     }
 }

@@ -44,21 +44,15 @@ trait ProductRepository
     private function sendProductNotification($product, $type = 'tambah', $outletId = null)
     {
         try {
-            $recipients = User::all();
-
             $isUpdate = ($type === 'update');
 
-            $details = [
+            auth()->user()->sendSystemNotification([
                 'title'   => $isUpdate ? 'Produk Diperbarui' : 'Produk Baru!',
-                'message' => $isUpdate
-                             ? "Data produk '{$product->name}' telah diperbarui."
-                             : "Produk '{$product->name}' berhasil ditambahkan ke sistem.",
+                'message' => "Produk '{$product->name}' telah " . ($isUpdate ? 'diperbarui' : 'ditambahkan') . " oleh " . auth()->user()->name,
                 'link'    => route('poz::transaction.product.index') . '?outlet=' . $outletId,
                 'icon'    => $isUpdate ? 'bx bx-edit' : 'bx bx-plus-circle',
                 'color'   => $isUpdate ? 'warning' : 'success',
-            ];
-
-            Notification::send($recipients, new GlobalGenericNotification($details));
+            ]);
         } catch (\Exception $e) {
             \Log::error("Realtime Notification Error: " . $e->getMessage());
         }

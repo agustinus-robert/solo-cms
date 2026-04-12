@@ -123,10 +123,6 @@
             </div>
 
             <div class="card-footer bg-white p-4 border-top-0 d-flex align-items-center justify-content-between">
-                <button type="button" wire:click="testNotification" class="btn btn-outline-info px-4 me-2">
-                    🚀 Test Realtime
-                </button>
-
                 <div>
                     <div wire:loading class="spinner-border spinner-border-sm text-primary me-2"></div>
                     <span wire:loading class="small text-muted">Memproses data...</span>
