@@ -84,14 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //         console.log("📦 EVENT RECEIVED:", data);
     //     });
 
-    window.Echo.channel('test-channel')
-    .listen('.test.event', (data) => {
-        console.log('🔥 DUMMY EVENT MASUK:', data.message);
-        alert('Data masuk: ' + data.message);
-    });
+
 });
 </script>
 
-{{-- @auth
+@auth
     @include('partials.admin-notif-toast')
-@endauth --}}
+@endauth
