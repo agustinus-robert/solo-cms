@@ -2,7 +2,7 @@
 
 Dokumentasi ini menjelaskan cara menjalankan fitur realtime pada Laravel menggunakan **Reverb WebSocket Server** dengan **Herd (Valet)** dan **Nginx (SSL / WSS)**.
 
----
+## jangan lupa untuk herd **secure** dan **import sertifikat** di firefox
 
 # 📦 Requirement
 
