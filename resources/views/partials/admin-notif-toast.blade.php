@@ -1,28 +1,25 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    /**
-     * Pastikan ID User login tersedia.
-     * Jika kamu pakai Blade, ambil langsung dari auth()->id().
-     */
     const userId = "{{ auth()->id() }}";
 
     const waitEcho = setInterval(() => {
         if (!window.Echo) return;
         clearInterval(waitEcho);
 
-        // SESUAIKAN: Menggunakan .private() dan namespace model User kamu
         window.Echo.private(`Modules.Account.Models.User.${userId}`)
             .listen('.notification.received', (data) => {
                 showFbNotification(data);
+                updateNotificationBadge();
+                updateNotificationDropdown(data);
             });
 
     }, 100);
 });
 
-// =========================
-// NOTIF STACK MANAGER
-// =========================
+// ==========================================
+// 1. POPUP NOTIFICATION (TOAST)
+// ==========================================
 const MAX_NOTIF = 5;
 
 function getContainer() {
@@ -72,7 +69,7 @@ function showFbNotification(data) {
         cursor: pointer;
         pointer-events: auto;
         display: flex;
-        align-items: flex-start; /* GAMBAR TETEP DI ATAS KIRI */
+        align-items: flex-start;
         gap: 12px;
         margin-bottom: 10px;
         width: 100%;
@@ -102,49 +99,25 @@ function showFbNotification(data) {
                 </div>
             </div>
         </div>
-
         <div style="flex: 1; display: flex; flex-direction: column;">
             <div style="font-weight: 700; font-size: 14px; color: #050505; margin-bottom: 2px;">
                 ${data.sender_name}
             </div>
-
             <div style="font-size: 13px; color: #65676b; line-height: 1.2; margin-bottom: 4px;">
                 ${data.action}
             </div>
-
             <div style="font-size: 13px; color: #050505; font-weight: 500; line-height: 1.3;">
                 ${data.message}
             </div>
         </div>
-
-        <button style="
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            border: none;
-            background: transparent;
-            color: #999;
-            font-size: 18px;
-            cursor: pointer;
-            line-height: 1;
-        ">×</button>
+        <button style="position: absolute; top: 8px; right: 8px; border: none; background: transparent; color: #999; font-size: 18px; cursor: pointer;">×</button>
     `;
 
-    notif.onclick = () => {
-        if (data.link && data.link !== '#') window.location.href = data.link;
-    };
-
-    notif.querySelector('button').onclick = (e) => {
-        e.stopPropagation();
-        removeNotif(notif);
-    };
+    notif.onclick = () => { if (data.link && data.link !== '#') window.location.href = data.link; };
+    notif.querySelector('button').onclick = (e) => { e.stopPropagation(); removeNotif(notif); };
 
     container.prepend(notif);
-    requestAnimationFrame(() => {
-        notif.style.transform = 'translateX(0)';
-        notif.style.opacity = '1';
-    });
-
+    requestAnimationFrame(() => { notif.style.transform = 'translateX(0)'; notif.style.opacity = '1'; });
     setTimeout(() => removeNotif(notif), 8000);
     enforceLimit(container);
 }
@@ -159,9 +132,73 @@ function removeNotif(el) {
 function enforceLimit(container) {
     const items = container.querySelectorAll('.fb-toast');
     if (items.length > MAX_NOTIF) {
-        // Hapus yang paling lama (paling bawah) jika melebihi limit
-        for (let i = MAX_NOTIF; i < items.length; i++) {
-            removeNotif(items[i]);
+        for (let i = MAX_NOTIF; i < items.length; i++) { removeNotif(items[i]); }
+    }
+}
+
+function updateNotificationBadge() {
+    const badges = document.querySelectorAll('#notif-count-data');
+
+    console.log(badges)
+    if (badges.length > 0) {
+        badges.forEach(badge => {
+            let currentText = badge.innerText.replace(/\D/g, '');
+            let count = parseInt(currentText) || 0;
+            let newCount = count + 1;
+
+            badge.innerText = newCount;
+            badge.style.setProperty('display', 'inline-block', 'important');
+            badge.classList.remove('d-none');
+
+            console.log('Badge updated:', newCount);
+        });
+    } else {
+        const backupBadge = document.querySelector('.noti-icon .badge');
+        if (backupBadge) {
+            let count = parseInt(backupBadge.innerText.replace(/\D/g, '')) || 0;
+            backupBadge.innerText = count + 1;
+            backupBadge.style.display = 'inline-block';
+        } else {
+            console.error('CRITICAL: Badge notfound even with backup selector');
+        }
+    }
+}
+
+function updateNotificationDropdown(data) {
+    const listContainer = document.getElementById('nav-dropdown-notifications');
+    const listWrapper = listContainer ? listContainer.querySelector('.p-3').nextElementSibling : null;
+
+    const emptyMsg = listContainer ? listContainer.querySelector('.dropdown-item.py-2') : null;
+    if (emptyMsg && emptyMsg.innerText.includes('Tidak ada')) {
+        emptyMsg.remove();
+    }
+
+    if (listContainer) {
+        const newLink = document.createElement('a');
+        newLink.className = 'dropdown-item d-flex align-items-center bg-light py-3';
+        newLink.href = data.link || 'javascript:;';
+
+        newLink.innerHTML = `
+            <div class="me-3">
+                <span class="float-end ms-n3 bg-danger pulse-danger rounded-circle border" style="width: 12px; height: 12px;"></span>
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-${data.color || 'primary'}" style="width: 2.5rem; height: 2.5rem;">
+                    <i class="${data.icon || 'bx bx-bell'} m-0 text-white"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-wrap" style="font-size: 13px;"><strong>${data.sender_name}</strong>: ${data.message}</div>
+                <div class="small text-muted">Baru saja</div>
+            </div>
+        `;
+
+        // Masukkan ke posisi paling atas setelah header judul
+        const header = listContainer.querySelector('.p-3');
+        header.insertAdjacentElement('afterend', newLink);
+
+        // Batasi list dropdown maksimal 4 (agar sesuai dengan .take(4) di Blade)
+        const allItems = listContainer.querySelectorAll('.dropdown-item');
+        if (allItems.length > 4) {
+            allItems[allItems.length - 1].remove();
         }
     }
 }
