@@ -1,74 +1,95 @@
-<script>
-window.Echo = new Echo({
-    broadcaster: 'reverb',
-    key: '{{ env("REVERB_APP_KEY") }}',
-    wsHost: '{{ env("REVERB_HOST") }}',
-    wsPort: {{ env("REVERB_PORT") ?? 80 }},
-    wssPort: {{ env("REVERB_PORT") ?? 443 }},
-    forceTLS: {{ env("REVERB_SCHEME") === 'https' ? 'true' : 'false' }},
-    enabledTransports: ['ws', 'wss'],
-    disableStats: true,
-    authEndpoint: '/broadcasting/auth',
-    namespace: 'App.Events',
-});
-
-window.Echo.connector.pusher.connection.bind('state_change', (states) => {
-    console.log('Status Koneksi:', states.current);
-});
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pusher-js@8.3.0/dist/web/pusher.min.js"></script>
 
 <script>
-window.Echo.channel('products-market')
-    .listen('.stock.updated', (data) => {
-        console.log("Data Diterima di Browser:", data);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 INIT ECHO START');
 
-        const pId = data.productId.toString();
-        const vCode = data.variantCode ? data.variantCode.toString() : "";
-        const newStock = parseInt(data.newStock);
-
-        const catalogBadges = document.querySelectorAll(`.stock-display-${pId}-${vCode}`);
-        catalogBadges.forEach(badge => {
-            badge.innerText = newStock;
-            if (newStock <= 0) {
-                badge.classList.remove('bg-success');
-                badge.classList.add('bg-danger');
-            } else {
-                badge.classList.remove('bg-danger');
-                badge.classList.add('bg-success');
-            }
-        });
-
-        const variantInput = document.querySelector(`input[name="selected_variant"][data-code="${vCode}"]`);
-
-        if (variantInput) {
-            const container = variantInput.closest('.variant-option');
-            const stockDisplay = container.querySelector('strong');
-
-            if (stockDisplay) {
-                stockDisplay.innerText = newStock;
-
-                if (newStock <= 0) {
-                    variantInput.disabled = true;
-                    variantInput.checked = false;
-                    stockDisplay.className = 'text-danger';
-                    stockDisplay.innerText = 'Habis';
-
-                    const qtyGroup = container.querySelector('.qty-input-group');
-                    if (qtyGroup) qtyGroup.style.display = 'none';
-                } else {
-                    variantInput.disabled = false;
-                    stockDisplay.className = 'text-success';
-
-                    const qtyInput = container.querySelector('input[type="number"]');
-                    if (qtyInput) {
-                        qtyInput.max = newStock;
-                        if (parseInt(qtyInput.value) > newStock) {
-                            qtyInput.value = newStock;
-                        }
-                    }
-                }
-            }
-        }
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+        broadcaster: 'reverb',
+        key: 'slcmskey',
+        wsHost: window.location.hostname,
+        wsPort: 443,
+        wssPort: 443,
+        forceTLS: true,
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true,
     });
+
+    console.log('ECHO INSTANCE CREATED');
+
+    const pusher = window.Echo.connector.pusher;
+
+    // =========================
+    // 🔥 CONNECTION STATE DEBUG
+    // =========================
+    pusher.connection.bind('state_change', (states) => {
+        console.log('🔄 STATE:', states.previous, '➡️', states.current);
+    });
+
+    pusher.connection.bind('connecting', () => {
+        console.log('⏳ CONNECTING...');
+    });
+
+    pusher.connection.bind('connected', () => {
+        console.log('✅ CONNECTED (WSS SUCCESS)');
+        console.log('📡 SOCKET ID:', pusher.connection.socket_id);
+    });
+
+    pusher.connection.bind('disconnected', () => {
+        console.warn('⚠️ DISCONNECTED');
+    });
+
+    pusher.connection.bind('unavailable', () => {
+        console.error('🚫 UNAVAILABLE (SERVER DOWN / SSL SALAH)');
+    });
+
+    pusher.connection.bind('failed', () => {
+        console.error('💀 FAILED (HANDSHAKE GAGAL)');
+    });
+
+    pusher.connection.bind('error', (err) => {
+        console.error('🔥 ERROR DETAIL:', err);
+    });
+
+    // =========================
+    // 🔍 TRANSPORT CHECK
+    // =========================
+    setTimeout(() => {
+        try {
+            const transport = pusher.connection.transport?.name;
+            console.log('🚚 TRANSPORT:', transport);
+
+            if (transport !== 'ws' && transport !== 'wss') {
+                console.error('❌ BUKAN WEBSOCKET!');
+            } else {
+                console.log('✅ WEBSOCKET AKTIF:', transport);
+            }
+        } catch (e) {
+            console.error('❌ TRANSPORT CHECK FAILED', e);
+        }
+    }, 2000);
+
+    const testUrl = `wss://${window.location.hostname}/app/slcmskey?protocol=7&client=js&version=8.3.0&flash=false`;
+    console.log('🧪 TEST DIRECT WSS:', testUrl);
+
+    try {
+        const ws = new WebSocket(testUrl);
+
+        ws.onopen = () => console.log('🟢 RAW WSS CONNECTED');
+        ws.onerror = (e) => console.error('🔴 RAW WSS ERROR', e);
+        ws.onclose = (e) => console.warn('🟡 RAW WSS CLOSED', e);
+    } catch (e) {
+        console.error('❌ RAW WSS FAILED', e);
+    }
+
+    // =========================
+    // 📡 CHANNEL LISTENER
+    // =========================
+    window.Echo.channel('products-market')
+        .listen('.stock.updated', (data) => {
+            console.log("📦 EVENT RECEIVED:", data);
+        });
+});
 </script>

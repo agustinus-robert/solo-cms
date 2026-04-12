@@ -3,10 +3,8 @@
  * for JavaScript based Bootstrap features such as modals and tabs. This
  * code may be modified to fit the specific needs of your application.
  */
-
+import './bootstrap';
 import EmailBuilder from '@usewaypoint/email-builder';
-
-
 
 //import grapesjs from 'grapesjs';
 // import gjsBlocksBasic from 'grapesjs-blocks-basic';
@@ -33,39 +31,38 @@ try {
     //         window.emailBuilder = builder;
     //     }
     // });
-//     document.addEventListener('DOMContentLoaded', function () {
-//         const swv = 'sw-visibility';
-//         const expt = 'export-template';
-//         const osm = 'open-sm';
-//         const otm = 'open-tm';
-//         const ola = 'open-layers';
-//         const obl = 'open-blocks';
-//         const ful = 'fullscreen';
-//         const prv = 'preview';
+    //     document.addEventListener('DOMContentLoaded', function () {
+    //         const swv = 'sw-visibility';
+    //         const expt = 'export-template';
+    //         const osm = 'open-sm';
+    //         const otm = 'open-tm';
+    //         const ola = 'open-layers';
+    //         const obl = 'open-blocks';
+    //         const ful = 'fullscreen';
+    //         const prv = 'preview';
 
-//         if (document.querySelector('#gjs')) {
-//             // Pastikan ada elemen target
-//             const editor = grapesjs.init({
-//                 container: '#gjs',
-//                 layerManager: {
-//                     appendTo: '.layers-container',
-//                 },
-//                 fromElement: true,
-//                 storageManager: false,
-//                 plugins: [
-//                     gjsBlocksBasic,
-//                     gjsBlocksFlexbox,
-//                     gjsPresetWebpage,
-//                     forms,
-//                     navbar,
-//                     rtgrape,
-//                 ],
-//                 panels: { defaults: [] },
-//             });
+    //         if (document.querySelector('#gjs')) {
+    //             // Pastikan ada elemen target
+    //             const editor = grapesjs.init({
+    //                 container: '#gjs',
+    //                 layerManager: {
+    //                     appendTo: '.layers-container',
+    //                 },
+    //                 fromElement: true,
+    //                 storageManager: false,
+    //                 plugins: [
+    //                     gjsBlocksBasic,
+    //                     gjsBlocksFlexbox,
+    //                     gjsPresetWebpage,
+    //                     forms,
+    //                     navbar,
+    //                     rtgrape,
+    //                 ],
+    //                 panels: { defaults: [] },
+    //             });
 
-//         }
-//     });
-
+    //         }
+    //     });
 
     // Axios modules
     window.axios = require('axios');

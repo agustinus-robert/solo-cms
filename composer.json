@@ -22,7 +22,7 @@
         "laravel/jetstream": "^5.0",
         "laravel/octane": "^2.3",
         "laravel/pennant": "^1.7",
-        "laravel/reverb": "^1.0",
+        "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire-ui/modal": "^2.0",
