@@ -147,6 +147,7 @@
     <script src="{{ asset('skote/libs/chart.js/chart.umd.js') }}"></script>
 
     <!-- App js -->
+    {{-- <script src="{{ mix('js/app.js') }}"></script> --}}
     <script src="{{ asset('skote/js/app.js') }}"></script>
     <script src="{{ asset('js/scripts2.js') }}"></script>
 
@@ -157,6 +158,7 @@
             });
         });
     </script>
+    @include('web::electro.global.echos')
     @stack('scripts')
 </body>
 

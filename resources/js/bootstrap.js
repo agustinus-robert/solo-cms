@@ -13,46 +13,65 @@ if (token) {
 
 /**
  * Laravel Echo & Reverb Setup
- * Menggunakan kredensial Reverb secara langsung.
  */
 import Echo from 'laravel-echo';
 window.Pusher = require('pusher-js');
 
-if (typeof APP !== 'undefined') {
-    window.Echo = new Echo({
-        broadcaster: 'reverb',
-        key: APP.REVERB_APP_KEY,
-        wsHost: 'slcms.test',
-        wsPort: 8080, // Tembak langsung ke port Reverb
-        wssPort: 8080,
-        forceTLS: true, // Tetap pakai WSS
-        enabledTransports: ['ws', 'wss'],
+// Inisialisasi Echo
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: 'slcmskey',
+    wsHost: window.location.hostname,
+    wsPort: 8080, // PAKAI 8080
+    wssPort: 8080, // PAKAI 8080
+    forceTLS: true, // Matikan dulu TLS buat debug
+    enabledTransports: ['ws', 'wss'],
+    disableStats: true,
+});
+
+const pusher = window.Echo.connector.pusher;
+
+pusher.connection.bind('state_change', (states) => {
+    console.log('🔄 REVERB STATE:', states.previous, '➡️', states.current);
+});
+
+pusher.connection.bind('connected', () => {
+    console.log('✅ Connected to Reverb via WSS!');
+    console.log('📡 Socket ID:', pusher.connection.socket_id);
+});
+
+window.Echo.channel('test-channel')
+    .subscribed(() => {
+        console.log('✅ SUBSCRIBED test-channel');
+    })
+    .listen('.test.event', (data) => {
+        console.log('🔥 FULL EVENT:', data);
+    })
+    .error((err) => {
+        console.error('❌ CHANNEL ERROR:', err);
     });
 
-    console.info('Echo (Reverb) initialized on: ' + (APP.REVERB_HOST || window.location.hostname));
+pusher.connection.bind('error', (err) => {
+    console.error('🔥 REVERB ERROR:', err);
+});
 
-    window.Echo.connector.pusher.connection.bind('connected', () => {
-        console.log('Connected to Reverb via WSS (Secure)!');
-    });
+/**
+ * Listener Real-time Stok
+ */
+window.Echo.channel('product-stock').listen('ProductStockUpdated', (e) => {
+    console.log('Update stok diterima:', e);
 
-    /**
-     * Listener Real-time Stok
-     */
-    window.Echo.channel('product-stock').listen('ProductStockUpdated', (e) => {
-        console.log('Update stok diterima:', e);
+    let stockLabel = document.querySelector(`.stock-display[data-product-id="${e.productId}"]`);
+    if (stockLabel && !e.variantCode) {
+        stockLabel.innerText = e.newStock;
+    }
 
-        let stockLabel = document.querySelector(`.stock-display[data-product-id="${e.productId}"]`);
-        if (stockLabel && !e.variantCode) {
-            stockLabel.innerText = e.newStock;
-        }
-
-        if (e.variantCode) {
-            let variantLabels = document.querySelectorAll(
-                `.variant-stock[data-code="${e.variantCode}"]`
-            );
-            variantLabels.forEach((label) => {
-                label.innerText = e.newStock;
-            });
-        }
-    });
-}
+    if (e.variantCode) {
+        let variantLabels = document.querySelectorAll(
+            `.variant-stock[data-code="${e.variantCode}"]`
+        );
+        variantLabels.forEach((label) => {
+            label.innerText = e.newStock;
+        });
+    }
+});

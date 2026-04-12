@@ -12,6 +12,10 @@ use Modules\Poz\Models\SupplierSchedule;
 use Modules\Poz\Models\PurchaseItems;
 use Modules\Poz\Models\ProductStock;
 
+use Modules\Account\Models\User;
+use App\Notifications\GlobalGenericNotification;
+use Illuminate\Support\Facades\Notification;
+
 trait ProductRepository
 {
     /**
@@ -37,6 +41,28 @@ trait ProductRepository
         'weight'
     ];
 
+    private function sendProductNotification($product, $type = 'tambah', $outletId = null)
+    {
+        try {
+            $recipients = User::all();
+
+            $isUpdate = ($type === 'update');
+
+            $details = [
+                'title'   => $isUpdate ? 'Produk Diperbarui' : 'Produk Baru!',
+                'message' => $isUpdate
+                             ? "Data produk '{$product->name}' telah diperbarui."
+                             : "Produk '{$product->name}' berhasil ditambahkan ke sistem.",
+                'link'    => route('poz::transaction.product.index') . '?outlet=' . $outletId,
+                'icon'    => $isUpdate ? 'bx bx-edit' : 'bx bx-plus-circle',
+                'color'   => $isUpdate ? 'warning' : 'success',
+            ];
+
+            Notification::send($recipients, new GlobalGenericNotification($details));
+        } catch (\Exception $e) {
+            \Log::error("Realtime Notification Error: " . $e->getMessage());
+        }
+    }
     /**
      * Store newly created resource.
      */
@@ -104,6 +130,7 @@ trait ProductRepository
             }
 
             $this->saveMetas($product, $data);
+            $this->sendProductNotification($product, 'tambah', $data['outlet'] ?? null);
 
             return true;
         }
@@ -136,6 +163,7 @@ trait ProductRepository
 
             $product->metas()->delete();
             $this->saveMetas($product, $data);
+            $this->sendProductNotification($product, 'update', $data['outlet'] ?? null);
 
             return true;
         }

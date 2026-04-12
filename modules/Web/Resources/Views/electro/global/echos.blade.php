@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         broadcaster: 'reverb',
         key: 'slcmskey',
         wsHost: window.location.hostname,
-        wsPort: 443,
-        wssPort: 443,
-        forceTLS: true,
+        wsPort: 8080, // PAKAI 8080
+        wssPort: 8080, // PAKAI 8080
+        forceTLS: true, // Matikan dulu TLS buat debug
         enabledTransports: ['ws', 'wss'],
         disableStats: true,
     });
@@ -79,9 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('❌ RAW WSS FAILED', e);
     }
 
-    window.Echo.channel('products-market')
-        .listen('.stock.updated', (data) => {
-            console.log("📦 EVENT RECEIVED:", data);
-        });
+    // window.Echo.channel('products-market')
+    //     .listen('.stock.updated', (data) => {
+    //         console.log("📦 EVENT RECEIVED:", data);
+    //     });
+
+    window.Echo.channel('test-channel')
+    .listen('.test.event', (data) => {
+        console.log('🔥 DUMMY EVENT MASUK:', data.message);
+        alert('Data masuk: ' + data.message);
+    });
 });
 </script>
+
+{{-- @auth
+    @include('partials.admin-notif-toast')
+@endauth --}}

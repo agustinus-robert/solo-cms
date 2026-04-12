@@ -11,6 +11,10 @@ use Modules\Cms\Http\Controllers\Builder\DataTableBuilderController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
+use Modules\Poz\Models\Product;
+use Modules\Poz\Models\ProductVariant;
+use App\Observers\ProductObserver;
+use App\Observers\ProductVariantObserver;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -23,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
         public function register()
     {
+        Product::observe(ProductObserver::class);
+        ProductVariant::observe(ProductVariantObserver::class);
+
         if (!app()->runningInConsole()) {
             $this->app->when(DataTableBuilderController::class)->needs(DataTable::class)->give(function () {
                 $className = request()->query('class');
