@@ -21,9 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const pusher = window.Echo.connector.pusher;
 
-    // =========================
-    // 🔥 CONNECTION STATE DEBUG
-    // =========================
     pusher.connection.bind('state_change', (states) => {
         console.log('🔄 STATE:', states.previous, '➡️', states.current);
     });
@@ -53,9 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('🔥 ERROR DETAIL:', err);
     });
 
-    // =========================
-    // 🔍 TRANSPORT CHECK
-    // =========================
+
     setTimeout(() => {
         try {
             const transport = pusher.connection.transport?.name;
@@ -84,9 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('❌ RAW WSS FAILED', e);
     }
 
-    // =========================
-    // 📡 CHANNEL LISTENER
-    // =========================
     window.Echo.channel('products-market')
         .listen('.stock.updated', (data) => {
             console.log("📦 EVENT RECEIVED:", data);
