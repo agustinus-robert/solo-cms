@@ -7,6 +7,7 @@ use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Traits\Userstamps\Userstamps;
+use Modules\Account\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -18,6 +19,7 @@ class Supplier extends Model
 
     protected $fillable = [
         'code',
+        'user_id',
         'name',
         'phone',
         'email',
@@ -36,5 +38,10 @@ class Supplier extends Model
 
     public function stock(){
         return $this->hasMany(SupplierSchedule::class, 'supplier_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 }

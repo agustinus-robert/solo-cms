@@ -174,9 +174,9 @@
         `;
 
         tbody.appendChild(row);
-        
+
         $(row).find('.select2').select2({ width: '100%' });
-        
+
         rowIndex++;
         attachValidationEvents();
         validateSubmit();
@@ -186,7 +186,7 @@
         const row = button.closest('tr');
         row.remove();
         validateSubmit();
-        
+
         const tbody = document.getElementById('schedule-body');
         if (tbody.children.length === 0) {
             tbody.innerHTML = `<tr id="empty-state"><td colspan="3" class="text-center py-10 text-muted">...</td></tr>`;
