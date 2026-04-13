@@ -20,6 +20,59 @@ use App\Notifications\GlobalGenericNotification;
 
 class SubmissionController extends Controller
 {
+    private function sendVacationNotification($targetUser, $type, $vacation)
+    {
+        try {
+            if (!$targetUser || !$targetUser->id) return;
+
+            $user = auth()->user();
+            $categoryName = $vacation->quota->category->name ?? 'Cuti/Izin';
+
+            $data = match($type) {
+                'store' => [
+                    'title'   => 'Pengajuan Cuti Baru',
+                    'message' => "Karyawan <strong>{$user->name}</strong> mengajukan <strong>{$categoryName}</strong>. Mohon tinjau detailnya.",
+                    'action'  => 'Tinjau Cuti',
+                    'icon'    => 'bx bx-calendar-event',
+                    'color'   => 'warning',
+                    'link'    => route('portal::vacation.manage.show', $vacation->id),
+                ],
+                'update' => [
+                    'title'   => 'Revisi Cuti Terkirim',
+                    'message' => "<strong>{$user->name}</strong> mengirim revisi <strong>{$categoryName}</strong>. Silakan cek pembaruannya.",
+                    'action'  => 'Cek Revisi',
+                    'icon'    => 'bx bx-refresh',
+                    'color'   => 'info',
+                    'link'    => route('portal::vacation.manage.show', $vacation->id),
+                ],
+                'cancel' => [
+                    'title'   => 'Pengajuan Cuti Dibatalkan',
+                    'message' => "Pengajuan <strong>{$categoryName}</strong> atas nama <strong>{$user->name}</strong> telah dibatalkan.",
+                    'action'  => 'Cuti Dibatalkan',
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'secondary',
+                    'link'    => '#',
+                ],
+                default => null,
+            };
+
+            if ($data) {
+                $targetUser->sendSystemNotification([
+                    'user_id_target' => $targetUser->id,
+                    'title'          => $data['title'],
+                    'message'        => $data['message'],
+                    'action'         => $data['action'],
+                    'link'           => $data['link'],
+                    'icon'           => $data['icon'],
+                    'color'          => $data['color'],
+                    'sender_name'    => $user->name,
+                    'sender_image'   => $user->image_url ?? null,
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error("Realtime Vacation Notification Error: " . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */
@@ -95,6 +148,17 @@ class SubmissionController extends Controller
         return view('portal::vacation.submission.create', compact('employee', 'quotas'));
     }
 
+    public function show(EmployeeVacation $vacation, Request $request)
+    {
+        $user = $request->user();
+        $employee = $user->employee;
+        $myPositionIds = $employee->positions()->pluck('id')->toArray();
+
+        $vacation = $vacation->load(['approvables.userable.position', 'quota.employee.user', 'quota.category']);
+
+        return view('portal::vacation.submission.show', compact('user', 'employee', 'vacation', 'myPositionIds'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -124,16 +188,7 @@ class SubmissionController extends Controller
             if ($firstApprover && $firstApprover->userable) {
                 $targetUser = $firstApprover->userable->employee->user;
                 $categoryName = $vacation->quota->category->name ?? 'Cuti Tahunan';
-
-                if ($targetUser) {
-                    $targetUser->notify(new GlobalGenericNotification([
-                        'title'   => 'Pengajuan Cuti Baru',
-                        'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan <strong>{$categoryName}</strong>. Mohon kesediaan Anda untuk meninjau pengajuan ini.",
-                        'link'    => route('portal::vacation.manage.show', $vacation->id),
-                        'icon'    => 'bx bx-calendar-event',
-                        'color'   => 'warning'
-                    ]));
-                }
+                $this->sendVacationNotification($targetUser, 'store', $vacation);
             }
 
             $hasApprover = $vacation->approvables()->exists();
@@ -165,14 +220,7 @@ class SubmissionController extends Controller
 
         if ($approvable = $vacation->approvables()->orderBy('level')->first()) {
             $targetUser = $approvable->userable->employee->user;
-
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Revisi Cuti Terkirim',
-                'message' => "<strong>{$employee->user->name}</strong> telah mengirimkan revisi pengajuan cuti. Silakan tinjau kembali data yang diperbarui.",
-                'link'    => route('portal::vacation.manage.show', $vacation->id),
-                'icon'    => 'bx bx-refresh',
-                'color'   => 'info'
-            ]));
+            $this->sendVacationNotification($targetUser, 'update', $vacation);
         }
 
         return redirect()->route('portal::vacation.submission.index')->with('success', 'Pengajuan hasil revisi sudah dikirim ulang, silakan tunggu notifikasi selanjutnya dari atasan!');
@@ -189,14 +237,7 @@ class SubmissionController extends Controller
 
         if ($approvable && $approvable->userable) {
             $targetUser = $approvable->userable->employee->user;
-
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Pengajuan Cuti Dibatalkan',
-                'message' => "Pengajuan cuti atas nama <strong>{$employeeName}</strong> telah dibatalkan oleh yang bersangkutan.",
-                'link'    => '#',
-                'icon'    => 'bx bx-trash',
-                'color'   => 'secondary'
-            ]));
+            $this->sendVacationNotification($targetUser, 'cancel', $vacation);
         }
 
         $vacation->delete();

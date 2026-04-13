@@ -19,6 +19,26 @@ use App\Notifications\GlobalGenericNotification;
 
 class ManageController extends Controller
 {
+    private function sendManageVacationNotification($targetUser, $data)
+    {
+        try {
+            if (!$targetUser) return;
+
+            $targetUser->sendSystemNotification([
+                'user_id_target' => $targetUser->id, // Wajib ada untuk Model User
+                'title'          => $data['title'],
+                'message'        => $data['message'],
+                'action'         => $data['action'] ?? 'Tinjau Detail',
+                'link'           => $data['link'],
+                'icon'           => $data['icon'],
+                'color'          => $data['color'],
+                'sender_name'    => auth()->user()->name,
+                'sender_image'   => auth()->user()->image_url ?? null,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Realtime Manage Vacation Notification Error: " . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */
@@ -83,13 +103,13 @@ class ManageController extends Controller
             if ($resultValue == ApprovableResultEnum::APPROVE->value) {
                 $model->update(['dates' => $model->dates->filter(fn($d) => empty($d['c']))]);
 
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageVacationNotification($submitter, [
                     'title'   => 'Pembatalan Cuti Disetujui',
-                    'message' => "Permintaan pembatalan cuti Anda untuk keperluan <strong>{$model->description}</strong> telah disetujui.",
+                    'message' => "Permintaan pembatalan cuti Anda untuk <strong>{$model->description}</strong> telah disetujui.",
                     'link'    => route('portal::vacation.submission.show', $model->id),
                     'icon'    => 'bx bx-undo',
                     'color'   => 'success'
-                ]));
+                ]);
             }
 
             if ($resultValue == ApprovableResultEnum::REJECT->value) {
@@ -100,13 +120,13 @@ class ManageController extends Controller
                     })
                 ]);
 
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageVacationNotification($submitter, [
                     'title'   => 'Pembatalan Cuti Ditolak',
-                    'message' => "Permintaan pembatalan cuti Anda ditolak. Status cuti Anda tetap berjalan sebagaimana mestinya.",
+                    'message' => "Permintaan pembatalan cuti Anda ditolak. Status cuti tetap berjalan.",
                     'link'    => route('portal::vacation.submission.show', $model->id),
                     'icon'    => 'bx bx-error-alt',
                     'color'   => 'danger'
-                ]));
+                ]);
             }
         } else {
             if ($resultValue == ApprovableResultEnum::APPROVE->value) {
@@ -114,23 +134,23 @@ class ManageController extends Controller
             }
 
             if ($resultValue == ApprovableResultEnum::REJECT->value) {
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageVacationNotification($submitter, [
                     'title'   => 'Pengajuan Cuti Ditolak',
-                    'message' => "Mohon maaf, pengajuan cuti Anda untuk keperluan <strong>{$model->description}</strong> ditolak oleh atasan.",
+                    'message' => "Mohon maaf, pengajuan cuti Anda untuk <strong>{$model->description}</strong> ditolak.",
                     'link'    => route('portal::vacation.submission.show', $model->id),
                     'icon'    => 'bx bx-x-circle',
                     'color'   => 'danger'
-                ]));
+                ]);
             }
 
             if ($resultValue == ApprovableResultEnum::REVISION->value) {
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageVacationNotification($submitter, [
                     'title'   => 'Revisi Pengajuan Cuti',
-                    'message' => "Pengajuan cuti Anda memerlukan revisi. Silakan cek catatan atasan dan perbarui data Anda.",
+                    'message' => "Pengajuan cuti Anda memerlukan revisi. Silakan cek catatan atasan.",
                     'link'    => route('portal::vacation.submission.show', $model->id),
                     'icon'    => 'bx bx-edit',
                     'color'   => 'warning'
-                ]));
+                ]);
             }
         }
 
@@ -147,21 +167,21 @@ class ManageController extends Controller
 
         if ($superior && $superior->userable) {
             $nextUser = $superior->userable->employee->user;
-            $nextUser->notify(new GlobalGenericNotification([
+            $this->sendManageVacationNotification($nextUser, [
                 'title'   => 'Persetujuan Cuti Baru',
-                'message' => "Ada pengajuan cuti dari <strong>{$submitter->name}</strong> yang menunggu persetujuan Anda.",
+                'message' => "Ada pengajuan cuti dari <strong>{$submitter->name}</strong> menunggu persetujuan Anda.",
                 'link'    => route('portal::vacation.manage.show', $model->id),
                 'icon'    => 'bx bx-file-find',
                 'color'   => 'info'
-            ]));
+            ]);
         } else {
-            $submitter->notify(new GlobalGenericNotification([
+            $this->sendManageVacationNotification($submitter, [
                 'title'   => 'Pengajuan Cuti Disetujui',
                 'message' => "Selamat! Pengajuan cuti Anda untuk <strong>{$model->description}</strong> telah disetujui sepenuhnya.",
                 'link'    => route('portal::vacation.submission.show', $model->id),
                 'icon'    => 'bx bx-check-double',
                 'color'   => 'success'
-            ]));
+            ]);
         }
     }
     /**

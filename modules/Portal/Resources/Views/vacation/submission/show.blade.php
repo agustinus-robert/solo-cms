@@ -208,7 +208,7 @@
 
                                                             <div class="row g-2">
                                                                 <div class="col-sm-8">
-                                                                    <input type="text" name="reason" class="form-control form-control-sm" placeholder="Tulis catatan (opsional)..." autofocus>
+                                                                    <input type="text" name="reason" class="form-control form-control-sm" placeholder="Tulis catatan (Jika menolak pengajuan libur!)..." autofocus>
                                                                 </div>
                                                                 <div class="col-sm-4 text-end">
                                                                     <div class="btn-group btn-group-sm">
