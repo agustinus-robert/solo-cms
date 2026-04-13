@@ -49,10 +49,25 @@ class BrandController extends Controller
 
     public function destroy(Request $request)
     {
-        $brand = Brand::findOrFail($request->brand); // Mencari pozt berdasarkan ID
-        $brand->delete(); // Melakukan soft delete
+        $brand = Brand::findOrFail($request->brand);
+        $brandName = $brand->name;
+        $outletId = $request->outlet;
+        if ($brand->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Brand Dihapus',
+                    'message' => "Brand <strong>{$brandName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.brand.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
 
-        return redirect(route('poz::master.brand.index'))->with('msg-sukses', "Data berhasil dihapus");
+            return redirect(route('poz::master.brand.index') . '?outlet=' . $outletId)
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
 
     public function brandTable(Request $request)
