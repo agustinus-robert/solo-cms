@@ -293,11 +293,6 @@ class User extends Authenticatable
 
     public function sendSystemNotification(array $details)
     {
-        $recipients = self::where('id', '!=', $this->id)->get();
-
-        foreach ($recipients as $recipient) {
-            $details['user_id_target'] = $recipient->id;
-            $recipient->notify(new \App\Notifications\GlobalGenericNotification($details));
-        }
+        $this->notify(new \App\Notifications\GlobalGenericNotification($details));
     }
 }

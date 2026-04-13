@@ -19,7 +19,6 @@ class SubmissionController extends Controller
     private function sendSubmissionNotification($targetUser, $type = 'store')
     {
         try {
-            // 1. Pastikan targetUser tidak null dan punya ID
             if (!$targetUser || !$targetUser->id) {
                 \Log::warning("Notif Izin: Target user null.");
                 return;
@@ -28,7 +27,6 @@ class SubmissionController extends Controller
             $user = auth()->user();
             $isCancel = ($type === 'cancel');
 
-            // 2. Gunakan method yang sama dengan POS
             $targetUser->sendSystemNotification([
                 'user_id_target' => $targetUser->id,
                 'title'          => $isCancel ? 'Pengajuan Dibatalkan' : 'Persetujuan Izin Baru',
@@ -38,7 +36,6 @@ class SubmissionController extends Controller
                 'link'           => $isCancel ? '#' : route('hrms::service.leave.manage.index'),
                 'icon'           => $isCancel ? 'bx bx-x-circle' : 'bx bx-file',
                 'color'          => $isCancel ? 'danger' : 'warning',
-                // Tambahkan flag ini jika method sendSystemNotification membutuhkannya
                 'sender_id'      => $user->id
             ]);
 

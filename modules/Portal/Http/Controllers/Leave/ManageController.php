@@ -56,9 +56,9 @@ class ManageController extends Controller
     {
         $approvable->update($request->transformed()->toArray());
         $submitter = $approvable->modelable->employee->user;
-        $result = $request->input('result');
+        $result = (string) $request->input('result');
 
-        if ($result == ApprovableResultEnum::APPROVE->value) {
+        if ($result == (string) ApprovableResultEnum::APPROVE->value) {
 
             $this->sendApprovalNotification($submitter, 'approve', $approvable);
             $superiorApprovable = $approvable->modelable->approvables
@@ -86,16 +86,25 @@ class ManageController extends Controller
     private function sendApprovalNotification($targetUser, $type, $approvable, $submitter = null)
     {
         try {
+            if (!$targetUser || !isset($targetUser->id)) {
+                \Log::warning("Leave Notification: Target user tidak valid.");
+                return;
+            }
+
             $user = auth()->user();
+
+            $submitterName = ($submitter instanceof \Modules\Account\Models\User)
+                ? $submitter->name
+                : ($submitter->name ?? 'Karyawan');
 
             $data = match($type) {
                 'approve' => [
                     'title'   => 'Pengajuan Disetujui',
-                    'message' => "Pengajuan Anda telah disetujui pada level {$approvable->level}. Menunggu proses selanjutnya.",
+                    'message' => "Pengajuan Anda telah disetujui oleh ".$user->name,
                     'action'  => 'Izin Disetujui',
                     'icon'    => 'bx bx-check-circle',
                     'color'   => 'success',
-                    'link'    => route('hrms::service.leave.manage.index'),
+                    'link'    => route('portal::leave.submission.index'),
                 ],
                 'reject' => [
                     'title'   => 'Pengajuan Ditolak',
@@ -103,29 +112,41 @@ class ManageController extends Controller
                     'action'  => 'Izin Ditolak',
                     'icon'    => 'bx bx-x-circle',
                     'color'   => 'danger',
-                    'link'    => route('hrms::service.leave.manage.index'),
+                    'link'    => route('portal::leave.submission.index'),
                 ],
                 'next_level' => [
                     'title'   => 'Perlu Persetujuan',
-                    'message' => "Ada pengajuan baru dari " . ($submitter->name ?? 'Karyawan') . " yang memerlukan persetujuan Anda.",
+                    'message' => "Ada pengajuan baru dari {$submitterName} yang memerlukan persetujuan Anda.",
                     'action'  => 'Persetujuan Izin',
                     'icon'    => 'bx bx-user-voice',
                     'color'   => 'info',
-                    'link'    => url()->current(),
+                    'link'    => route('hrms::service.leave.manage.index'),
                 ],
+                default => null,
             };
 
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'        => $data['title'],
-                'message'      => $data['message'],
-                'action'       => $data['action'],
-                'link'         => $data['link'],
-                'icon'         => $data['icon'],
-                'color'        => $data['color']
-            ]));
+
+            if ($data) {
+                $targetUser->sendSystemNotification([
+                    'user_id_target' => $targetUser->id,
+                    'title'          => $data['title'],
+                    'message'        => $data['message'],
+                    'action'         => $data['action'],
+                    'link'           => $data['link'],
+                    'icon'           => $data['icon'],
+                    'color'          => $data['color'],
+                    'sender_name'    => $user->name,
+                    'sender_image'   => $user->image_url ?? null,
+                ]);
+            }
 
         } catch (\Exception $e) {
-            \Log::error("Realtime Leave Approval Notification Error: " . $e->getMessage());
+            // Log lebih detail supaya ketahuan salahnya di mana
+            \Log::error("Realtime Leave Approval Notification Error: " . $e->getMessage(), [
+                'type' => $type,
+                'user_id' => $targetUser->id ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }
