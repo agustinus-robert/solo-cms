@@ -80,7 +80,6 @@ trait AdjustmentRepository
         try {
             $statusText = $adjustment->status === 'plus' ? 'Penambahan' : 'Pengurangan';
 
-            // Panggil fungsi STATIC dari class User
             \Modules\Account\Models\User::broadcastSystemNotification([
                 'title'   => 'Adjustment Stok Baru',
                 'message' => "<strong>{$statusText}</strong> stok pada produk <strong>{$product->name}</strong> sebanyak <strong>" . abs($adjustment->qty) . "</strong>.",
