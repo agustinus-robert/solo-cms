@@ -17,9 +17,7 @@ class BrandController extends Controller
     public function index()
     {
         $data = [];
-        // dbuilder_table untuk membuat generate table pada kolom header dan pemanggilan kolom database
         $data['column'] = [
-            //DT_RowIndex usahakan false karena tidak ada secara fisik pada database
             dbuilder_table('image', 'Gambar', false, false, 'w10'),
             dbuilder_table('code', 'Code'),
             dbuilder_table('name', 'Nama', false, true),

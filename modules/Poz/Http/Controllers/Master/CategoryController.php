@@ -46,10 +46,26 @@ class CategoryController extends Controller
 
     public function destroy(Request $request)
     {
-        $category = Category::findOrFail($request->category); // Mencari pozt berdasarkan ID
-        $category->delete(); // Melakukan soft delete
+        $category = Category::findOrFail($request->category);
+        $categoryName = $category->name;
+        $outletId = $request->outlet;
 
-        return redirect(route('poz::master.category.index'))->with('msg-sukses', "Data berhasil dihapus");
+        if ($category->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Kategori Dihapus',
+                    'message' => "Kategori <strong>{$categoryName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.category.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash-alt',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
+
+            return redirect(route('poz::master.category.index') . '?outlet=' . $outletId)
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
 
     public function categoryTable(Request $request)
