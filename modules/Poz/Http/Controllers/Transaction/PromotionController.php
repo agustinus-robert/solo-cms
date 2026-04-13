@@ -17,6 +17,25 @@ use Illuminate\Support\Facades\Notification;
 
 class PromotionController extends Controller
 {
+    private function sendPromotionNotification($promotion, $type = 'create')
+    {
+        try {
+            $details = [
+                'title'   => ($type == 'create') ? 'Promosi Baru' : 'Promosi Diperbarui',
+                'message' => ($type == 'create')
+                    ? "Promosi <strong>'{$promotion->name}'</strong> telah berhasil dibuat."
+                    : "Data promosi <strong>'{$promotion->name}'</strong> baru saja diubah.",
+                'link'    => route('poz::transaction.product-promotion.index'),
+                'icon'    => ($type == 'create') ? 'bx bx-megaphone' : 'bx bx-edit-alt',
+                'color'   => ($type == 'create') ? 'success' : 'info'
+            ];
+
+            \Modules\Account\Models\User::broadcastSystemNotification($details);
+        } catch (\Exception $e) {
+            \Log::error("Gagal broadcast promo: " . $e->getMessage());
+        }
+    }
+
     public function index()
     {
         $data = [
@@ -104,7 +123,9 @@ class PromotionController extends Controller
                 'color'   => 'success'
             ];
 
-            Notification::send(User::all(), new GlobalGenericNotification($details));
+            DB::afterCommit(function () use ($promotion) {
+                $this->sendPromotionNotification($promotion, 'create');
+            });
 
             DB::commit();
 
@@ -172,15 +193,9 @@ class PromotionController extends Controller
 
             $promotion->outlets()->sync($request->outlet_id);
 
-            $details = [
-                'title'   => 'Promosi Diperbarui',
-                'message' => "Data promosi '{$promotion->name}' baru saja diubah.",
-                'link'    => '#',
-                'icon'    => 'bx bx-edit-alt',
-                'color'   => 'info'
-            ];
-
-            Notification::send(User::all(), new GlobalGenericNotification($details));
+            DB::afterCommit(function () use ($promotion) {
+                $this->sendPromotionNotification($promotion, 'update');
+            });
 
             DB::commit();
 
@@ -198,16 +213,34 @@ class PromotionController extends Controller
     public function destroy(Request $request, $id)
     {
         $promotion = ProductPromotion::findOrFail($id);
+        $promotionName = $promotion->name;
 
+        DB::beginTransaction();
         try {
             if ($promotion->image_name && file_exists(public_path('uploads/' . $promotion->location . '/' . $promotion->image_name))) {
                 unlink(public_path('uploads/' . $promotion->location . '/' . $promotion->image_name));
             }
 
             $promotion->delete();
-            return redirect()->back()->with('msg-sukses', "Promosi berhasil dihapus");
+            DB::afterCommit(function () use ($promotionName) {
+                $details = [
+                    'title'   => 'Promosi Dihapus',
+                    'message' => "Promosi <strong>'{$promotionName}'</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::transaction.product-promotion.index'),
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger'
+                ];
+
+                \Modules\Account\Models\User::broadcastSystemNotification($details);
+            });
+
+            DB::commit();
+            return redirect()->back()->with('success', "Promosi berhasil dihapus");
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('msg-error', "Gagal hapus data: " . $e->getMessage());
+            DB::rollBack();
+            Log::error("Gagal hapus promo: " . $e->getMessage());
+            return redirect()->back()->with('error', "Gagal hapus data: " . $e->getMessage());
         }
     }
 
