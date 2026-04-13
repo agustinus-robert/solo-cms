@@ -48,10 +48,26 @@ class TierController extends Controller
 
     public function destroy(Request $request)
     {
-        $tier = Tier::findOrFail($request->tier); // Mencari pozt berdasarkan ID
-        $tier->delete(); // Melakukan soft delete
+        $tier = Tier::findOrFail($request->tier);
 
-        return redirect(route('poz::master.tier.index'))->with('msg-sukses', "Data berhasil dihapus");
+        $tierName = $tier->name;
+        $outletId = $request->outlet;
+        if ($tier->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Tier Dihapus',
+                    'message' => "Tier Harga <strong>{$tierName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.tier.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
+
+            return redirect(route('poz::master.tier.index') . '?outlet=' . $outletId)
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
 
     public function tierTable(Request $request)

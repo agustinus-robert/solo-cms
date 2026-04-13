@@ -7,119 +7,114 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\Supplier;
 use Illuminate\Support\Str;
 use Modules\Account\Models\User;
-use App\Models\Team;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 trait SupplierRepository
 {
-    /**
-     * Define the form keys for resource
-     */
     private $keys = [
-        'code',
-        'name',
-        'email',
-        'phone',
-        'address',
-        'location',
-        'image_name'
+        'code', 'name', 'email', 'phone', 'address', 'location', 'image_name'
     ];
 
     /**
-     * Store newly created resource.
+     * Handler Upload (Private)
      */
-    public function storeSupplier(array $data, $document)
+    private function handleSupplierUpload(array $data, $document)
     {
-        DB::beginTransaction();
-
-        try {
-            $location = 'file_supplier/' . uniqid();
-
-            if (isset($document) && $document instanceof \Illuminate\Http\UploadedFile) {
-                $fileName = $document->getClientOriginalName();
-                $document->storeAs($location, $fileName, 'public');
-                $data['location'] = $location;
-                $data['image_name'] = $fileName;
-            }
-
-            $supplier = new Supplier(Arr::only($data, $this->keys));
-
-            if ($supplier->save()) {
-
-                $user = new User([
-                    'name' => $data['name'],
-                    'username' => $data['name'].rand(100, 999),
-                    'email' => $data['email'],
-                    'password' => 'password',
-                    'current_team_id' => 1
-                ]);
-
-                $user->save();
-
-                $outletId = $data['outlet'];
-
-                if ($outletId) {
-                    $supplier->outlets()->attach($outletId);
-                }
-            }
-
-            DB::commit();
-            return true;
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            dd($e);
-            return false;
-        }
-    }
-
-    /**
-     * Update the current resource.
-     */
-    public function updateSupplier(array $data, $id, $document)
-    {
-        $supplier = Supplier::find($id);
-        $location = 'file_supplier/' . uniqid();
-
         if (isset($document) && $document instanceof \Illuminate\Http\UploadedFile) {
+            $location = 'file_supplier/' . uniqid();
             $fileName = $document->getClientOriginalName();
             $document->storeAs($location, $fileName, 'public');
+
             $data['location'] = $location;
             $data['image_name'] = $fileName;
         }
 
-        if ($supplier->update(Arr::only($data, $this->keys))) {
-            $outletId = $data['outlet'];
+        return $data;
+    }
 
-            if ($outletId) {
-                $supplier->outlets()->syncWithoutDetaching($outletId);
+    /**
+     * Handler Notifikasi (Private) - Create & Update Only
+     */
+    private function sendSupplierNotification($supplier, $type = 'create', $outletId = null)
+    {
+        try {
+            if (!$outletId) return;
+
+            $isUpdate = ($type === 'update');
+
+            auth()->user()->broadcastToSameOutlet([
+                'title'   => $isUpdate ? 'Supplier Diperbarui' : 'Supplier Baru!',
+                'message' => "Supplier <strong>{$supplier->name}</strong> telah " . ($isUpdate ? 'diperbarui' : 'ditambahkan') . " oleh <strong>" . auth()->user()->name . "</strong>.",
+                'link'    => route('poz::master.supplier.index') . '?outlet=' . $outletId,
+                'icon'    => $isUpdate ? 'bx bx-edit-alt' : 'bx bx-store-alt',
+                'color'   => $isUpdate ? 'warning' : 'success',
+            ], $outletId);
+        } catch (\Exception $e) {
+            Log::error("Realtime Supplier Notification Error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store Supplier
+     */
+    public function storeSupplier(array $data, $document)
+    {
+        return DB::transaction(function () use ($data, $document) {
+            $data = $this->handleSupplierUpload($data, $document);
+            $supplier = new Supplier(Arr::only($data, $this->keys));
+
+            if ($supplier->save()) {
+                // Logika pembuatan user dummy supplier
+                $user = new User([
+                    'name' => $data['name'],
+                    'username' => Str::slug($data['name']) . rand(100, 999),
+                    'email' => $data['email'],
+                    'password' => bcrypt('password'), // Sebaiknya di-hash
+                    'current_team_id' => 1
+                ]);
+                $user->save();
+
+                $outletId = $data['outlet'] ?? null;
+                if ($outletId) {
+                    $supplier->outlets()->attach($outletId);
+                }
+
+                DB::afterCommit(function () use ($supplier, $outletId) {
+                    $this->sendSupplierNotification($supplier, 'create', $outletId);
+                });
+
+                return true;
             }
-
-            return true;
-        }
-        return false;
+            return false;
+        });
     }
 
     /**
-     * Remove the current resource.
+     * Update Supplier
      */
-    public function destroySupplier($id)
+    public function updateSupplier(array $data, $id, $document)
     {
-        if (Supplier::where('id', $id)->delete()) {
-            return true;
-        }
+        return DB::transaction(function () use ($data, $id, $document) {
+            $supplier = Supplier::find($id);
+            if (!$supplier) return false;
 
-        return false;
-    }
+            $data = $this->handleSupplierUpload($data, $document);
 
-    /**
-     * Restore the current resource.
-     */
-    public function restoreSupplier($id)
-    {
-        if (Supplier::onlyTrashed()->find($id)->restore()) {
-            return true;
-        }
-        return false;
+            if ($supplier->update(Arr::only($data, $this->keys))) {
+                $outletId = $data['outlet'] ?? null;
+
+                if ($outletId) {
+                    $supplier->outlets()->syncWithoutDetaching($outletId);
+                }
+
+                DB::afterCommit(function () use ($supplier, $outletId) {
+                    $this->sendSupplierNotification($supplier, 'update', $outletId);
+                });
+
+                return true;
+            }
+            return false;
+        });
     }
 }

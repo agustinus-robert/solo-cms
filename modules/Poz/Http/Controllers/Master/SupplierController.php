@@ -49,14 +49,27 @@ class SupplierController extends Controller
 
     public function destroy(Request $request)
     {
-        $id = request()->query('outlet', auth()->user()->current_outlet_id);
+        $outletId = $request->query('outlet', auth()->user()->current_outlet_id);
 
         $supplier = Supplier::findOrFail($request->supplier);
-        $supplier->delete();
+        $supplierName = $supplier->name;
+        if ($supplier->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Supplier Dihapus',
+                    'message' => "Supplier <strong>{$supplierName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.supplier.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
 
-        return redirect(route('poz::master.supplier.index', ['outlet' => $id]))->with('msg-sukses', "Data berhasil dihapus");
+            return redirect(route('poz::master.supplier.index', ['outlet' => $outletId]))
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
-
     public function supplierTable(Request $request)
     {
         $outletId = $request->outlet;

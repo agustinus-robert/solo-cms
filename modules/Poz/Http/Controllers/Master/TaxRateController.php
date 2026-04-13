@@ -44,10 +44,27 @@ class TaxRateController extends Controller
 
     public function destroy(Request $request)
     {
-        $tax = Tax::findOrFail($request->tax); // Mencari pozt berdasarkan ID
-        $tax->delete(); // Melakukan soft delete
+        $tax = Tax::findOrFail($request->tax);
 
-        return redirect(route('poz::master.tax.index'))->with('msg-sukses', "Data berhasil dihapus");
+        $taxName = $tax->name;
+        $outletId = $request->outlet;
+
+        if ($tax->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Pajak Dihapus',
+                    'message' => "Data pajak <strong>{$taxName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.tax.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
+
+            return redirect(route('poz::master.tax.index') . '?outlet=' . $outletId)
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
 
     public function taxTable(Request $request)

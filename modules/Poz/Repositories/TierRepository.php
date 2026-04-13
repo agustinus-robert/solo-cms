@@ -6,6 +6,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\Tier;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 trait TierRepository
 {
@@ -18,24 +20,50 @@ trait TierRepository
     ];
 
     /**
+     * Handler Notifikasi (Private) - Hanya Create & Update
+     */
+    private function sendTierNotification($tier, $type = 'create', $outletId = null)
+    {
+        try {
+            if (!$outletId) return;
+
+            $isUpdate = ($type === 'update');
+
+            auth()->user()->broadcastToSameOutlet([
+                'title'   => $isUpdate ? 'Tier Harga Diperbarui' : 'Tier Harga Baru!',
+                'message' => "Tier <strong>{$tier->name}</strong> telah " . ($isUpdate ? 'diperbarui' : 'ditambahkan') . " oleh <strong>" . auth()->user()->name . "</strong>.",
+                'link'    => route('poz::master.tier.index') . '?outlet=' . $outletId,
+                'icon'    => $isUpdate ? 'bx bx-edit-alt' : 'bx bx-layer-plus',
+                'color'   => $isUpdate ? 'warning' : 'success',
+            ], $outletId);
+        } catch (\Exception $e) {
+            Log::error("Realtime Tier Notification Error: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Store newly created resource.
      */
     public function storeTier(array $data)
     {
-        $location = 'file_brand/' . uniqid();
+        return DB::transaction(function () use ($data) {
+            $tier = new Tier(Arr::only($data, $this->keys));
 
-        $brand = new Tier(Arr::only($data, $this->keys));
-        if ($brand->save()) {
-            $outletId = $data['outlet'];
+            if ($tier->save()) {
+                $outletId = $data['outlet'] ?? null;
 
-            if ($outletId) {
-                $brand->outlets()->attach($outletId);
+                if ($outletId) {
+                    $tier->outlets()->attach($outletId);
+                }
+
+                DB::afterCommit(function () use ($tier, $outletId) {
+                    $this->sendTierNotification($tier, 'create', $outletId);
+                });
+
+                return true;
             }
-
-            return true;
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -43,40 +71,24 @@ trait TierRepository
      */
     public function updateTier(array $data, $id)
     {
-        $tier = Tier::find($id);
+        return DB::transaction(function () use ($data, $id) {
+            $tier = Tier::find($id);
+            if (!$tier) return false;
 
-        if ($tier->update(Arr::only($data, $this->keys))) {
-            $outletId = $data['outlet'];
+            if ($tier->update(Arr::only($data, $this->keys))) {
+                $outletId = $data['outlet'] ?? null;
 
-            if ($outletId) {
-                $tier->outlets()->syncWithoutDetaching($outletId);
+                if ($outletId) {
+                    $tier->outlets()->syncWithoutDetaching($outletId);
+                }
+
+                DB::afterCommit(function () use ($tier, $outletId) {
+                    $this->sendTierNotification($tier, 'update', $outletId);
+                });
+
+                return true;
             }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Remove the current resource.
-     */
-    public function destroyInquiry($id)
-    {
-        if (Brand::where('id', $id)->delete()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Restore the current resource.
-     */
-    public function restoreInquiry($id)
-    {
-        if (Brand::onlyTrashed()->find($id)->restore()) {
-            return true;
-        }
-        return false;
+            return false;
+        });
     }
 }
