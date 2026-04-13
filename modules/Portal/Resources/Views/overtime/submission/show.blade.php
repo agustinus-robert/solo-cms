@@ -182,7 +182,7 @@
                                                         @csrf @method('put')
                                                         <div class="row g-2">
                                                             <div class="col-sm-8">
-                                                                <input type="text" name="reason" class="form-control form-control-sm" placeholder="Tulis catatan (opsional)...">
+                                                                <input type="text" name="reason" class="form-control form-control-sm" placeholder="Tulis catatan (jika menolak pengajuan lembur!)...">
                                                             </div>
                                                             <div class="col-sm-4">
                                                                 <div class="btn-group btn-group-sm w-100">

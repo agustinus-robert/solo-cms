@@ -21,6 +21,59 @@ class SubmissionController extends Controller
 {
     private $superiors = [];
 
+    private function sendOvertimeNotification($targetUser, $type, $overtime)
+    {
+        try {
+            if (!$targetUser || !$targetUser->id) return;
+
+            $user = auth()->user();
+
+            $data = match($type) {
+                'store' => [
+                    'title'   => 'Pengajuan Lembur Baru',
+                    'message' => "Karyawan <strong>{$user->name}</strong> mengajukan lembur baru. Mohon tinjau detailnya.",
+                    'action'  => 'Persetujuan Lembur',
+                    'icon'    => 'bx bx-timer',
+                    'color'   => 'warning',
+                    'link'    => route('portal::overtime.submission.index', ['view' => 'approvals']),
+                ],
+                'update' => [
+                    'title'   => 'Perubahan Data Lembur',
+                    'message' => "<strong>{$user->name}</strong> memperbarui data pengajuan lembur. Silakan cek kembali.",
+                    'action'  => 'Cek Perubahan',
+                    'icon'    => 'bx bx-edit-alt',
+                    'color'   => 'info',
+                    'link'    => route('portal::overtime.submission.index', ['view' => 'approvals']),
+                ],
+                'cancel' => [
+                    'title'   => 'Lembur Dibatalkan',
+                    'message' => "Pengajuan lembur atas nama <strong>{$user->name}</strong> telah dibatalkan oleh karyawan.",
+                    'action'  => 'Izin Dibatalkan',
+                    'icon'    => 'bx bx-trash-alt',
+                    'color'   => 'secondary',
+                    'link'    => '#',
+                ],
+                default => null,
+            };
+
+            if ($data) {
+                $targetUser->sendSystemNotification([
+                    'user_id_target' => $targetUser->id,
+                    'title'          => $data['title'],
+                    'message'        => $data['message'],
+                    'action'         => $data['action'],
+                    'link'           => $data['link'],
+                    'icon'           => $data['icon'],
+                    'color'          => $data['color'],
+                    'sender_name'    => $user->name,
+                    'sender_image'   => $user->image_url ?? null,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Realtime Overtime Notification Error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -149,13 +202,7 @@ class SubmissionController extends Controller
 
             if ($firstApprover && $firstApprover->userable) {
                 $targetUser = $firstApprover->userable->employee->user;
-                $targetUser->notify(new GlobalGenericNotification([
-                    'title'   => 'Pengajuan Lembur Baru',
-                    'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan lembur. Mohon tinjau detail pekerjaan lembur tersebut.",
-                    'link'    => route('portal::overtime.submission.show', $overtime->id), // atau ke link manage atasan
-                    'icon'    => 'bx bx-timer',
-                    'color'   => 'warning'
-                ]));
+                $this->sendOvertimeNotification($targetUser, 'store', $overtime);
             } else {
                 $overtime->update(['paidable_at' => now()]);
             }
@@ -196,14 +243,7 @@ class SubmissionController extends Controller
 
             if ($approvable = $overtime->approvables()->orderBy('level')->first()) {
                 $targetUser = $approvable->userable->employee->user;
-
-                $targetUser->notify(new GlobalGenericNotification([
-                    'title'   => 'Pembaruan Pengajuan Lembur',
-                    'message' => "<strong>{$employee->user->name}</strong> memperbarui data pengajuan lembur. Silakan cek kembali.",
-                    'link'    => route('portal::overtime.submission.show', $overtime->id),
-                    'icon'    => 'bx bx-edit-alt',
-                    'color'   => 'info'
-                ]));
+                $this->sendOvertimeNotification($targetUser, 'update', $overtime);
             } else {
                 $overtime->update(['paidable_at' => now()]);
             }
@@ -219,20 +259,11 @@ class SubmissionController extends Controller
     public function destroy(EmployeeOvertime $overtime)
     {
         $employeeName = $overtime->employee->user->name;
-
-        // Ambil atasan level pertama untuk pemberitahuan pembatalan
         $approvable = $overtime->approvables()->orderBy('level')->first();
 
         if ($approvable && $approvable->userable) {
             $targetUser = $approvable->userable->employee->user;
-
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Lembur Dibatalkan',
-                'message' => "Pengajuan lembur atas nama <strong>{$employeeName}</strong> telah dibatalkan oleh karyawan.",
-                'link'    => '#',
-                'icon'    => 'bx bx-trash-alt',
-                'color'   => 'secondary'
-            ]));
+            $this->sendOvertimeNotification($targetUser, 'cancel', $overtime);
         }
 
         $overtime->delete();

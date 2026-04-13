@@ -16,6 +16,28 @@ use Modules\Portal\Notifications\Overtime\Submission\SubmissionNotification;
 
 class ManageController extends Controller
 {
+
+    private function sendManageOvertimeNotification($targetUser, $data, $overtime)
+    {
+        try {
+            if (!$targetUser) return;
+
+            $targetUser->sendSystemNotification([
+                'user_id_target' => $targetUser->id,
+                'title'          => $data['title'],
+                'message'        => $data['message'],
+                'action'         => $data['action'] ?? 'Lihat Detail',
+                'link'           => $data['link'],
+                'icon'           => $data['icon'],
+                'color'          => $data['color'],
+                'sender_name'    => auth()->user()->name,
+                'sender_image'   => auth()->user()->image_url ?? null,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Realtime Manage Overtime Notification Error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -82,35 +104,36 @@ class ManageController extends Controller
 
             if ($nextSuperior && $nextSuperior->userable) {
                 $nextUser = $nextSuperior->userable->employee->user;
-                $nextUser->notify(new GlobalGenericNotification([
+                $this->sendManageOvertimeNotification($nextUser, [
                     'title'   => 'Persetujuan Lembur (Meneruskan)',
-                    'message' => "Ada pengajuan lembur dari <strong>{$submitter->name}</strong> yang telah disetujui di level sebelumnya dan menunggu keputusan Anda.",
+                    'message' => "Ada pengajuan lembur dari <strong>{$submitter->name}</strong> menunggu keputusan Anda.",
                     'link'    => route('portal::overtime.manage.show', $overtime->id),
                     'icon'    => 'bx bx-redo',
                     'color'   => 'info'
-                ]));
+                ], $overtime);
             } else {
                 $overtime->update(['paidable_at' => now()]);
 
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageOvertimeNotification($submitter, [
                     'title'   => 'Lembur Disetujui',
-                    'message' => "Kabar baik! Pengajuan lembur Anda telah <strong>disetujui sepenuhnya</strong> dan siap diproses ke sistem penggajian.",
+                    'message' => "Kabar baik! Pengajuan lembur Anda telah <strong>disetujui sepenuhnya</strong>.",
                     'link'    => route('portal::overtime.submission.show', $overtime->id),
                     'icon'    => 'bx bx-check-double',
                     'color'   => 'success'
-                ]));
+                ], $overtime);
             }
         }
 
         if ($isRejected) {
             $overtime->update(['paidable_at' => null]);
-            $submitter->notify(new GlobalGenericNotification([
+
+            $this->sendManageOvertimeNotification($submitter, [
                 'title'   => 'Lembur Ditolak',
-                'message' => "Pengajuan lembur Anda telah ditolak. Silakan cek detail pengajuan untuk melihat alasan atau catatan dari atasan.",
+                'message' => "Pengajuan lembur Anda telah ditolak. Silakan cek detail alasan dari atasan.",
                 'link'    => route('portal::overtime.submission.show', $overtime->id),
                 'icon'    => 'bx bx-x-circle',
                 'color'   => 'danger'
-            ]));
+            ], $overtime);
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
