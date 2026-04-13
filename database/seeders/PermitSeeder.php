@@ -12,6 +12,8 @@ use Modules\Cms\Models\CmsLiveEditorsAccess;
 use Modules\HRMS\Models\Employee;
 use Modules\HRMS\Models\EmployeeContract;
 use Modules\HRMS\Models\EmployeePosition;
+use Modules\Poz\Models\Supplier;
+use Modules\Poz\Models\Outlet;
 
 class PermitSeeder extends Seeder
 {
@@ -129,6 +131,21 @@ class PermitSeeder extends Seeder
             );
 
             $user->syncRoles([$assignedRole]);
+
+            if ($assignedRole->name === 'supplier') {
+                $supplier = Supplier::updateOrCreate(
+                    ['email' => $user->email],
+                    [
+                        'user_id' => $user->id,
+                        'code'    => $typeCode . sprintf("%03d", $key + 1),
+                        'name'    => $user->name,
+                        'phone'   => '0812' . rand(10000000, 99999999),
+                        'address' => 'Alamat Supplier ' . $user->name,
+                    ]
+                );
+
+                $supplier->outlets()->sync([2]);
+            }
 
             $user->setMeta('profile_sex', ($key % 2 == 0) ? 'male' : 'female');
             $user->setMeta('profile_mariage', 'single');

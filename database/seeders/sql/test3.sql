@@ -550,23 +550,6 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Records of supplier
--- ----------------------------
-BEGIN;
-INSERT INTO "ref_suppliers" ("id", "code", "name", "email", "phone", "address", "location", "image_name", "user_id", "created_by", "deleted_by", "updated_by", "deleted_at", "created_at", "updated_at") VALUES (1, 'DIN804', 'Dina Martina Supplier', 'idare@conn.net', '1-440-428-6327', '46888 Gusikowski Islands Suite 348
-Robertsmouth, GA 78816', 'Lake Duncanport', NULL, 10000004, 10000004, NULL, NULL, NULL, '2026-03-14 22:31:36+07', '2026-03-14 22:31:36+07'), (2, 'SAN841', 'Sania Sari Supplier', 'gudrun.zieme@gulgowski.org', '+14405405092', '2755 Jude Loop
-Emardborough, MS 42886-9477', 'Rexhaven', NULL, 10000005, 10000005, NULL, NULL, NULL, '2026-03-14 22:31:36+07', '2026-03-14 22:31:36+07'), (3, 'NIS321', 'Nisa Matutina Supplier', 'lebsack.narciso@turcotte.com', '+1-484-438-8074', '2372 Felipa Views
-East Markburgh, WA 31526-1656', 'East Brettown', NULL, 10000006, 10000006, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (4, 'DON891', 'Doni Simanjuntak Supplier', 'vanessa.schmidt@okeefe.com', '+15598757346', '97779 Schiller Centers
-Shieldsville, DE 95363-2388', 'Sengerfort', NULL, 10000007, 10000007, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (5, 'RON838', 'Roni Mulyono Supplier', 'guy.dibbert@herzog.com', '305-259-0349', '59521 Alvina Points Suite 118
-Schaeferport, OR 49141-1250', 'Port Tracy', NULL, 10000008, 10000008, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (6, 'ROB506', 'Robert Haryanto Supplier', 'novella69@keeling.com', '1-352-559-8580', '46360 Katlyn Motorway
-North Mariana, MA 08690', 'West Aubreeville', NULL, 10000009, 10000009, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (7, 'AGU462', 'Agusta Dwi Saptono Supplier', 'wmedhurst@erdman.com', '253-573-9443', '521 Goldner Harbor
-Anikatown, MS 12114', 'Lake Abdulport', NULL, 10000010, 10000010, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (8, 'ADA115', 'Adam Jaya Supplier', 'legros.thelma@kertzmann.com', '516-374-5547', '70554 Harber Glen
-Lake Pearliestad, TN 73125', 'Lake Mellie', NULL, 10000011, 10000011, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (9, 'ANT138', 'Anton Pujiharto Supplier', 'tyreek54@mitchell.com', '+1.551.229.5122', '12167 Lehner Mall
-Hillaryburgh, NJ 35850-9622', 'Tevinmouth', NULL, 10000012, 10000012, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07'), (10, 'DIN812', 'Dina Martha Supplier', 'tziemann@spencer.com', '+1.985.895.8422', '6314 Sporer Fields
-Nicolastad, DC 47679', 'North Ned', NULL, 10000013, 10000013, NULL, NULL, NULL, '2026-03-14 22:31:37+07', '2026-03-14 22:31:37+07');
-COMMIT;
-
--- ----------------------------
 -- Records of supplier_schedule
 -- ----------------------------
 BEGIN;

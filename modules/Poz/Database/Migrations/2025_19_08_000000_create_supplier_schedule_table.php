@@ -22,7 +22,7 @@ class CreateSupplierScheduleTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('supplier_id')->references('id')->on('ref_suppliers')->onDelete('cascade');
+            $table->foreign('supplier_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
