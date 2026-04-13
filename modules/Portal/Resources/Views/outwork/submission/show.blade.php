@@ -151,7 +151,7 @@
                                                                     <input type="hidden" name="approvable_id" value="{{ $approvable->id }}">
                                                                     <input type="hidden" name="next" value="{{ url()->current() }}">
                                                                     <div class="col-sm-7">
-                                                                        <input type="text" name="reason" class="form-control form-control-sm" placeholder="Catatan...">
+                                                                        <input type="text" name="reason" class="form-control form-control-sm" placeholder="Isi alasan jika menolak pengajuan..">
                                                                     </div>
                                                                     <div class="col-sm-5">
                                                                         <div class="btn-group btn-group-sm w-100">

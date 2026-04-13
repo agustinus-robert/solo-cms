@@ -13,6 +13,53 @@ use App\Notifications\GlobalGenericNotification;
 
 class SubmissionController extends Controller
 {
+
+    private function sendOutworkNotification($targetUser, $type, $outwork)
+    {
+        try {
+            if (!$targetUser || !$targetUser->id) return;
+
+            $user = auth()->user();
+            $categoryName = $outwork->category->name ?? 'Kegiatan Luar';
+
+            $data = match($type) {
+                'store' => [
+                    'title'   => 'Persetujuan Insentif Baru',
+                    'message' => "Karyawan <strong>{$user->name}</strong> mengajukan insentif untuk kegiatan <strong>{$categoryName}</strong>.",
+                    'action'  => 'Tinjau Insentif',
+                    'icon'    => 'bx bx-badge-check',
+                    'color'   => 'warning',
+                    'link'    => route('portal::outwork.manage.show', $outwork->id),
+                ],
+                'cancel' => [
+                    'title'   => 'Pengajuan Insentif Dibatalkan',
+                    'message' => "Pengajuan insentif <strong>{$categoryName}</strong> oleh <strong>{$user->name}</strong> telah dibatalkan.",
+                    'action'  => 'Izin Dibatalkan',
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'secondary',
+                    'link'    => '#',
+                ],
+                default => null,
+            };
+
+            if ($data) {
+                $targetUser->sendSystemNotification([
+                    'user_id_target' => $targetUser->id,
+                    'title'          => $data['title'],
+                    'message'        => $data['message'],
+                    'action'         => $data['action'],
+                    'link'           => $data['link'],
+                    'icon'           => $data['icon'],
+                    'color'          => $data['color'],
+                    'sender_name'    => $user->name,
+                    'sender_image'   => $user->image_url ?? null,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Realtime Outwork Notification Error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -97,15 +144,7 @@ class SubmissionController extends Controller
 
         if ($firstApprover && $firstApprover->userable) {
             $approverUser = $firstApprover->userable->employee->user;
-
-            $approverUser->notify(new GlobalGenericNotification([
-                'title'   => 'Persetujuan Insentif Baru',
-                'message' => "Karyawan <strong>{$employee->user->name}</strong> mengajukan insentif untuk kegiatan <strong>{$categoryName}</strong>. Mohon kesediaannya untuk meninjau pengajuan ini.",
-                'link'    => route('portal::outwork.manage.show', $outwork->id),
-                'icon'    => 'bx bx-badge-check',
-                'color'   => 'warning'
-            ]));
-
+            $this->sendOutworkNotification($approverUser, 'store', $outwork);
         } else {
             $outwork->update(['paidable_at' => now()]);
         }
@@ -128,14 +167,7 @@ class SubmissionController extends Controller
 
         if ($notifiedApprover && $notifiedApprover->userable) {
             $targetUser = $notifiedApprover->userable->employee->user;
-
-            $targetUser->notify(new GlobalGenericNotification([
-                'title'   => 'Pengajuan Insentif Dibatalkan',
-                'message' => "Pengajuan insentif <strong>{$categoryName}</strong> oleh <strong>{$employeeName}</strong> telah dibatalkan/dihapus oleh yang bersangkutan.",
-                'link'    => '#',
-                'icon'    => 'bx bx-trash',
-                'color'   => 'secondary'
-            ]));
+            $this->sendOutworkNotification($notifiedApprover->userable->employee->user, 'cancel', $outwork);
         }
 
         $outwork->delete();

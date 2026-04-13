@@ -12,6 +12,27 @@ use App\Notifications\GlobalGenericNotification;
 
 class ManageController extends Controller
 {
+    private function sendManageOutworkNotification($targetUser, $data)
+    {
+        try {
+            if (!$targetUser) return;
+
+            $targetUser->sendSystemNotification([
+                'user_id_target' => $targetUser->id,
+                'title'          => $data['title'],
+                'message'        => $data['message'],
+                'action'         => $data['action'] ?? 'Tinjau Detail',
+                'link'           => $data['link'],
+                'icon'           => $data['icon'],
+                'color'          => $data['color'],
+                'sender_name'    => auth()->user()->name,
+                'sender_image'   => auth()->user()->image_url ?? null,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Realtime Manage Outwork Notification Error: " . $e->getMessage());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -75,13 +96,13 @@ class ManageController extends Controller
             if ($approvable->id === $lastApprover->id) {
                 $outwork->update(['paidable_at' => now()]);
 
-                $submitter->notify(new GlobalGenericNotification([
+                $this->sendManageOutworkNotification($submitter, [
                     'title'   => 'Insentif Disetujui Sepenuhnya',
-                    'message' => "Selamat! Pengajuan insentif <strong>{$categoryName}</strong> Anda telah disetujui oleh semua pihak dan siap diproses.",
+                    'message' => "Selamat! Pengajuan insentif <strong>{$categoryName}</strong> Anda telah disetujui sepenuhnya.",
                     'link'    => route('portal::outwork.submission.show', $outwork->id),
                     'icon'    => 'bx bx-check-double',
                     'color'   => 'success'
-                ]));
+                ]);
             } else {
                 $nextSuperior = $allApprovers->where('level', '>', $approvable->level)
                                             ->where('result', ApprovableResultEnum::PENDING)
@@ -90,13 +111,13 @@ class ManageController extends Controller
                 if ($nextSuperior && $nextSuperior->userable) {
                     $nextUser = $nextSuperior->userable->employee->user;
 
-                    $nextUser->notify(new GlobalGenericNotification([
+                    $this->sendManageOutworkNotification($nextUser, [
                         'title'   => 'Perlu Approval Insentif',
-                        'message' => "Ada pengajuan insentif <strong>{$categoryName}</strong> dari <strong>{$submitter->name}</strong> yang menunggu persetujuan Anda.",
+                        'message' => "Ada pengajuan insentif <strong>{$categoryName}</strong> dari <strong>{$submitter->name}</strong> menunggu persetujuan Anda.",
                         'link'    => route('portal::outwork.manage.show', $outwork->id),
                         'icon'    => 'bx bx-time-five',
                         'color'   => 'info'
-                    ]));
+                    ]);
                 }
             }
         }
@@ -104,13 +125,13 @@ class ManageController extends Controller
         if ($isRejected) {
             $outwork->update(['paidable_at' => null]);
 
-            $submitter->notify(new GlobalGenericNotification([
+            $this->sendManageOutworkNotification($submitter, [
                 'title'   => 'Insentif Ditolak',
-                'message' => "Mohon maaf, pengajuan insentif <strong>{$categoryName}</strong> Anda ditolak. Silakan cek catatan untuk informasi lebih lanjut.",
+                'message' => "Mohon maaf, pengajuan insentif <strong>{$categoryName}</strong> Anda ditolak. Silakan cek catatan atasan.",
                 'link'    => route('portal::outwork.submission.show', $outwork->id),
                 'icon'    => 'bx bx-x-circle',
                 'color'   => 'danger'
-            ]));
+            ]);
         }
 
         return redirect()->next()->with('success', 'Berhasil memperbarui status pengajuan, terima kasih!');
