@@ -299,12 +299,16 @@ class User extends Authenticatable
 
     public static function broadcastSystemNotification(array $details)
     {
-        $recipients = self::where('id', '!=', auth()->id())->get();
+        $myId = auth()->id();
+        $recipients = self::where('id', '!=', $myId)->get();
 
-        \Illuminate\Support\Facades\Notification::send(
-            $recipients,
-            new \App\Notifications\GlobalGenericNotification($details)
-        );
+        if ($recipients->isNotEmpty()) {
+            foreach ($recipients as $recipient) {
+                $details['user_id_target'] = $recipient->id;
+
+                $recipient->notify(new \App\Notifications\GlobalGenericNotification($details));
+            }
+        }
     }
 
     public function broadcastToSameOutlet(array $details, $outletId = null)
@@ -316,6 +320,7 @@ class User extends Authenticatable
         }
 
         if (!$outletId) return;
+
         $recipients = self::whereHas('employee.outlets', function($q) use ($outletId) {
                 $q->where('outlet_id', $outletId);
             })

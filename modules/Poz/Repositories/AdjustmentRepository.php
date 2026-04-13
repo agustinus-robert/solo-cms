@@ -61,7 +61,10 @@ trait AdjustmentRepository
                     ]);
 
                     $productStock->outlets()->syncWithoutDetaching($outletId);
-                    $this->sendAdjustmentNotifications($adjustment, $product, $outletId);
+
+                    DB::afterCommit(function () use ($adjustment, $product, $outletId) {
+                        $this->sendAdjustmentNotifications($adjustment, $product, $outletId);
+                    });
                 }
                 return true;
             }
@@ -69,57 +72,25 @@ trait AdjustmentRepository
         });
     }
 
+    /**
+     * Handler Notifikasi Adjustment (Private)
+     */
     private function sendAdjustmentNotifications($adjustment, $product, $outletId)
     {
-        $userName = Auth::user()->name;
-        $statusText = $adjustment->status === 'plus' ? 'Penambahan' : 'Pengurangan';
+        try {
+            $statusText = $adjustment->status === 'plus' ? 'Penambahan' : 'Pengurangan';
 
-        $payload = [
-            'title'   => 'Adjustment Stok Baru',
-            'message' => "<strong>{$userName}</strong> melakukan {$statusText} stok pada produk <strong>{$product->name}</strong> sebanyak <strong>" . abs($adjustment->qty) . "</strong>.",
-            'link'    => route('poz::supplierz.adjustment.index'),
-            'icon'    => $adjustment->status === 'plus' ? 'bx bx-trending-up' : 'bx bx-trending-down',
-            'color'   => $adjustment->status === 'plus' ? 'success' : 'danger'
-        ];
+            // Panggil fungsi STATIC dari class User
+            \Modules\Account\Models\User::broadcastSystemNotification([
+                'title'   => 'Adjustment Stok Baru',
+                'message' => "<strong>{$statusText}</strong> stok pada produk <strong>{$product->name}</strong> sebanyak <strong>" . abs($adjustment->qty) . "</strong>.",
+                'link'    => route('poz::supplierz.adjustment.index') . '?outlet=' . $outletId,
+                'icon'    => $adjustment->status === 'plus' ? 'bx bx-trending-up' : 'bx bx-trending-down',
+                'color'   => $adjustment->status === 'plus' ? 'success' : 'danger',
+            ]);
 
-        $managementUsers = User::role(['administrator'])->get();
-        foreach ($managementUsers as $user) {
-            $user->notify(new GlobalGenericNotification($payload));
+        } catch (\Exception $e) {
+            \Log::error("Global Broadcast Error: " . $e->getMessage());
         }
-
-        if ($outletId) {
-            $outletEmployees = Employee::whereHas('outlets', function($q) use ($outletId) {
-                $q->where('outlets.id', $outletId);
-            })->with('user')->get();
-
-            foreach ($outletEmployees as $employee) {
-                if ($employee->user) {
-                    $employee->user->notify(new GlobalGenericNotification($payload));
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove the current resource.
-     */
-    public function destroyInquiry($id)
-    {
-        if (Adjustment::where('id', $id)->delete()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Restore the current resource.
-     */
-    public function restoreInquiry($id)
-    {
-        if (Adjustment::onlyTrashed()->find($id)->restore()) {
-            return true;
-        }
-        return false;
     }
 }
