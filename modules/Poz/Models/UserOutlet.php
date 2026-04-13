@@ -7,6 +7,7 @@ use App\Models\Traits\Restorable\Restorable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Account\Models\User;
+use Modules\HRMS\Models\Employee;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -18,13 +19,12 @@ class UserOutlet extends Model
     public $table = "user_employee_outlets";
 
     protected $fillable = [
-        'user_id',
+        'empl_id',
         'outlet_id',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
+    public function employee(){
+        return $this->belongsTo(Employee::class, 'empl_id');
     }
 
     public function outlet()

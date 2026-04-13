@@ -26,7 +26,8 @@ class GlobalGenericNotification extends Notification implements ShouldBroadcastN
 
     public function broadcastOn()
     {
-        return new PrivateChannel('Modules.Account.Models.User.' . $this->details['user_id_target']);
+        $targetId = $this->details['user_id_target'] ?? auth()->id();
+        return new PrivateChannel('Modules.Account.Models.User.' . $targetId);
     }
 
     public function broadcastAs()

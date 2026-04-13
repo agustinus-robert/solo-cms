@@ -17,6 +17,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use \Modules\Poz\Models\UserOutlet;
 
 use Modules\Academic\Models\Student;
 use Modules\HRMS\Models\Employee;
@@ -304,5 +305,28 @@ class User extends Authenticatable
             $recipients,
             new \App\Notifications\GlobalGenericNotification($details)
         );
+    }
+
+    public function broadcastToSameOutlet(array $details, $outletId = null)
+    {
+        if (!$outletId) {
+            $outletId = UserOutlet::whereHas('employee', function($q) {
+                $q->where('user_id', $this->id);
+            })->pluck('outlet_id')->first();
+        }
+
+        if (!$outletId) return;
+        $recipients = self::whereHas('employee.outlets', function($q) use ($outletId) {
+                $q->where('outlet_id', $outletId);
+            })
+            ->where('id', '!=', $this->id)
+            ->get();
+
+        if ($recipients->isNotEmpty()) {
+            foreach ($recipients as $recipient) {
+                $details['user_id_target'] = $recipient->id;
+                $recipient->notify(new \App\Notifications\GlobalGenericNotification($details));
+            }
+        }
     }
 }
