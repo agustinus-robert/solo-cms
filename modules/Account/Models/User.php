@@ -295,4 +295,14 @@ class User extends Authenticatable
     {
         $this->notify(new \App\Notifications\GlobalGenericNotification($details));
     }
+
+    public static function broadcastSystemNotification(array $details)
+    {
+        $recipients = self::where('id', '!=', auth()->id())->get();
+
+        \Illuminate\Support\Facades\Notification::send(
+            $recipients,
+            new \App\Notifications\GlobalGenericNotification($details)
+        );
+    }
 }

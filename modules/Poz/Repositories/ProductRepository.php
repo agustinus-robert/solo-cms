@@ -46,7 +46,7 @@ trait ProductRepository
         try {
             $isUpdate = ($type === 'update');
 
-            auth()->user()->sendSystemNotification([
+            auth()->user()->broadcastSystemNotification([
                 'title'   => $isUpdate ? 'Produk Diperbarui' : 'Produk Baru!',
                 'message' => "Produk '{$product->name}' telah " . ($isUpdate ? 'diperbarui' : 'ditambahkan') . " oleh " . auth()->user()->name,
                 'link'    => route('poz::transaction.product.index') . '?outlet=' . $outletId,
