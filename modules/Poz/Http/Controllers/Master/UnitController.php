@@ -44,10 +44,27 @@ class UnitController extends Controller
 
     public function destroy(Request $request)
     {
-        $tax = Unit::findOrFail($request->tax); // Mencari pozt berdasarkan ID
-        $tax->delete(); // Melakukan soft delete
+        $unit = Unit::findOrFail($request->unit);
 
-        return redirect(route('poz::master.unit.index'))->with('msg-sukses', "Data berhasil dihapus");
+        $unitName = $unit->name;
+        $outletId = $request->outlet;
+
+        if ($unit->delete()) {
+            if ($outletId) {
+                auth()->user()->broadcastToSameOutlet([
+                    'title'   => 'Unit/Satuan Dihapus',
+                    'message' => "Unit <strong>{$unitName}</strong> telah dihapus oleh <strong>" . auth()->user()->name . "</strong>.",
+                    'link'    => route('poz::master.unit.index') . '?outlet=' . $outletId,
+                    'icon'    => 'bx bx-trash',
+                    'color'   => 'danger',
+                ], $outletId);
+            }
+
+            return redirect(route('poz::master.unit.index') . '?outlet=' . $outletId)
+                ->with('success', "Data berhasil dihapus");
+        }
+
+        return redirect()->back()->with('error', "Gagal menghapus data");
     }
 
     public function unitTable(Request $request)
