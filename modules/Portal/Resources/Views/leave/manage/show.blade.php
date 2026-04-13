@@ -201,7 +201,7 @@
                                                     </select>
                                                     <button class="btn btn-primary"><i class="mdi mdi-check-bold"></i> Simpan</button>
                                                 </div>
-                                                <textarea class="form-control form-control-sm" name="reason" rows="2" placeholder="Berikan catatan (opsional)">{{ old('reason', $approvable->reason) }}</textarea>
+                                                <textarea class="form-control form-control-sm" name="reason" rows="2" placeholder="Berikan catatan (jika ingin ditolak!)">{{ old('reason', $approvable->reason) }}</textarea>
                                             </form>
                                         @else
                                             <div class="bg-light p-2 rounded border">

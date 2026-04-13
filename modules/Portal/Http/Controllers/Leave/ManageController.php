@@ -73,7 +73,7 @@ class ManageController extends Controller
             }
         }
 
-        if ($result == ApprovableResultEnum::REJECT->value) {
+        if ($result == (string) ApprovableResultEnum::REJECT->value) {
             $this->sendApprovalNotification($submitter, 'reject', $approvable);
         }
 
@@ -108,7 +108,7 @@ class ManageController extends Controller
                 ],
                 'reject' => [
                     'title'   => 'Pengajuan Ditolak',
-                    'message' => "Mohon maaf, pengajuan Anda ditolak pada level {$approvable->level}.",
+                    'message' => "Mohon maaf, pengajuan Anda ditolak oleh ".$user->name,
                     'action'  => 'Izin Ditolak',
                     'icon'    => 'bx bx-x-circle',
                     'color'   => 'danger',
