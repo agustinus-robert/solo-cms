@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Poz\Models\Adjustment;
 use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Models\Product;
+use App\Events\ProductStockUpdated;
 use Modules\Account\Models\User;
 use Modules\HRMS\Models\Employee;
 use App\Notifications\GlobalGenericNotification;
@@ -62,8 +63,30 @@ trait AdjustmentRepository
 
                     $productStock->outlets()->syncWithoutDetaching($outletId);
 
-                    DB::afterCommit(function () use ($adjustment, $product, $outletId) {
-                        $this->sendAdjustmentNotifications($adjustment, $product, $outletId);
+                    DB::afterCommit(function () use ($adjustment, $product, $outletId, $data) {
+                        try {
+                            $this->sendAdjustmentNotifications($adjustment, $product, $outletId);
+                            $variantCode = $data['variant_code'] ?? null;
+                            $newStock = $product->getStockByVariant($variantCode, $outletId);
+
+                            \Log::info("Memulai Broadcast StockUpdate", [
+                                'product_id' => $product->id,
+                                'stock' => $newStock
+                            ]);
+
+                            broadcast(new ProductStockUpdated(
+                                $product->id,
+                                $variantCode,
+                                $newStock
+                            ))->toOthers();
+
+                        } catch (\Exception $e) {
+                            \Log::error("GAGAL BROADCAST STOK: " . $e->getMessage(), [
+                                'product_id' => $product->id,
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine()
+                            ]);
+                        }
                     });
                 }
                 return true;

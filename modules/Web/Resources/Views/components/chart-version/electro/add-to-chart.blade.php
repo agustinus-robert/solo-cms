@@ -236,33 +236,33 @@
             btn.disabled = false;
         });
 
-        window.addEventListener('cart-updated', async function() {
-            const modalEl = document.getElementById('variantModal');
+        // window.addEventListener('cart-updated', async function() {
+        //     const modalEl = document.getElementById('variantModal');
 
-            if (modalEl && modalEl.classList.contains('show')) {
-                const productId = document.getElementById('modal-product-id').value;
-                console.log('Update detected, refreshing variants for product:', productId);
+        //     if (modalEl && modalEl.classList.contains('show')) {
+        //         const productId = document.getElementById('modal-product-id').value;
+        //         console.log('Update detected, refreshing variants for product:', productId);
 
-                try {
-                    const response = await fetch("{{ route('web::web.cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ id: productId, qty: 0 })
-                    });
+        //         try {
+        //             const response = await fetch("{{ route('web::web.cart.add') }}", {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'Content-Type': 'application/json',
+        //                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+        //                     'Accept': 'application/json'
+        //                 },
+        //                 body: JSON.stringify({ id: productId, qty: 0 })
+        //             });
 
-                    const data = await response.json();
-                    if (data.status === 'NEED_VARIANT') {
-                        openVariantSelection(productId, data.variants);
-                    }
-                } catch (error) {
-                    console.error('Gagal sinkronisasi stok modal:', error);
-                }
-            }
-        });
+        //             const data = await response.json();
+        //             if (data.status === 'NEED_VARIANT') {
+        //                 openVariantSelection(productId, data.variants);
+        //             }
+        //         } catch (error) {
+        //             console.error('Gagal sinkronisasi stok modal:', error);
+        //         }
+        //     }
+        // });
     </script>
     @endpush
 @endonce

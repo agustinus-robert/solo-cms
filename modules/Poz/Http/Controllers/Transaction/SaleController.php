@@ -11,8 +11,10 @@ use Modules\Poz\Models\CashRegister;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Modules\Poz\Models\ProductStock;
 use Modules\Poz\Traits\SaleTrait;
+use App\Events\ProductStockUpdated;
 
 class SaleController extends Controller
 {
@@ -116,29 +118,63 @@ class SaleController extends Controller
             $this->storeSaleItems($sale, $items);
             $this->deductStock($items, $outletId, $sale->id);
 
+            DB::afterCommit(function () use ($items, $outletId) {
+                foreach ($items as $item) {
+                    foreach ($item['bought_variants'] as $variant) {
+                        $currentStock = $this->getAvailableStock($item['id'], $outletId);
+                        event(new ProductStockUpdated($item['id'], $variant['code'], $currentStock));
+                    }
+                }
+            });
+
             DB::commit();
             return redirect()->route('poz::transaction.sale.index')
-                            ->with('msg-sukses', "Transaksi #" . $sale->reference . " Berhasil!");
+                            ->with('success', "Transaksi #" . $sale->reference . " Berhasil!");
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            dd([
-                'message' => $e->getMessage(),
+            Log::error("Gagal Simpan Transaksi POS: " . $e->getMessage(), [
+                'user_id' => Auth::id(),
                 'file'    => $e->getFile(),
                 'line'    => $e->getLine(),
-                'trace'   => $e->getTraceAsString()
+                'request' => $request->all()
             ]);
 
-            return back()->with('msg-gagal', "Gagal simpan: " . $e->getMessage());
+            return back()->with('error', "Gagal simpan: " . $e->getMessage());
         }
     }
 
     public function destroy(Request $request)
     {
-        $sale = SaleData::findOrFail($request->sale);
-        $sale->delete();
-        return redirect(route('poz::transaction.sale.index'))->with('msg-sukses', "Data berhasil dihapus");
+        $sale = SaleData::with('saleItems')->findOrFail($request->sale);
+        $items = $sale->saleItems;
+        $reference = $sale->reference;
+        $outletId = Auth::user()->outlet_id;
+
+        try {
+            DB::beginTransaction();
+            $sale->delete();
+
+            DB::afterCommit(function () use ($items, $outletId) {
+                foreach ($items as $item) {
+                    $currentStock = $this->getAvailableStock($item->product_id, $outletId);
+                    event(new ProductStockUpdated($item->product_id, $item->variant_code, $currentStock));
+                }
+            });
+
+            DB::commit();
+            return redirect(route('poz::transaction.sale.index'))->with('success', "Data berhasil dihapus");
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error("Gagal Hapus Transaksi POS #{$reference}: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->with('error', "Gagal hapus: " . $e->getMessage());
+        }
     }
 
     public function invoice($sale_id)

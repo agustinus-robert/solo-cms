@@ -78,16 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error('❌ RAW WSS FAILED', e);
     }
-
-    // window.Echo.channel('products-market')
-    //     .listen('.stock.updated', (data) => {
-    //         console.log("📦 EVENT RECEIVED:", data);
-    //     });
-
-
 });
 </script>
 
 @auth
     @include('partials.admin-notif-toast')
 @endauth
+
+@include('partials.stock-channel')

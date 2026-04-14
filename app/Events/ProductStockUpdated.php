@@ -4,28 +4,25 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ProductStockUpdated implements ShouldBroadcastNow
+class ProductStockUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $productId;
     public $variantCode;
     public $newStock;
+    public $socketId;
 
-    /**
-     * @param int|string $productId
-     * @param float|int $newStock
-     * @param string|null $variantCode
-     */
-    public function __construct($productId, $newStock, $variantCode = null)
+    public function __construct($productId, $variantCode, $newStock)
     {
         $this->productId = $productId;
-        $this->newStock = $newStock;
         $this->variantCode = $variantCode;
+        $this->newStock = $newStock;
+        $this->socketId = request()->header('X-Socket-ID');
     }
 
     public function broadcastOn()
@@ -36,14 +33,5 @@ class ProductStockUpdated implements ShouldBroadcastNow
     public function broadcastAs()
     {
         return 'stock.updated';
-    }
-
-    public function broadcastWith()
-    {
-        return [
-            'productId'   => (int) $this->productId,
-            'variantCode' => (string) $this->variantCode,
-            'newStock'    => (int) $this->newStock,
-        ];
     }
 }

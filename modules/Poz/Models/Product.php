@@ -109,4 +109,30 @@ class Product extends Model
         $meta = $this->metas->where('meta_key', $key)->first();
         return $meta ? $meta->meta_value : $default;
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class, 'product_id', 'id');
+    }
+
+    public function getStockByVariant($variantCode = null, $outletId = null)
+    {
+        $query = $this->stocks();
+
+        if ($variantCode) {
+            $query->where('variant_code', $variantCode);
+        } else {
+            $query->where(function($q) {
+                $q->whereNull('variant_code')->orWhere('variant_code', '');
+            });
+        }
+
+        if ($outletId) {
+            $query->whereHas('outlets', function ($q) use ($outletId) {
+                $q->where('outlets.id', $outletId);
+            });
+        }
+
+        return $query->sum('qty');
+    }
 }

@@ -2,6 +2,26 @@
 <script>
     let cart = [];
 
+    function updateVisualStock(variantCode, newStock) {
+        const buttons = document.querySelectorAll(`button[onclick*="${variantCode}"]`);
+        buttons.forEach(btn => {
+            if (btn.innerText.includes(':')) {
+                let parts = btn.innerText.split(':');
+                btn.innerText = `${parts[0]}: ${newStock}`;
+            } else {
+                btn.innerText = `Stok: ${newStock}`;
+            }
+
+            if (newStock <= 0) {
+                btn.classList.add('disabled', 'btn-light');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.classList.remove('disabled', 'btn-light');
+                btn.classList.add('btn-outline-primary');
+            }
+        });
+    }
+
     function addItemToCart(product, variant) {
         if (variant.real_stock <= 0) {
             alert('Stok habis!');
@@ -26,6 +46,9 @@
                 real_stock: variant.real_stock
             });
         }
+
+        let currentVisualStock = variant.real_stock - (existingItem ? existingItem.qty : 1);
+        updateVisualStock(variant.code, currentVisualStock);
         renderCart();
     }
 
@@ -69,19 +92,27 @@
 
     function updateQty(index, delta) {
         const item = cart[index];
+        if (delta > 0 && item.qty >= item.real_stock) {
+            alert('Maksimal stok tercapai');
+            return;
+        }
+
         if (item.qty + delta > 0) {
-            if (delta > 0 && item.qty >= item.real_stock) {
-                alert('Maksimal stok tercapai');
-                return;
-            }
             item.qty += delta;
+            let newVisualStock = item.real_stock - item.qty;
+            updateVisualStock(item.variant_code, newVisualStock);
         } else {
+            updateVisualStock(item.variant_code, item.real_stock);
             removeItem(index);
+            return;
         }
         renderCart();
     }
 
     function removeItem(index) {
+        const item = cart[index];
+        updateVisualStock(item.variant_code, item.real_stock);
+
         cart.splice(index, 1);
         renderCart();
     }
