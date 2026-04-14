@@ -1,19 +1,15 @@
 <div class="pos-main-layout">
-    {{-- KIRI: AREA PRODUK --}}
     <div class="pos-left-section">
     <div class="card border-0 shadow-sm rounded-4 pos-card-wrapper-manual">
         <div class="card-body p-3">
-            {{-- Search Partial --}}
             @include('poz::transaction.sale.partials.search')
 
-            {{-- Area Produk Scrollable --}}
             <div class="scroll-y-products-manual mt-3">
                 <div class="row g-2">
                     @foreach($products as $p)
                         @php
                             $allVariants = [];
 
-                            // 1. Ambil list variant dari JSON master hanya untuk mapping CODE dan NAME
                             if ($p->variant) {
                                 foreach ($p->variant as $vRow) {
                                     $vData = is_string($vRow->product_variant) ? json_decode($vRow->product_variant) : $vRow->product_variant;
@@ -21,12 +17,7 @@
                                     if (is_array($vData)) {
                                         foreach ($vData as $v) {
                                             $vObj = (object) $v;
-
-                                            // Validasi status variant
                                             if (($vObj->status ?? '') !== 'deleted' && ($vObj->deleted_at ?? null) === null) {
-
-                                                // HITUNG STOK DARI LEDGER $stocks (sum plus - sum minus)
-                                                // Cocokkan berdasarkan variant_code
                                                 $mutations = collect($stocks)->where('variant_code', $vObj->code);
 
                                                 $realStock = $mutations->reduce(function($carry, $item) {
@@ -41,7 +32,6 @@
                                 }
                             }
 
-                            // 2. Fallback jika produk tidak punya variant
                             if (empty($allVariants)) {
                                 $mutations = collect($stocks)->where('variant_code', $p->code);
 
@@ -87,7 +77,8 @@
                                     <div class="d-flex flex-wrap justify-content-center gap-1">
                                         @foreach($allVariants as $v)
                                             <button type="button"
-                                                    class="btn btn-xs {{ $v->real_stock > 0 ? 'btn-outline-primary' : 'btn-light disabled text-muted' }} py-0 px-1"
+                                                    data-variant-code="{{ $v->code }}"
+                                                    class="btn btn-xs btn-add-to-cart {{ $v->real_stock > 0 ? 'btn-outline-primary' : 'btn-light disabled text-muted' }} py-0 px-1"
                                                     style="font-size: 9px;"
                                                     onclick="event.stopPropagation(); addItemToCart({{ json_encode($p) }}, {{ json_encode($v) }})">
                                                 {{ ($v->name == 'Default' || $v->variant_type == 'no_variant') ? 'Stok' : $v->name }}: {{ $v->real_stock }}
@@ -104,7 +95,6 @@
     </div>
 </div>
 
-    {{-- KANAN: SIDEBAR KERANJANG --}}
     <div class="pos-right-sidebar">
         <div class="card border-0 shadow-sm rounded-4 mb-3 card-keranjang-manual">
             <div class="card-header bg-white border-0 pt-3 pb-0">
@@ -131,7 +121,6 @@
             </div>
         </div>
 
-        {{-- SUMMARY DI BAWAH --}}
         <div class="card border-0 shadow-sm border-top border-primary border-4 rounded-4">
             <div class="card-body p-3">
                 @include('poz::transaction.sale.partials.summary')

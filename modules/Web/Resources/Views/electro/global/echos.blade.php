@@ -2,6 +2,15 @@
 <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.3.0/dist/web/pusher.min.js"></script>
 
 <script>
+window.sendStockWhisper = function(variantCode, currentVisualStock) {
+    if (window.Echo) {
+        window.Echo.private('products-market').whisper('stock-reserved', {
+            variantCode: variantCode,
+            newVisualStock: currentVisualStock
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 INIT ECHO START');
 

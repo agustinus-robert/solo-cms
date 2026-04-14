@@ -2,22 +2,46 @@
 <script>
     let cart = [];
 
+    /**
+     * FUNGSI UNTUK BROADCAST KE CLIENT LAIN
+     * Menggunakan direct pusher event karena whisper tidak jalan di public channel
+     */
+    function broadcastStockToClients(vCode, vStock) {
+        if (window.Echo && window.Echo.connector.pusher) {
+            window.Echo.connector.pusher.send_event('client-stock-reserved', {
+                variantCode: vCode,
+                newVisualStock: vStock,
+                socketId: window.Echo.socketId()
+            }, 'products-market');
+        }
+    }
+
     function updateVisualStock(variantCode, newStock) {
-        const buttons = document.querySelectorAll(`button[onclick*="${variantCode}"]`);
+        const buttons = document.querySelectorAll(`.btn-add-to-cart[data-variant-code="${variantCode}"]`);
+
         buttons.forEach(btn => {
-            if (btn.innerText.includes(':')) {
-                let parts = btn.innerText.split(':');
-                btn.innerText = `${parts[0]}: ${newStock}`;
-            } else {
-                btn.innerText = `Stok: ${newStock}`;
-            }
+            btn.innerText = `Stok: ${newStock}`;
 
             if (newStock <= 0) {
                 btn.classList.add('disabled', 'btn-light');
                 btn.classList.remove('btn-outline-primary');
+
+                const card = btn.closest('.product-card-item');
+                if (card) {
+                    card.classList.add('is-out');
+                    if (!card.querySelector('.bg-danger')) {
+                        card.insertAdjacentHTML('afterbegin', '<div class="position-absolute top-50 start-50 translate-middle bg-danger text-white px-2 py-1 rounded small fw-bold" style="z-index: 10;">HABIS</div>');
+                    }
+                }
             } else {
                 btn.classList.remove('disabled', 'btn-light');
                 btn.classList.add('btn-outline-primary');
+                const card = btn.closest('.product-card-item');
+                if (card) {
+                    card.classList.remove('is-out');
+                    const badge = card.querySelector('.bg-danger');
+                    if (badge) badge.remove();
+                }
             }
         });
     }
@@ -27,29 +51,84 @@
             alert('Stok habis!');
             return;
         }
+
         const existingItem = cart.find(item => item.variant_code === variant.code);
-        if (existingItem) {
-            if (existingItem.qty < variant.real_stock) {
+        let currentQtyInCart = existingItem ? existingItem.qty : 0;
+
+        if (currentQtyInCart < variant.real_stock) {
+            if (existingItem) {
                 existingItem.qty += 1;
             } else {
-                alert('Stok tidak mencukupi!');
-                return;
+                cart.push({
+                    product_id: product.id,
+                    product_name: product.name,
+                    variant_code: variant.code,
+                    variant_name: variant.name,
+                    price: parseFloat(variant.price || product.price),
+                    qty: 1,
+                    real_stock: variant.real_stock
+                });
             }
+
+            let newQty = existingItem ? existingItem.qty : 1;
+            let currentVisualStock = variant.real_stock - newQty;
+
+            // Update layar sendiri
+            updateVisualStock(variant.code, currentVisualStock);
+            renderCart();
+
+            // Beritahu client lain
+            broadcastStockToClients(variant.code, currentVisualStock);
         } else {
-            cart.push({
-                product_id: product.id,
-                product_name: product.name,
-                variant_code: variant.code,
-                variant_name: variant.name,
-                price: parseFloat(variant.price || product.price),
-                qty: 1,
-                real_stock: variant.real_stock
-            });
+            alert('Stok tidak mencukupi!');
+        }
+    }
+
+    function updateQty(index, delta) {
+        const item = cart[index];
+        if (delta > 0 && item.qty >= item.real_stock) {
+            alert('Maksimal stok tercapai');
+            return;
         }
 
-        let currentVisualStock = variant.real_stock - (existingItem ? existingItem.qty : 1);
-        updateVisualStock(variant.code, currentVisualStock);
+        if (item.qty + delta > 0) {
+            item.qty += delta;
+            let newVisualStock = item.real_stock - item.qty;
+
+            updateVisualStock(item.variant_code, newVisualStock);
+            broadcastStockToClients(item.variant_code, newVisualStock);
+        } else {
+            removeItem(index);
+            return;
+        }
         renderCart();
+    }
+
+    function removeItem(index) {
+        const item = cart[index];
+        const vCode = item.variant_code;
+        const vStock = item.real_stock;
+
+        // Kembalikan stok visual dan broadcast
+        updateVisualStock(vCode, vStock);
+        broadcastStockToClients(vCode, vStock);
+
+        cart.splice(index, 1);
+        renderCart();
+    }
+
+    function syncInternalProductStock(variantCode, newStock) {
+        const itemInCart = cart.find(item => item.variant_code === variantCode);
+        if (itemInCart) {
+            itemInCart.real_stock = newStock;
+            if (itemInCart.qty > newStock) {
+                itemInCart.qty = Math.max(0, newStock);
+                if (itemInCart.qty === 0) {
+                    cart.splice(cart.indexOf(itemInCart), 1);
+                }
+            }
+            renderCart();
+        }
     }
 
     function renderCart() {
@@ -90,33 +169,6 @@
         updateSummary();
     }
 
-    function updateQty(index, delta) {
-        const item = cart[index];
-        if (delta > 0 && item.qty >= item.real_stock) {
-            alert('Maksimal stok tercapai');
-            return;
-        }
-
-        if (item.qty + delta > 0) {
-            item.qty += delta;
-            let newVisualStock = item.real_stock - item.qty;
-            updateVisualStock(item.variant_code, newVisualStock);
-        } else {
-            updateVisualStock(item.variant_code, item.real_stock);
-            removeItem(index);
-            return;
-        }
-        renderCart();
-    }
-
-    function removeItem(index) {
-        const item = cart[index];
-        updateVisualStock(item.variant_code, item.real_stock);
-
-        cart.splice(index, 1);
-        renderCart();
-    }
-
     function updateSummary() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const inputDisc = document.getElementById('inputDiscount');
@@ -144,12 +196,10 @@
 
     function calculateChange(forcedGrandTotal = null) {
         let gt = forcedGrandTotal;
-
         if (gt === null) {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const discInput = document.getElementById('inputDiscount');
             const disc = (discInput && discInput.value !== "") ? parseFloat(discInput.value) : 0;
-
             const afterDiscount = Math.max(0, subtotal - disc);
             gt = afterDiscount + (afterDiscount * 0.11);
         }
@@ -159,7 +209,6 @@
 
         const change = amountPaid - gt;
         const textChange = document.getElementById('textChange');
-        const btnSubmit = document.getElementById('btnSubmit');
 
         if(!textChange) return;
 
@@ -168,12 +217,7 @@
             textChange.className = 'fw-bold text-success';
         } else {
             textChange.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(change);
-
-            if (change < 0) {
-                textChange.className = 'fw-bold text-danger';
-            } else {
-                textChange.className = 'fw-bold text-success';
-            }
+            textChange.className = change < 0 ? 'fw-bold text-danger' : 'fw-bold text-success';
         }
     }
 
@@ -189,15 +233,12 @@
             productColumns.forEach(column => {
                 const titleEl = column.querySelector('h6');
                 if (!titleEl) return;
-
                 const productName = titleEl.innerText.toLowerCase();
 
                 if (productName.includes(keyword)) {
                     column.classList.remove('d-none');
-                    setTimeout(() => {
-                        column.style.opacity = "1";
-                        column.style.transform = "scale(1)";
-                    }, 10);
+                    column.style.opacity = "1";
+                    column.style.transform = "scale(1)";
                     hasVisible++;
                 } else {
                     column.style.opacity = "0";
@@ -218,13 +259,12 @@
 
         if (count === 0) {
             if (!msg) {
-                const html = `
-                    <div id="noProductMsg" class="col-12 text-center py-5 my-5 animate__animated animate__fadeIn" style="width: 100%;">
+                container.insertAdjacentHTML('beforeend', `
+                    <div id="noProductMsg" class="col-12 text-center py-5 my-5" style="width: 100%;">
                         <i class="fa fa-box-open fa-3x text-light mb-3"></i>
                         <h5 class="text-muted fw-bold">Barang tidak ada</h5>
                         <p class="small text-secondary">Produk "${keyword}" tidak ditemukan.</p>
-                    </div>`;
-                container.insertAdjacentHTML('beforeend', html);
+                    </div>`);
             }
         } else {
             if (msg) msg.remove();
@@ -232,6 +272,24 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // --- HANDLER UNTUK SINKRONISASI MASUK ---
+        if (window.Echo) {
+            const marketChannel = window.Echo.channel('products-market');
+
+            // Listen broadcast dari server
+            marketChannel.listen('.stock.updated', (data) => {
+                updateVisualStock(data.variantCode, data.newStock);
+                syncInternalProductStock(data.variantCode, data.newStock);
+            });
+
+            // Listen client-event dari POS lain
+            marketChannel.on('client-stock-reserved', (data) => {
+                if (data.socketId !== window.Echo.socketId()) {
+                    updateVisualStock(data.variantCode, data.newVisualStock);
+                }
+            });
+        }
+
         const inputDisc = document.getElementById('inputDiscount');
         const inputPaid = document.getElementById('amountPaid');
         const paymentType = document.getElementById('paymentType');
@@ -239,8 +297,8 @@
         if(inputDisc) inputDisc.addEventListener('input', updateSummary);
         if(inputPaid) inputPaid.addEventListener('input', () => calculateChange());
         if(paymentType) paymentType.addEventListener('change', () => updateSummary());
-        const posForm = document.getElementById('saleForm');
 
+        const posForm = document.getElementById('saleForm');
         if (posForm) {
             posForm.addEventListener('submit', function(e) {
                 if (cart.length === 0) {
@@ -249,24 +307,17 @@
                     return;
                 }
 
-                const formattedItems = cart.map(item => {
-                    return {
-                        id: item.product_id,
-                        bought_variants: [{
-                            code: item.variant_code,
-                            qty: item.qty,
-                            price: item.price
-                        }]
-                    };
-                });
+                const formattedItems = cart.map(item => ({
+                    id: item.product_id,
+                    bought_variants: [{
+                        code: item.variant_code,
+                        qty: item.qty,
+                        price: item.price
+                    }]
+                }));
 
                 const itemsInput = document.getElementById('itemsInput');
-                if (itemsInput) {
-                    itemsInput.value = JSON.stringify(formattedItems);
-                    console.log("Data items berhasil disiapkan:", itemsInput.value);
-                } else {
-                    console.error("Elemen itemsInput tidak ditemukan!");
-                }
+                if (itemsInput) itemsInput.value = JSON.stringify(formattedItems);
             });
         }
 
