@@ -4,6 +4,7 @@ namespace modules\Hotel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Hotel\Models\Booking;
 
 class BookingSource extends Model
 {

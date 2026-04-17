@@ -1,88 +1,188 @@
-@extends('hrms::layouts.default')
+@extends('hotel::layouts.default')
 
-@section('title', 'Dasbor | ')
+@section('title', 'Dasbor Hotel | ')
 
-@section('navtitle', 'Dasbor')
+@section('navtitle', 'Dasbor Operasional')
 
 @php
     $charts = [
         [
-            'name' => 'genderChart',
-            'label' => 'Karyawan berdasarkan jenis kelamin',
-            'icon' => 'mdi mdi-gender-male-female',
-            'data' => $employee_by_genders,
+            'name' => 'roomStatusChart',
+            'label' => 'Status Kondisi Kamar',
+            'icon' => 'mdi mdi-door-open',
+            'data' => $room_stats_chart,
             'type' => 'pie',
             'row' => 4,
-            'height' => '40vh',
+            'height' => '35vh',
         ],
         [
-            'name' => 'contractChart',
-            'label' => 'Karyawan berdasarkan jenis perjanjian kerja',
-            'icon' => 'mdi mdi-file-document-multiple-outline',
-            'data' => $employee_by_contracts,
+            'name' => 'bookingSourceChart',
+            'label' => 'Sumber Reservasi',
+            'icon' => 'mdi mdi-source-branch',
+            'data' => $booking_sources,
+            'type' => 'doughnut',
+            'row' => 4,
+            'height' => '35vh',
+        ],
+        [
+            'name' => 'paymentStatusChart',
+            'label' => 'Status Pembayaran (Bulan Ini)',
+            'icon' => 'mdi mdi-cash-check',
+            'data' => $payment_stats,
             'type' => 'pie',
             'row' => 4,
-            'height' => '40vh',
-        ],
-        [
-            'name' => 'educationChart',
-            'label' => 'Karyawan berdasarkan jenis pendidikan',
-            'icon' => 'mdi mdi-school-outline',
-            'data' => $employee_by_educations,
-            'type' => 'pie',
-            'row' => 4,
-            'height' => '40vh',
-        ],
-        [
-            'name' => 'religionChart',
-            'label' => 'Karyawan berdasarkan agama',
-            'icon' => 'mdi mdi-hand-heart',
-            'data' => $employee_by_religions,
-            'type' => 'pie',
-            'row' => 4,
-            'height' => '40vh',
-        ],
-        [
-            'name' => 'departmentChart',
-            'label' => 'Karyawan berdasarkan departemen',
-            'icon' => 'mdi mdi-link-box-variant-outline',
-            'data' => $employee_by_departements,
-            'type' => 'bar',
-            'row' => 8,
-            'height' => '40vh',
+            'height' => '35vh',
         ],
     ];
 @endphp
 
 @section('content')
     <div class="row">
-        <div class="col-xl-12">
-            <div class="card border-0">
+        {{-- Welcome Card --}}
+        <div class="col-xl-12 mb-4">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-md-between">
-                        <div>
-                            <img class="w-100" src="{{ asset('img/manypixels/Welcome.svg') }}" alt="" style="height: 140px;">
-                        </div>
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
                         <div class="order-md-first text-md-start text-center">
-                            <div class="px-4 py-3">
-                                <h2 class="fw-normal">Selamat datang {{ Auth::user()->name }}!</h2>
-                                <div class="text-muted">di {{ config('modules.hrms.name') }}</div>
+                            <div class="px-3 py-2">
+                                <h2 class="fw-bold text-primary">Selamat Datang, {{ Auth::user()->name }}!</h2>
+                                <div class="text-muted">Manajemen Hotel & Properti — <strong>{{ now()->translatedFormat('l, d F Y') }}</strong></div>
                             </div>
+                        </div>
+                        <div>
+                            <img src="{{ asset('img/manypixels/Welcome.svg') }}" alt="Welcome" style="height: 120px;">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        {{-- Top Statistics Cards (Key Performance Indicators) --}}
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="mb-1 opacity-75">Tersedia</p>
+                            <h3 class="fw-bold">{{ $roomStats['available'] ?? 0 }}</h3>
+                        </div>
+                        <i class="mdi mdi-check-circle-outline mdi-36px opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="mb-1 opacity-75">Terisi (Occupied)</p>
+                            <h3 class="fw-bold">{{ $roomStats['occupied'] ?? 0 }}</h3>
+                        </div>
+                        <i class="mdi mdi-account-group mdi-36px opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="mb-1 fw-bold opacity-75">Kotor (Dirty)</p>
+                            <h3 class="fw-bold">{{ $roomStats['dirty'] ?? 0 }}</h3>
+                        </div>
+                        <i class="mdi mdi-broom mdi-36px opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="mb-1 opacity-75">Kedatangan (Arrival)</p>
+                            <h3 class="fw-bold">{{ $stats['arrivals'] ?? 0 }}</h3>
+                        </div>
+                        <i class="mdi mdi-luggage mdi-36px opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Dynamic Charts Section --}}
         @foreach ($charts as $key => $value)
-            <div class="col-md-{{ $value['row'] }}">
-                <div class="card border-0">
-                    <div class="card-body border-bottom"><i class="{{ $value['icon'] }}"></i> {{ $value['label'] }}</div>
-                    <div class="chart-container" style="height: {{ $value['height'] }}; width:100%;">
-                        <canvas id="{{ $value['name'] }}" class="custom-chart"></canvas>
+            <div class="col-md-{{ $value['row'] }} mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body border-bottom fw-bold">
+                        <i class="{{ $value['icon'] }} me-2 text-primary"></i> {{ $value['label'] }}
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        @php
+                            $totalData = is_array($value['data']) ? array_sum($value['data']) : 0;
+                        @endphp
+
+                        @if($totalData > 0)
+                            <div class="chart-container" style="height: {{ $value['height'] }}; width:100%;">
+                                <canvas id="{{ $value['name'] }}" class="custom-chart"></canvas>
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="mdi mdi-database-off mdi-48px text-light"></i>
+                                <p class="text-muted mt-2">Belum ada data</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
         @endforeach
+
+        {{-- Table Kedatangan (Arrivals Today) --}}
+        <div class="col-xl-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="mdi mdi-clock-outline me-2"></i>Kedatangan Tamu Hari Ini</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Tamu</th>
+                                <th>Kamar</th>
+                                <th>Tipe</th>
+                                <th>Status Bayar</th>
+                                <th class="text-end pe-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($todayArrivals ?? [] as $arrival)
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ $arrival->guest->full_name }}</div>
+                                        <small class="text-muted">{{ $arrival->guest->phone_number }}</small>
+                                    </td>
+                                    <td><span class="badge bg-outline-primary text-primary border border-primary px-3">{{ $arrival->room->room_number }}</span></td>
+                                    <td>{{ $arrival->room->type->name }}</td>
+                                    <td>
+                                        <span class="badge {{ $arrival->payment_status->value == 'paid' ? 'bg-success' : 'bg-soft-warning text-warning' }}">
+                                            {{ strtoupper($arrival->payment_status->value) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-sm btn-primary shadow-sm px-3">Check-in</button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">Tidak ada kedatangan yang dijadwalkan hari ini.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -93,94 +193,73 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            margin-bottom: 20px;
         }
-
-        .custom-chart {
-            max-width: 100%;
-            /* Ensure the chart does not overflow its container */
-            max-height: 100%;
-            /* Ensure the chart stays within the container's height */
-        }
+        .bg-soft-warning { background-color: #fff3cd; }
+        .custom-chart { max-width: 100%; max-height: 100%; }
+        .card { border-radius: 12px; }
     </style>
 @endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const charts = {!! json_encode($charts) !!};
+        const chartConfigs = {!! json_encode($charts) !!};
 
-        // Function to create chart data
         function createChartData(dataValues, label) {
+            const labels = Object.keys(dataValues);
+            const values = Object.values(dataValues);
+
             return {
-                labels: Object.keys(dataValues),
+                labels: labels,
                 datasets: [{
                     label: label,
-                    data: Object.values(dataValues),
+                    data: values,
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(90, 199, 90, 0.7)',
-                        'rgba(63, 43, 173, 0.7)'
+                        '#4e73df', '#1cc88a', '#f6c23e', '#e74a3b', '#5a5c69', '#36b9cc'
                     ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(90, 199, 90, 1)',
-                        'rgba(63, 43, 173, 1)',
-                    ],
-                    borderWidth: 1
+                    hoverOffset: 10,
+                    borderWidth: 0
                 }]
             };
         }
 
-        // Custom legend generation function to display values and percentages
-        function generateLegendLabels(chart) {
-            const data = chart.data.datasets[0].data;
-            const total = data.reduce((sum, value) => sum + value, 0);
-
-            return chart.data.labels.map((label, index) => {
-                const value = data[index];
-                const percentage = ((value / total) * 100).toFixed(2);
-
-                // Return an object with the text and other properties
-                return {
-                    text: `${label}: ${value} (${percentage}%)`,
-                    fillStyle: chart.data.datasets[0].backgroundColor[index], // Color for the legend box
-                    hidden: false, // If you want to allow hiding by clicking on legend
-                    index: index // Store index
-                };
-            });
-        }
-
-        // Function to create and render a chart
         function createChart(ctx, chartData, chartType) {
+            const isPie = chartType === 'pie' || chartType === 'doughnut';
+
             return new Chart(ctx, {
-                type: chartType, // Set chart type
+                type: chartType,
                 data: chartData,
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom', // Set the legend position to 'left'
+                            position: 'bottom',
                             labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: { size: 11 },
                                 generateLabels: (chart) => {
-                                    return generateLegendLabels(chart); // Use custom legend generation
+                                    const data = chart.data.datasets[0].data;
+                                    const total = data.reduce((a, b) => a + b, 0);
+                                    return chart.data.labels.map((label, i) => ({
+                                        text: `${label}: ${data[i]} (${((data[i]/total)*100).toFixed(1)}%)`,
+                                        fillStyle: chart.data.datasets[0].backgroundColor[i],
+                                        index: i
+                                    }));
                                 }
                             }
                         }
-                    }
+                    },
+                    cutout: chartType === 'doughnut' ? '70%' : 0
                 }
             });
         }
 
-        // Loop through each chart configuration and render the chart
-        charts.forEach(chart => {
-            const chartData = createChartData(chart.data, chart.label);
-            const ctx = document.getElementById(chart.name);
-            if (ctx) {
-                createChart(ctx, chartData, chart.type || 'pie'); // Default to 'pie' if no type specified
+        chartConfigs.forEach(config => {
+            const ctx = document.getElementById(config.name);
+            if (ctx && config.data) {
+                createChart(ctx, createChartData(config.data, config.label), config.type || 'pie');
             }
         });
     </script>

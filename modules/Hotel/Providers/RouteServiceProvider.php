@@ -35,14 +35,14 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
             ->namespace($this->moduleNamespace)
-            ->prefix('hrms')
-            ->name('hrms::')
+            ->prefix('hotel')
+            ->name('hotel::')
             ->group(__DIR__ . '/../Routes/web.php');
 
         Route::middleware('api')
             ->namespace($this->moduleNamespace . '\API')
-            ->prefix('api/hrms')
-            ->name('api::hrms.')
+            ->prefix('api/hotel')
+            ->name('api::hotel.')
             ->group(__DIR__ . '/../Routes/api.php');
     }
 }

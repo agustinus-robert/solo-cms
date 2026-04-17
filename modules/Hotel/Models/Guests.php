@@ -5,7 +5,7 @@ namespace modules\Hotel\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Guest extends Model
+class Guests extends Model
 {
     protected $table = 'hotel_guests';
 

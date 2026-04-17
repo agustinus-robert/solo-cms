@@ -73,6 +73,13 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('hotel::dashboard') }}">
+                        <i class="bx bx-restaurant" style='font-size:30px;'></i>
+                        <span>Perhotelan</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun</span>

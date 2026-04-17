@@ -1,9 +1,9 @@
 <?php
 
-namespace modules\Hotel\Models;
+namespace Modules\Hotel\Models;
 
-use modules\Hotel\Enums\BookingStatus;
-use modules\Hotel\Enums\PaymentStatus;
+use modules\Hotel\Enums\BookingStatusEnum;
+use modules\Hotel\Enums\PaymentStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,13 +23,13 @@ class Booking extends Model
         'check_out_plan' => 'datetime',
         'actual_check_in' => 'datetime',
         'actual_check_out' => 'datetime',
-        'status' => BookingStatus::class,
-        'payment_status' => PaymentStatus::class,
+        'status' => BookingStatusEnum::class,
+        'payment_status' => PaymentStatusEnum::class,
     ];
 
     public function guest(): BelongsTo
     {
-        return $this->belongsTo(Guest::class, 'guest_id');
+        return $this->belongsTo(Guests::class, 'guest_id');
     }
 
     public function room(): BelongsTo

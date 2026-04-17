@@ -1,0 +1,8 @@
+<ul class="metismenu list-unstyled" id="side-menu">
+    <li class="{{ Request::routeIs('hotel::dashboard') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::dashboard') ? 'active' : '' }}" href="{{ route('hotel::dashboard') }}">
+            <i class="nav-main-link-icon mdi mdi-apps"></i>
+            <span class="nav-main-link-name">Dasbor</span>
+        </a>
+    </li>
+</ul>
