@@ -61,11 +61,11 @@ class PphController extends Controller
         ]));
     }
 
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request, Tax2024Service $taxService)
     {
         $pph = $request->transformed()->toArray();
 
-        if ($empl = $this->storeTaxYear($pph, true)) {
+        if ($empl = $taxService->storeTaxYear($pph, true)) {
             return redirect()->next()->with('success', 'PPh 21 tahunan <strong>' . $empl->employee->user->name . '</strong> berhasil dibuat.');
         }
         return redirect()->fail();

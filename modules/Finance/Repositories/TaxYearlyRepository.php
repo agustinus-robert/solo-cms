@@ -74,6 +74,7 @@ trait TaxYearlyRepository
             ])->get();
 
         $data = [];
+
         foreach ($components as $key => $component) {
             $default = $defaults->firstWhere('id', $component['component_id']);
 

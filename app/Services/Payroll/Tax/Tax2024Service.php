@@ -4,8 +4,13 @@ namespace App\Services\Payroll\Tax;
 
 use Carbon\Carbon;
 use App\Services\Payroll\TerRateService;
-use Modules\HRMS\Models\Employee; // Tambahkan import ini
-use Modules\Finance\Repositories\TaxYearlyRepository; // Tambahkan ini jika dibutuhkan trait-nya
+use Modules\HRMS\Models\Employee;
+use Modules\Finance\Repositories\TaxYearlyRepository;
+use Modules\HRMS\Models\EmployeeDataRecapitulation;
+use Modules\HRMS\Models\EmployeeTax;
+use Modules\HRMS\Enums\DataRecapitulationTypeEnum;
+
+use Illuminate\Support\Facades\DB;
 
 class Tax2024Service implements PayrollTaxInterface
 {
@@ -146,5 +151,29 @@ class Tax2024Service implements PayrollTaxInterface
         }
 
         return (float) $taxTotal;
+    }
+
+    public function storeTaxYear($data, $toRecap)
+    {
+        return DB::transaction(function () use ($data, $toRecap) {
+            $pph = new EmployeeTax($data);
+            $pph->save();
+
+            if ($toRecap) {
+                EmployeeDataRecapitulation::create([
+                    'empl_id'  => $pph->empl_id,
+                    'type'     => DataRecapitulationTypeEnum::PPH21,
+                    'start_at' => $pph->start_at->format('Y-m-d'),
+                    'end_at'   => $pph->end_at->format('Y-m-d'),
+                    'result'   => [
+                        'id'       => $pph->id,
+                        'pph'      => $pph->meta->pphtotal ?? 0,
+                        'pph_cmp'  => $pph->meta->pph_company ?? 0,
+                        'pph_empl' => $pph->meta->pph_employee ?? 0,
+                    ]
+                ]);
+            }
+            return $pph;
+        });
     }
 }
