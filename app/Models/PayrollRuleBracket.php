@@ -6,15 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class PayrollRuleBracket extends Model
 {
+    protected $table = "payroll_rule_brackets";
+
     protected $fillable = [
         'payroll_rule_id',
         'min',
         'max',
-        'rate'
+        'rate',
+        'class'
     ];
-
-    public function rule()
-    {
-        return $this->belongsTo(PayrollRule::class);
-    }
 }

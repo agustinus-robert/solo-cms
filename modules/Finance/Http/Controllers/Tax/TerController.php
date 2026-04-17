@@ -17,8 +17,9 @@ use Modules\Finance\Http\Requests\Tax\Pph\StoreRequest;
 use Modules\Finance\Repositories\TaxRepository;
 use Modules\HRMS\Enums\DataRecapitulationTypeEnum;
 use Modules\HRMS\Models\EmployeeDataRecapitulation;
-use App\Services\PayrollCalculator;
-use App\Services\TerCategoryResolver;
+
+use App\Services\Payroll\PayrollCalculator;
+use App\Services\Payroll\TerCategoryResolver;
 
 class TerController extends Controller
 {
@@ -65,32 +66,51 @@ class TerController extends Controller
                 ->whereDate('end_at', $end_at->format('Y-m-d')),
         ])->has('contract')->find($request->get('employee'));
 
-//        $ters = getTERCategory($employee->user->getMeta('profile_mariage'), $employee->user->getMeta('profile_child'), $employee->user->getMeta('profile_sex'), $employee->getMeta('tax_status'));
         $data = $this->getComponentValue($employee, $start_at, $end_at);
 
         $collectionData = collect($data);
         $totalBruto = $collectionData->whereIn('ctg_az', [1, 2])->sum('real_salary');
 
         $terResolver = app(TerCategoryResolver::class);
+
+        $sexMeta = $employee->user->getMeta('profile_sex');
+        $sexInt  = ($sexMeta === 'female') ? 2 : 1;
+
+        $marriageMeta = $employee->user->getMeta('profile_mariage');
+        $marriageInt  = is_numeric($marriageMeta) ? (int) $marriageMeta : match($marriageMeta) {
+            'married'  => 1,
+            'single'   => 2,
+            'divorced' => ($sexInt === 2) ? 3 : 4,
+            default    => 2,
+        };
+
+        $childInt = (int) $employee->user->getMeta('profile_child', 0);
         $ters = $terResolver->resolve(
-            $employee->user->getMeta('profile_mariage'),
-            $employee->user->getMeta('profile_child'),
-            $employee->user->getMeta('profile_sex')
+            $marriageInt,
+            $childInt,
+            $sexInt,
+            $start_at
         );
 
         $calculator = app(PayrollCalculator::class);
 
         $context = [
-            'gaji'          => $totalBruto,
-            'penghasilan'   => $totalBruto,
-            'mariage'       => $employee->user->getMeta('profile_mariage'),
-            'child'         => $employee->user->getMeta('profile_child'),
-            'sex'           => $employee->user->getMeta('profile_sex'),
-            'tax_category'  => $ters['category'],
-            'employee_type' => $employee->getMeta('employee_type') ?? 'monthly',
+            'gaji'                => $totalBruto,
+            'penghasilan'         => $totalBruto,
+            'mariage'             => $employee->user->getMeta('profile_mariage'),
+            'child'               => $employee->user->getMeta('profile_child'),
+            'sex'                 => $employee->user->getMeta('profile_sex'),
+            'ptkp_value'          => $ters['value'],
+            'ptkp_category'       => $ters['category'],
+            'tax_category'        => $ters['category'],
+            'start_at'            => $start_at,
+            'employee_type'       => $employee->getMeta('employee_type') ?? 'monthly',
+            'is_daily'            => ($employee->getMeta('employee_type') === 'daily'),
+            'total_bruto_setahun' => $employee->total_bruto_setahun ?? ($totalBruto * 12),
+            'total_pph_jan_nov'   => $employee->total_pph_jan_nov ?? 0,
         ];
 
-        $terNominal = $calculator->calculate('TER', $context, $start_at);
+        $terNominal = $calculator->calculate('PPH21', $context, $start_at);
 
         return view('finance::tax.ters.create', [
             'start_at'   => $start_at,
@@ -101,6 +121,7 @@ class TerController extends Controller
             'earnings'   => collect($data)->whereIn('ctg_az', [1, 2]),
             'reductions' => collect($data)->where('ctg_az', 3),
             'ters'       => $ters,
+            'ter_nominal'=> $terNominal,
             'configs'    => $configs,
         ]);
     }

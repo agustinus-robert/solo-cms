@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->text('formula');
-            $table->json('config')->nullable();
 
             $table->date('effective_start');
             $table->date('effective_end')->nullable();

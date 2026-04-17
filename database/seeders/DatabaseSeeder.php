@@ -26,11 +26,13 @@ class DatabaseSeeder extends Seeder
             \Modules\Core\Database\Seeders\LeaveDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\InsuranceDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\OutworkDatabaseSeeder::class,
+            \Modules\Core\Database\Seeders\PtkpDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\SlipDatabaseSeeder::class,
             \Modules\Core\Database\Seeders\LoanDatabaseSeeder::class,
             OnlyDataSeeder::class,
             PermitSeeder::class,
             PayrollBpjsSeeder::class,
-            PayrollRuleSeeder::class,        ]);
+            PayrollRuleSeeder::class,
+        ]);
     }
 }

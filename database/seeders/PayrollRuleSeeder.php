@@ -9,62 +9,28 @@ class PayrollRuleSeeder extends Seeder
 {
     public function run(): void
     {
-        $ter = PayrollRule::create([
-            'code' => 'TER',
-            'name' => 'TER Bulanan',
-            'formula' => 'gaji * rate_lookup',
+        PayrollRule::create([
+            'code'            => 'PPH21', // Samakan kodenya
+            'name'            => 'PPh 21 Pasal 17 (2016-2022)',
+            'formula'         => 'App\Services\Payroll\Tax\Tax2016Service',
+            'effective_start' => '2016-01-01',
+            'effective_end'   => '2022-12-31',
+        ]);
+
+        PayrollRule::create([
+            'code'            => 'PPH21', // Samakan kodenya
+            'name'            => 'PPh 21 Pasal 17 (2023)',
+            'formula'         => 'App\Services\Payroll\Tax\Tax2023Service',
+            'effective_start' => '2023-01-01',
+            'effective_end'   => '2023-12-31',
+        ]);
+
+        PayrollRule::create([
+            'code'            => 'PPH21', // Pakai PPH21 saja agar query 'first()' di Calculator ketemu
+            'name'            => 'PPh 21 TER & Pasal 17 (2024)',
+            'formula'         => 'App\Services\Payroll\Tax\Tax2024Service',
             'effective_start' => '2024-01-01',
-            'is_active' => true
-        ]);
-
-        $ter->brackets()->createMany([
-            ['min' => 0, 'max' => 5000000, 'rate' => 0.00],
-            ['min' => 5000001, 'max' => 10000000, 'rate' => 0.05],
-            ['min' => 10000001, 'max' => 20000000, 'rate' => 0.10],
-            ['min' => 20000001, 'max' => null, 'rate' => 0.15],
-        ]);
-
-        $pph = PayrollRule::create([
-            'code' => 'PPH21',
-            'name' => 'PPh 21 Pasal 17',
-            'formula' => '
-                bruto = penghasilan;
-                pkp = max(0, bruto - ptkp);
-                progressive(pkp)
-            ',
-            'effective_start' => '2024-01-01',
-            'is_active' => true
-        ]);
-
-        $pph->brackets()->createMany([
-            ['min' => 0, 'max' => 60000000, 'rate' => 0.05],
-            ['min' => 60000000, 'max' => 250000000, 'rate' => 0.15],
-            ['min' => 250000000, 'max' => 500000000, 'rate' => 0.25],
-            ['min' => 500000000, 'max' => 5000000000, 'rate' => 0.30],
-            ['min' => 5000000000, 'max' => null, 'rate' => 0.35],
-        ]);
-
-        $daily = PayrollRule::create([
-            'code' => 'DAILY_TO_MONTHLY',
-            'name' => 'Gaji Harian → Bulanan Equivalent',
-            'formula' => '
-                gaji_harian = jam_kerja_per_hari * upah_per_jam;
-                lembur = max(0, jam_kerja_per_hari - 8) * upah_per_jam * lembur_rate;
-                total_harian = gaji_harian + lembur;
-                gaji_bulanan = total_harian * hari_kerja;
-                gaji_bulanan = total_harian > daily_threshold ? gaji_bulanan * pro_rata : gaji_bulanan;
-            ',
-            'effective_start' => '2024-01-01',
-            'is_active' => true,
-            'config' => [
-                'lembur_rate' => 1.5,
-                'pro_rata' => 0.5,
-                'daily_threshold' => 450000,
-            ]
-        ]);
-
-        $daily->brackets()->createMany([
-            ['min' => null, 'max' => null, 'rate' => 0.0],
+            'effective_end'   => null,
         ]);
     }
 }

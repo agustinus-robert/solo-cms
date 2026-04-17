@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class PayrollRule extends Model
 {
+    protected $table = "payroll_rules";
+
     protected $fillable = [
         'code',
         'name',
         'formula',
-        'config',
         'effective_start',
         'effective_end',
         'is_active'
@@ -22,9 +23,4 @@ class PayrollRule extends Model
         'effective_end' => 'date',
         'is_active' => 'boolean'
     ];
-
-    public function brackets()
-    {
-        return $this->hasMany(PayrollRuleBracket::class);
-    }
 }

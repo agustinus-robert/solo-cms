@@ -27,6 +27,8 @@ class CompanyPtkp extends Model
         'category',
         'child',
         'value',
+        'effective_start',
+        'effective_end'
     ];
 
     /**

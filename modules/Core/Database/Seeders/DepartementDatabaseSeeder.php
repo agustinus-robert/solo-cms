@@ -21,7 +21,7 @@ class DepartementDatabaseSeeder extends Seeder
             ['kd' => 'purchasing', 'name' => 'Purchasing / Gudang'],
             ['kd' => 'hr', 'name' => 'HR / Admin'],
             ['kd' => 'security', 'name' => 'Keamanan'],
-            ['kd' => 'external', 'name' => 'Pihak Luar / Vendor'], // Tambahan untuk Supplier
+            ['kd' => 'external', 'name' => 'Pihak Luar / Vendor']
         ];
 
         $deptMap = [];
