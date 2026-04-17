@@ -12,12 +12,10 @@ use Modules\HRMS\Http\Controllers\Controller;
 use Modules\HRMS\Models\Employee;
 use Modules\HRMS\Models\EmployeeTax;
 use Modules\Finance\Http\Requests\Tax\Pph\StoreRequest;
-use Modules\Finance\Repositories\TaxYearlyRepository;
-use App\Services\TaxYearly;
+use App\Services\Payroll\Tax\Tax2024Service;
 
 class PphController extends Controller
 {
-    use TaxYearlyRepository;
     /**
      * Show the index page.
      */
@@ -46,7 +44,7 @@ class PphController extends Controller
         ]);
     }
 
-    public function create(Request $request, TaxYearly $taxService)
+    public function create(Request $request, Tax2024Service $taxService)
     {
         $year = $request->get('year', date('Y'));
         $emplId = $request->get('empl_id');
@@ -56,10 +54,10 @@ class PphController extends Controller
         }
 
         $taxData = $taxService->prepareYearlyTaxData($emplId, (int) $year);
-
         return view('finance::tax.pph.create', array_merge($taxData, [
             'types'      => [TaxTypeEnum::YEARLY],
             'categories' => collect(TaxCategoryEnum::cases()),
+            'isNpwp' => false,
         ]));
     }
 

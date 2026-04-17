@@ -4,9 +4,13 @@ namespace App\Services\Payroll\Tax;
 
 use Carbon\Carbon;
 use App\Services\Payroll\TerRateService;
+use Modules\HRMS\Models\Employee; // Tambahkan import ini
+use Modules\Finance\Repositories\TaxYearlyRepository; // Tambahkan ini jika dibutuhkan trait-nya
 
 class Tax2024Service implements PayrollTaxInterface
 {
+    use TaxYearlyRepository; // Gunakan repository yang sama agar fungsi getYearComponentValue dll tersedia
+
     protected $terRateService;
 
     public function __construct()
@@ -14,6 +18,9 @@ class Tax2024Service implements PayrollTaxInterface
         $this->terRateService = new TerRateService();
     }
 
+    /**
+     * Pintu utama kalkulasi PPh 21
+     */
     public function calculate(float $bruto, array $config, $brackets): float
     {
         if (isset($config['is_daily']) && $config['is_daily'] === true) {
@@ -23,19 +30,77 @@ class Tax2024Service implements PayrollTaxInterface
 
         $date = Carbon::parse($config['start_at']);
         if ($date->month != 12) {
-            $category = $config['ptkp_category'] ?? 'A';
-            $rates = $this->terRateService->getRatesByCategory($category);
-
-            $rate = 0;
-            foreach ($rates as $r) {
-                if ($bruto >= $r['lower'] && ($r['upper'] === null || $bruto < $r['upper'])) {
-                    $rate = $r['percentage'];
-                    break;
-                }
-            }
-            return floor($bruto * ($rate / 100));
+            return $this->calculateTer($bruto, $config);
         }
 
+        return $this->calculateYearly($bruto, $config);
+    }
+
+    /**
+     * FUNGSI PINDAHAN DARI TAXYEARLY
+     * Menyiapkan data bruto, ptkp, dan bulan kerja karyawan
+     */
+    public function prepareYearlyTaxData(int $employeeId, int $year): array
+    {
+        $date = Carbon::createFromDate($year);
+        $start_at = $date->copy()->startOfYear();
+        $end_at = $date->copy()->endOfYear();
+
+        $employee = Employee::has('contract')->findOrFail($employeeId);
+
+        $months = $this->calculateEffectiveMonths($employee, $year, $end_at);
+
+        $isNpwp = !empty($employee->user->getMeta('tax_number'));
+        $ptkp = $this->getPtkp($employee->user);
+
+        $componentValues = $this->getYearComponentValue($employee, $start_at, $end_at, $months);
+        $data = collect($componentValues);
+
+        return [
+            'year'       => $year,
+            'start_at'   => $start_at,
+            'end_at'     => $end_at,
+            'employee'   => $employee,
+            'is_npwp'    => $isNpwp,
+            'ptkp'       => $ptkp,
+            'months'     => $months,
+            'earnings'   => $data->filter(fn($i) => in_array($i['ctg_az'], [1, 2])),
+            'reductions' => $data->filter(fn($i) => $i['ctg_az'] == 3),
+        ];
+    }
+
+    /**
+     * FUNGSI TAXYEARLY
+     */
+    private function calculateEffectiveMonths(Employee $employee, int $year, Carbon $endOfYear): int
+    {
+        $joinDate = $employee->joined_at;
+
+        if (!$joinDate || $joinDate->year < $year) {
+            return 12;
+        }
+
+        $diff = $joinDate->diffInMonths($endOfYear) + 1;
+        return $diff > 12 ? 12 : $diff;
+    }
+
+    private function calculateTer(float $bruto, array $config): float
+    {
+        $category = $config['ptkp']['category'] ?? ($config['ptkp_category'] ?? 'A');
+        $rates = $this->terRateService->getRatesByCategory($category);
+
+        $rate = 0;
+        foreach ($rates as $r) {
+            if ($bruto >= $r['lower'] && ($r['upper'] === null || $bruto < $r['upper'])) {
+                $rate = $r['percentage'];
+                break;
+            }
+        }
+        return floor($bruto * ($rate / 100));
+    }
+
+    private function calculateYearly(float $bruto, array $config): float
+    {
         $brutoSetahun = $config['total_bruto_setahun'] ?? ($bruto * 12);
         $pphTerbayar  = $config['total_pph_jan_nov'] ?? 0;
 
@@ -44,23 +109,25 @@ class Tax2024Service implements PayrollTaxInterface
         return max(0, $pajakSetahun - $pphTerbayar);
     }
 
-    /**
-     * Helper untuk hitung total pajak progresif setahun (Pasal 17)
-     */
-    private function calculateAnnualProgresive($brutoSetahun, $config): float
+    private function calculateAnnualProgresive(float $brutoSetahun, array $config): float
     {
         $biayaJabatan = min($brutoSetahun * 0.05, 6000000);
+        $totalReductions = collect($config['reductions'] ?? [])->sum('real_salary');
+        $nettoSetahun = $brutoSetahun - $biayaJabatan - $totalReductions;
 
-        $nettoSetahun = $brutoSetahun - $biayaJabatan;
-        $ptkp = $config['ptkp_value'] ?? 54000000;
-        $pkp = max(0, floor(($nettoSetahun - $ptkp) / 1000) * 1000);
+        $ptkpValue = $config['ptkp']['value'] ?? 54000000;
+
+        $pkp = max(0, floor(($nettoSetahun - $ptkpValue) / 1000) * 1000);
+
         $progressiveBrackets = $this->terRateService->getProgressiveBrackets();
-
         $taxTotal = 0;
         $prevMax = 0;
 
+        $isNpwp = $config['is_npwp'] ?? true;
+
         foreach ($progressiveBrackets as $b) {
             if ($pkp <= 0) break;
+
             $range = $b['max'] ? ($b['max'] - $prevMax) : $pkp;
 
             if ($pkp > $range && $b['max']) {
@@ -74,6 +141,10 @@ class Tax2024Service implements PayrollTaxInterface
             }
         }
 
-        return $taxTotal;
+        if (!$isNpwp) {
+            $taxTotal = $taxTotal * 1.2;
+        }
+
+        return (float) $taxTotal;
     }
 }
