@@ -2,10 +2,6 @@
 <script>
     let cart = [];
 
-    /**
-     * FUNGSI UNTUK BROADCAST KE CLIENT LAIN
-     * Menggunakan direct pusher event karena whisper tidak jalan di public channel
-     */
     function broadcastStockToClients(vCode, vStock) {
         if (window.Echo && window.Echo.connector.pusher) {
             window.Echo.connector.pusher.send_event('client-stock-reserved', {
