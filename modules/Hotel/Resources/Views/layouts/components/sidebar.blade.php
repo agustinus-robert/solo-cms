@@ -30,4 +30,11 @@
             <span class="nav-main-link-name">Guest</span>
         </a>
     </li>
+
+    <li class="{{ Request::routeIs('hotel::booking.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::booking.index') ? 'active' : '' }}" href="{{ route('hotel::booking.index') }}">
+            <i class="nav-main-link-icon mdi mdi-book-edit-outline"></i>
+            <span class="nav-main-link-name">Booking</span>
+        </a>
+    </li>
 </ul>

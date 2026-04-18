@@ -3,6 +3,7 @@
 namespace modules\Hotel\Models;
 
 use modules\Hotel\Enums\RoomStatusEnum;
+use Modules\Hotel\Models\Booking;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

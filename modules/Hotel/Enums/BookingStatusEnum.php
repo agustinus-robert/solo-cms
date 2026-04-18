@@ -9,6 +9,7 @@ enum BookingStatusEnum: int
     case CHECKED_IN = 3;  // Tamu sudah di lokasi
     case CHECKED_OUT = 4; // Tamu sudah selesai
     case CANCELLED = 5;   // Pesanan dibatalkan
+    case COMPLETED = 6;   // Selesai
 
     /**
      * Label Bahasa Indonesia untuk tampilan UI

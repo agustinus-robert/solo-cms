@@ -14,4 +14,12 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     Route::namespace('Guest')->group(function () {
         Route::resource('guest', 'GuestController');
     });
+
+    Route::namespace('Booking')->group(function () {
+        Route::get('booking-available-room', 'BookingController@getAvailable')->name('room.available');
+        Route::patch('bookings/{booking}/checkin', 'BookingController@checkin')->name('booking.checkin');
+        Route::patch('bookings/{booking}/checkout', 'BookingController@checkout')->name('booking.checkout');
+        Route::patch('bookings/{booking}/cancel', 'BookingController@cancel')->name('booking.cancel');
+        Route::resource('booking', 'BookingController');
+    });
 });
