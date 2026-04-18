@@ -8,6 +8,13 @@
 
     <li class="menu-title" key="t-layanan">Manajemen Ruangan</li>
 
+    <li class="{{ Request::routeIs('hotel::room-types.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::room-types.index') ? 'active' : '' }}" href="{{ route('hotel::room-types.index') }}">
+            <i class="nav-main-link-icon mdi mdi-sofa-single-outline"></i>
+            <span class="nav-main-link-name">Tipe Ruangan</span>
+        </a>
+    </li>
+
     <li class="{{ Request::routeIs('hotel::room.*') ? 'mm-active' : '' }}">
         <a class="nav-main-link {{ Request::routeIs('hotel::room.index') ? 'active' : '' }}" href="{{ route('hotel::room.index') }}">
             <i class="nav-main-link-icon mdi mdi-bed-king"></i>

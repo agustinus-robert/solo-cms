@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('hotel_room_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('category')->default(1); // TAMBAHKAN INI
+            $table->integer('category')->default(1);
+            $table->integer('capacity');
             $table->decimal('base_price', 12, 2);
             $table->text('description')->nullable();
             $table->timestamps();
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->foreignId('room_type_id')->constrained('hotel_room_types')->onDelete('cascade');
             $table->string('room_number')->unique();
             $table->integer('floor');
-            $table->integer('status')->default(1); // UBAH KE INTEGER (RoomStatusEnum)
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
 
@@ -48,8 +49,8 @@ return new class extends Migration
             $table->dateTime('actual_check_in')->nullable();
             $table->dateTime('actual_check_out')->nullable();
             $table->decimal('total_price', 12, 2);
-            $table->integer('status')->default(1); // UBAH KE INTEGER (BookingStatus)
-            $table->integer('payment_status')->default(1); // UBAH KE INTEGER (PaymentStatus)
+            $table->integer('status')->default(1);
+            $table->integer('payment_status')->default(1);
             $table->text('notes')->nullable();
             $table->timestamps();
         });

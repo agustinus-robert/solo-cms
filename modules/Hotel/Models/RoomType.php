@@ -10,7 +10,7 @@ class RoomType extends Model
 {
     protected $table = 'hotel_room_types';
 
-    protected $fillable = ['name', 'base_price', 'description'];
+    protected $fillable = ['name', 'base_price', 'capacity', 'description'];
 
     public function rooms(): HasMany
     {

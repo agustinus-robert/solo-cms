@@ -7,6 +7,7 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     Route::get('/dashboard-hotel', 'DashboardController@index')->name('dashboard');
 
     Route::namespace('Room')->group(function () {
+        Route::resource('room-types', 'RoomTypeController');
         Route::resource('room', 'RoomController');
     });
 });
