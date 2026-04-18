@@ -46,6 +46,16 @@ class BookingController extends Controller
     }
 
     /**
+     * Detail Reservasi & Billing.
+     */
+    public function show(Booking $booking)
+    {
+        $booking->load(['guest', 'room.type', 'additionalServices']);
+
+        return view('hotel::booking.show', compact('booking'));
+    }
+
+    /**
      * Simpan reservasi baru.
      */
     public function store(StoreRequest $request)

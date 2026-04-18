@@ -58,8 +58,22 @@
                             <button class="btn btn-sm btn-light border" data-bs-toggle="dropdown">
                                 <i class="mdi mdi-dots-vertical"></i>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li><a class="dropdown-item" href="{{ route('hotel::booking.edit', $booking->id) }}"><i class="mdi mdi-eye me-2"></i>Detail / Edit</a></li>
+                           <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                {{-- Tombol Show/Detail --}}
+                                <li>
+                                    <a class="dropdown-item fw-bold text-dark" href="{{ route('hotel::booking.show', $booking->id) }}">
+                                        <i class="mdi mdi-information-outline me-2 text-info"></i>Detail & Billing
+                                    </a>
+                                </li>
+
+                                {{-- Tombol Edit --}}
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('hotel::booking.edit', $booking->id) }}">
+                                        <i class="mdi mdi-pencil-outline me-2"></i>Edit Reservasi
+                                    </a>
+                                </li>
+
+                                <div class="dropdown-divider"></div>
 
                                 @if(!$booking->actual_check_in && $booking->status->name !== 'CANCELLED')
                                     <li>
@@ -76,7 +90,9 @@
                                 @endif
 
                                 @if($booking->status->name !== 'CANCELLED' && !$booking->actual_check_out)
-                                    <div class="dropdown-divider"></div>
+                                    @if(!$booking->actual_check_in)
+                                        <div class="dropdown-divider"></div>
+                                    @endif
                                     <li>
                                         <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmAction('{{ route('hotel::booking.cancel', $booking->id) }}', 'Batalkan reservasi ini?')">
                                             <i class="mdi mdi-close-circle me-2"></i>Batalkan

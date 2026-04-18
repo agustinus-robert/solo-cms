@@ -21,5 +21,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::patch('bookings/{booking}/checkout', 'BookingController@checkout')->name('booking.checkout');
         Route::patch('bookings/{booking}/cancel', 'BookingController@cancel')->name('booking.cancel');
         Route::resource('booking', 'BookingController');
+        Route::resource('services', 'ServiceController');
     });
 });
