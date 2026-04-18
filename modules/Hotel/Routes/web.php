@@ -10,4 +10,8 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::resource('room-types', 'RoomTypeController');
         Route::resource('room', 'RoomController');
     });
+
+    Route::namespace('Guest')->group(function () {
+        Route::resource('guest', 'GuestController');
+    });
 });

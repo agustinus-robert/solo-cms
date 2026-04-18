@@ -21,4 +21,13 @@
             <span class="nav-main-link-name">Ruangan</span>
         </a>
     </li>
+
+    <li class="menu-title" key="t-layanan">Transaksi</li>
+
+    <li class="{{ Request::routeIs('hotel::guest.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::guest.index') ? 'active' : '' }}" href="{{ route('hotel::guest.index') }}">
+            <i class="nav-main-link-icon mdi mdi-account-group-outline"></i>
+            <span class="nav-main-link-name">Guest</span>
+        </a>
+    </li>
 </ul>
