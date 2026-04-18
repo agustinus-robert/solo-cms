@@ -69,7 +69,7 @@
                                             <input class="form-check-input" type="checkbox" name="amenities[]"
                                                 value="{{ $amenity->id }}"
                                                 id="amenity_{{ $amenity->id }}"
-                                                {{ isset($roomType) && $roomType->amenities->contains($amenity->id) ? 'checked' : '' }}>
+                                                {{ isset($type) && $type->amenities->contains($amenity->id) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="amenity_{{ $amenity->id }}">
                                                 <i class="mdi {{ $amenity->icon ?? 'mdi-check-circle-outline' }} text-primary me-1"></i>
                                                 {{ $amenity->name }}
