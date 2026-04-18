@@ -19,6 +19,7 @@ class StoreRequest extends FormRequest
             'base_price' => 'required|numeric|min:0',
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string',
+            'amenities.*' => 'exists:hotel_ref_amenities,id', // Validasi tiap ID di dalam array
         ];
     }
 
@@ -31,7 +32,8 @@ class StoreRequest extends FormRequest
             'name' => "Nama Tipe",
             'base_price' => "Harga Tipe",
             'capacity' => "Kapsitas Kamar",
-            'description' => "Deskripsi"
+            'description' => "Deskripsi",
+            'amenities' => 'Fasilitas'
         ];
     }
 
@@ -44,7 +46,8 @@ class StoreRequest extends FormRequest
             'name' => $this->input('name'),
             'base_price' => $this->input('base_price'),
             'capacity' => $this->input('capacity'),
-            'description' => $this->input('description')
+            'description' => $this->input('description'),
+            'amenities'   => $this->input('amenities', []),
         ];
     }
 }

@@ -37,4 +37,13 @@
             <span class="nav-main-link-name">Booking</span>
         </a>
     </li>
+
+    <li class="menu-title" key="t-layanan">Master</li>
+
+    <li class="{{ Request::routeIs('hotel::amenity.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::amenity.index') ? 'active' : '' }}" href="{{ route('hotel::amenity.index') }}">
+            <i class="nav-main-link-icon mdi mdi-offer"></i>
+            <span class="nav-main-link-name">Fasilitas</span>
+        </a>
+    </li>
 </ul>

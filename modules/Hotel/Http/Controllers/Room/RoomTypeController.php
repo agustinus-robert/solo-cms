@@ -8,6 +8,7 @@ use Modules\Hotel\Models\RoomType;
 use Modules\Hotel\Http\Requests\RoomType\StoreRequest;
 use Modules\Hotel\Http\Requests\RoomType\UpdateRequest;
 use Modules\Hotel\Repositories\Room\RoomTypeRepositories;
+use Modules\Hotel\Models\Amenity;
 
 class RoomTypeController extends Controller
 {
@@ -31,7 +32,8 @@ class RoomTypeController extends Controller
 
     public function create()
     {
-        return view('hotel::room-type.upsert', ['type' => null]);
+        $amenities = Amenity::orderBy('name', 'asc')->get();
+        return view('hotel::room-type.upsert', ['type' => null, 'amenities' => $amenities]);
     }
 
     public function store(StoreRequest $request)
@@ -53,7 +55,10 @@ class RoomTypeController extends Controller
 
     public function edit(RoomType $roomType)
     {
-        return view('hotel::room-type.upsert', ['type' => $roomType]);
+        $amenities = Amenity::orderBy('name', 'asc')->get();
+        $roomType->load('amenities');
+
+        return view('hotel::room-type.upsert', ['type' => $roomType, 'amenities' => $amenities]);
     }
 
     public function update(UpdateRequest $request, RoomType $roomType)

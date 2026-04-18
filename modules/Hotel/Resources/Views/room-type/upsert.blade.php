@@ -60,6 +60,26 @@
                             @enderror
                         </div>
 
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold d-block mb-3">Fasilitas Kamar (Amenities)</label>
+                            <div class="row g-3 p-3 border rounded bg-light">
+                                @foreach($amenities as $amenity)
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="amenities[]"
+                                                value="{{ $amenity->id }}"
+                                                id="amenity_{{ $amenity->id }}"
+                                                {{ isset($roomType) && $roomType->amenities->contains($amenity->id) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="amenity_{{ $amenity->id }}">
+                                                <i class="mdi {{ $amenity->icon ?? 'mdi-check-circle-outline' }} text-primary me-1"></i>
+                                                {{ $amenity->name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <div class="col-md-12">
                             <label class="form-label fw-bold">Deskripsi Fasilitas</label>
                             <textarea name="description" rows="4"

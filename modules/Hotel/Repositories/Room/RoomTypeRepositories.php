@@ -3,6 +3,7 @@
 namespace Modules\Hotel\Repositories\Room;
 
 use Modules\Hotel\Models\RoomType;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -13,15 +14,25 @@ trait RoomTypeRepositories
      */
     public function upsertType(array $data, ?int $id = null): RoomType
     {
-        return RoomType::updateOrCreate(
-            ['id' => $id],
-            [
-                'name'        => $data['name'],
-                'base_price'  => $data['base_price'],
-                'capacity'    => $data['capacity'],
-                'description' => $data['description'] ?? null,
-            ]
-        );
+        return DB::transaction(function () use ($data, $id) {
+            $roomType = RoomType::updateOrCreate(
+                ['id' => $id],
+                [
+                    'name'        => $data['name'],
+                    'base_price'  => $data['base_price'],
+                    'capacity'    => $data['capacity'],
+                    'description' => $data['description'] ?? null,
+                ]
+            );
+
+            if (isset($data['amenities'])) {
+                $roomType->amenities()->sync($data['amenities']);
+            } else {
+                $roomType->amenities()->sync([]);
+            }
+
+            return $roomType;
+        });
     }
 
     /**
