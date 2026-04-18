@@ -25,7 +25,6 @@ class BrandController extends Controller
         ];
 
         $data['title'] = 'Daftar Brand';
-
         return view('poz::master.brand.index', $data);
     }
 

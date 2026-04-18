@@ -46,6 +46,8 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.23",
+        "laradumps/laradumps": "^5.3",
+        "laradumps/laradumps-core": "^4.0",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
