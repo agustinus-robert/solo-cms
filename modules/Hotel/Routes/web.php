@@ -26,5 +26,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Master')->group(function() {
         Route::resource('amenity', 'AmenityController');
+        Route::resource('source', 'SourceController');
     });
 });

@@ -46,4 +46,11 @@
             <span class="nav-main-link-name">Fasilitas</span>
         </a>
     </li>
+
+    <li class="{{ Request::routeIs('hotel::source.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::source.index') ? 'active' : '' }}" href="{{ route('hotel::source.index') }}">
+            <i class="nav-main-link-icon mdi mdi-link"></i>
+            <span class="nav-main-link-name">Sumber Informasi</span>
+        </a>
+    </li>
 </ul>
