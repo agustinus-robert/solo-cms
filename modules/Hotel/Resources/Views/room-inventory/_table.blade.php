@@ -11,15 +11,10 @@
         <tbody>
             @forelse($allInventories as $item)
                 @php
-                    // Ambil data yang nempel di kamar ini sekarang
                     $pivotData = $room->inventories->where('id', $item->id)->first();
                     $isChecked = $pivotData ? 'checked' : '';
                     $currentInRoom = $pivotData ? $pivotData->pivot->quantity : 0;
-
-                    // Karena kita pakai sistem 'Decrement Fisik',
-                    // maka total_stock di DB adalah sisa gudang.
-                    // Max Allowed = Sisa Gudang + Yang sudah ada di kamar ini
-                    $maxAllowed = $item->total_stock + $currentInRoom;
+                    $maxAllowed = $item->current_stock + $currentInRoom;
                 @endphp
                 <tr>
                     <td class="ps-4">
@@ -31,15 +26,16 @@
                     </td>
                     <td>
                         <div class="d-flex align-items-center">
-                            <div class="avatar-xs bg-soft-primary rounded p-2 me-3 text-center">
-                                <i class="mdi {{ $item->type->value === 1 ? 'mdi-package-variant-closed' : 'mdi-shimmer' }} text-primary fs-5"></i>
+                            <div class="avatar-xs {{ $item->type->badgeClass() }} rounded p-2 me-3 text-center">
+                                <i class="mdi {{ $item->type === \Modules\Hotel\Enums\InventoryTypeEnum::ASSET ? 'mdi-package-variant-closed' : 'mdi-shimmer' }} fs-5"></i>
                             </div>
                             <div>
                                 <span class="fw-bold d-block text-dark">{{ $item->name }}</span>
                                 <div class="d-flex align-items-center gap-2" style="font-size: 11px;">
                                     <span class="text-muted small">Tersedia di Gudang: </span>
-                                    <span class="{{ $item->total_stock > 0 ? 'text-success' : 'text-danger' }} fw-bold">
-                                        {{ $item->total_stock }} {{ $item->unit }}
+                                    {{-- Menggunakan current_stock --}}
+                                    <span class="{{ $item->current_stock > 0 ? 'text-success' : 'text-danger' }} fw-bold">
+                                        {{ number_format($item->current_stock) }} {{ $item->unit }}
                                     </span>
                                 </div>
                             </div>

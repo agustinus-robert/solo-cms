@@ -16,7 +16,7 @@ class InventoryController extends Controller
 
     public function index(Request $request)
     {
-        $inventories = Inventory::latest()->get();
+        $inventories = Inventory::with('adjustments')->latest()->get();
 
         if ($request->ajax()) {
             return view('hotel::inventory._table', compact('inventories'))->render();

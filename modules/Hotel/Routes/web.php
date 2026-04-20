@@ -28,6 +28,11 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::resource('services', 'ServiceController');
     });
 
+    Route::namespace('Transaction')->group(function(){
+        Route::get('inventory-history/{inventory}', 'InventoryAdjustmentController@history');
+        Route::resource('inventory-adjustment', 'InventoryAdjustmentController');
+    });
+
     Route::namespace('Master')->group(function() {
         Route::resource('amenity', 'AmenityController');
         Route::resource('source', 'SourceController');

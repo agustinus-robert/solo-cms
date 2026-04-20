@@ -119,7 +119,6 @@ class HotelDatabaseSeeder extends Seeder
                 ['name' => $inv['name']],
                 [
                     'unit' => $inv['unit'],
-                    'total_stock' => $inv['total_stock'],
                     'type' => $inv['type'],
                 ]
             );

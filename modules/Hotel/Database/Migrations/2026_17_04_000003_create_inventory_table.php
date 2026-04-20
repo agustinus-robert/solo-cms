@@ -12,10 +12,20 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('type')->default(1);
-            $table->integer('total_stock')->default(0);
             $table->string('unit')->default('pcs');
             $table->integer('min_stock')->default(5);
             $table->text('description')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('hotel_inventory_adjustments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('inventory_id')->constrained('hotel_ref_inventories')->onDelete('cascade');
+
+            $table->unsignedInteger('quantity');
+            $table->enum('status', ['plus', 'minus']);
+            $table->text('note')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->timestamps();
         });
 

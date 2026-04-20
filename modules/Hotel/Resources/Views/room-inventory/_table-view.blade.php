@@ -12,8 +12,9 @@
                 <tr>
                     <td class="ps-4">
                         <div class="d-flex align-items-center">
-                            <div class="avatar-xs bg-soft-info rounded p-2 me-3 text-center">
-                                <i class="mdi {{ $inv->type->value === 1 ? 'mdi-package-variant-closed' : 'mdi-shimmer' }} text-info fs-5"></i>
+                            {{-- Gunakan badgeClass dari Enum untuk warna avatar agar seragam dengan index --}}
+                            <div class="avatar-xs {{ $inv->type->badgeClass() }} rounded p-2 me-3 text-center">
+                                <i class="mdi {{ $inv->type === \Modules\Hotel\Enums\InventoryTypeEnum::ASSET ? 'mdi-package-variant-closed' : 'mdi-shimmer' }} fs-5"></i>
                             </div>
                             <div>
                                 <span class="fw-bold d-block text-dark">{{ $inv->name }}</span>
@@ -22,11 +23,12 @@
                         </div>
                     </td>
                     <td class="text-center">
+                        {{-- Menampilkan jumlah yang dialokasikan ke kamar dari tabel pivot --}}
                         <div class="d-inline-block px-3 py-1 rounded-pill bg-soft-primary text-primary fw-bold">
-                            {{ $inv->pivot->quantity }} {{ $inv->unit }}
+                            {{ number_format($inv->pivot->quantity) }} {{ $inv->unit }}
                         </div>
                     </td>
-                    <td class="pe-4 text-muted">
+                    <td class="pe-4 text-muted small">
                         {{ $inv->pivot->note ?? '-' }}
                     </td>
                 </tr>
@@ -34,7 +36,7 @@
                 <tr>
                     <td colspan="3" class="text-center py-5">
                         <div class="text-muted opacity-50">
-                            <i class="mdi mdi-archive-off-outline mdi-48px"></i>
+                            <i class="mdi mdi-archive-off-outline" style="font-size: 3rem;"></i>
                             <p class="mt-2">Belum ada inventaris yang diset untuk kamar ini.</p>
                         </div>
                     </td>

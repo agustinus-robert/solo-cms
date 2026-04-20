@@ -3,8 +3,10 @@
 namespace Modules\Hotel\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use  \Modules\Hotel\Enums\InventoryTypeEnum;
+use Modules\Hotel\Enums\InventoryTypeEnum;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Hotel\Models\InventoryAdjustment;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use modules\Hotel\Models\Room;
 
 class Inventory extends Model
@@ -32,5 +34,17 @@ class Inventory extends Model
         return $this->type === InventoryTypeEnum::ASSET
             ? 'bg-soft-primary text-primary'
             : 'bg-soft-info text-info';
+    }
+
+
+    public function adjustments(): HasMany
+    {
+        return $this->hasMany(InventoryAdjustment::class, 'inventory_id');
+    }
+
+    public function getCurrentStockAttribute(): int
+    {
+        return $this->adjustments()->where('status', 'plus')->sum('quantity')
+             - $this->adjustments()->where('status', 'minus')->sum('quantity');
     }
 }
