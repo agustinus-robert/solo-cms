@@ -53,4 +53,11 @@
             <span class="nav-main-link-name">Sumber Informasi</span>
         </a>
     </li>
+
+    <li class="{{ Request::routeIs('hotel::inventory.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('hotel::inventory.index') ? 'active' : '' }}" href="{{ route('hotel::inventory.index') }}">
+            <i class="nav-main-link-icon mdi mdi-archive"></i>
+            <span class="nav-main-link-name">Inventaris</span>
+        </a>
+    </li>
 </ul>

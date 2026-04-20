@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('category')->default(1);
-            $table->integer('capacity');
+            $table->integer('capacity')->nullable();
             $table->decimal('base_price', 12, 2);
             $table->text('description')->nullable();
             $table->timestamps();
