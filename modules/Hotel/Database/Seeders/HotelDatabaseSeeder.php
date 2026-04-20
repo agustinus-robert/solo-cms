@@ -4,6 +4,7 @@ namespace Modules\Hotel\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Modules\Hotel\Models\Inventory;
 use Modules\Hotel\Models\RoomType;
 use Modules\Hotel\Models\Room;
 use Modules\Hotel\Models\Guests;
@@ -94,6 +95,34 @@ class HotelDatabaseSeeder extends Seeder
                 'phone_number' => $faker->phoneNumber,
                 'id_card_number' => $faker->nik,
             ]);
+        }
+
+        $inventoryData = [
+            ['name' => 'Bantal Bulu Angsa', 'unit' => 'Pcs', 'total_stock' => 100, 'type' => 1],
+            ['name' => 'Guling', 'unit' => 'Pcs', 'total_stock' => 100, 'type' => 1],
+            ['name' => 'Selimut Deluxe', 'unit' => 'Pcs', 'total_stock' => 50, 'type' => 1],
+            ['name' => 'TV Remote', 'unit' => 'Pcs', 'total_stock' => 30, 'type' => 1],
+            ['name' => 'Hanger Baju', 'unit' => 'Pcs', 'total_stock' => 200, 'type' => 1],
+            ['name' => 'Handuk Mandi', 'unit' => 'Pcs', 'total_stock' => 150, 'type' => 1],
+
+            // Kategori Consumables / Amenities (Misal Type 2)
+            ['name' => 'Sabun Cair 30ml', 'unit' => 'Botol', 'total_stock' => 500, 'type' => 2],
+            ['name' => 'Shampoo 30ml', 'unit' => 'Botol', 'total_stock' => 500, 'type' => 2],
+            ['name' => 'Sikat Gigi Set', 'unit' => 'Set', 'total_stock' => 300, 'type' => 2],
+            ['name' => 'Mineral Water 330ml', 'unit' => 'Botol', 'total_stock' => 1000, 'type' => 2],
+            ['name' => 'Kopi Sachet', 'unit' => 'Sachet', 'total_stock' => 400, 'type' => 2],
+            ['name' => 'Teh Sachet', 'unit' => 'Sachet', 'total_stock' => 400, 'type' => 2],
+        ];
+
+        foreach ($inventoryData as $inv) {
+            Inventory::updateOrCreate(
+                ['name' => $inv['name']],
+                [
+                    'unit' => $inv['unit'],
+                    'total_stock' => $inv['total_stock'],
+                    'type' => $inv['type'],
+                ]
+            );
         }
 
         $this->command->info('Data Master Hotel berhasil di-seed!');

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('hotel_ref_inventories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('type')->change();
+            $table->integer('type')->default(1);
             $table->integer('total_stock')->default(0);
             $table->string('unit')->default('pcs');
             $table->integer('min_stock')->default(5);

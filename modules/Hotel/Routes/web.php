@@ -8,6 +8,10 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Room')->group(function () {
         Route::resource('room-types', 'RoomTypeController');
+        Route::get('room-inventory-upsert/{room}', 'RoomInventoryController@upsert')->name('room-inventory.upsert');
+        Route::resource('room-inventory', 'RoomInventoryController');
+
+        Route::resource('room-inventory', 'RoomInventoryController');
         Route::resource('room', 'RoomController');
     });
 

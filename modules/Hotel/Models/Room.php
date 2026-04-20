@@ -4,9 +4,11 @@ namespace modules\Hotel\Models;
 
 use modules\Hotel\Enums\RoomStatusEnum;
 use Modules\Hotel\Models\Booking;
+use Modules\Hotel\Models\Inventory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Room extends Model
 {
@@ -26,5 +28,17 @@ class Room extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'room_id');
+    }
+
+    public function inventories(): BelongsToMany
+    {
+        return $this->belongsToMany(Inventory::class, 'hotel_room_inventories', 'room_id', 'inventory_id')
+            ->withPivot('quantity', 'note')
+            ->withTimestamps();
+    }
+
+    public function getStockInGudangAttribute()
+    {
+        return $this->total_stock - $this->rooms()->sum('hotel_room_inventories.quantity');
     }
 }

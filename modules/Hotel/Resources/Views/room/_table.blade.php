@@ -35,6 +35,12 @@
                         </td>
                         <td class="text-end pe-4">
                             <div class="btn-group">
+                                <a href="{{ route('hotel::room-inventory.show', $room->id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Inventaris Kamar">
+                                    <i class="mdi mdi-archive-outline"></i>
+                                </a>
+
                                 {{-- Tombol Edit Tetap Pakai Link --}}
                                 <a href="{{ route('hotel::room.edit', $room->id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
                                     <i class="mdi mdi-pencil"></i>
