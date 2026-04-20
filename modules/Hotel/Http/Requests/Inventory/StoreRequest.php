@@ -13,7 +13,6 @@ class StoreRequest extends FormRequest
         return [
             'name'        => 'required|string|max:255',
             'type'        => ['required', new Enum(InventoryTypeEnum::class)],
-            'total_stock' => 'required|integer|min:0',
             'unit'        => 'required|string|max:50',
             'min_stock'   => 'required|integer|min:0',
             'description' => 'nullable|string',

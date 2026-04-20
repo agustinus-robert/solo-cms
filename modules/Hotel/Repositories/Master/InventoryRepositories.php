@@ -13,7 +13,6 @@ trait InventoryRepositories
             [
                 'name'        => $data['name'],
                 'type'        => $data['type'],
-                'total_stock' => $data['total_stock'],
                 'unit'        => $data['unit'],
                 'min_stock'   => $data['min_stock'],
                 'description' => $data['description'] ?? null,

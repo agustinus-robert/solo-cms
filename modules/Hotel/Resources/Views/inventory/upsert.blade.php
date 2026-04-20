@@ -41,18 +41,9 @@
                             </select>
                             @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-                        {{-- Stok Saat Ini --}}
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Stok Saat Ini</label>
-                            <div class="input-group">
-                                <input type="number" name="total_stock" class="form-control @error('total_stock') is-invalid @enderror"
-                                    value="{{ old('total_stock', $inventory->total_stock ?? 0) }}" min="0" required>
-                            </div>
-                            @error('total_stock') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
 
                         {{-- Satuan --}}
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Satuan</label>
                             <input type="text" name="unit" class="form-control @error('unit') is-invalid @enderror"
                                 value="{{ old('unit', $inventory->unit ?? 'pcs') }}" placeholder="pcs, botol, pack" required>
@@ -60,7 +51,7 @@
                         </div>
 
                         {{-- Minimal Stok Alert --}}
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Minimal Stok (Alert)</label>
                             <input type="number" name="min_stock" class="form-control @error('min_stock') is-invalid @enderror"
                                 value="{{ old('min_stock', $inventory->min_stock ?? 5) }}" min="0" required>
