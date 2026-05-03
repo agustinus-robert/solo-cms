@@ -15,6 +15,15 @@
         </a>
     </li>
 
+    <li class="menu-title" key="t-layanan">Master</li>
+
+    <li class="{{ Request::routeIs('tour::label.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::label.index') ? 'active' : '' }}" href="{{ route('tour::label.index') }}">
+            <i class="nav-main-link-icon mdi mdi-label"></i>
+            <span class="nav-main-link-name">Label</span>
+        </a>
+    </li>
+
     {{-- <li class="menu-title" key="t-layanan">Manajemen Ruangan</li>
 
     <li class="{{ Request::routeIs('hotel::room-types.*') ? 'mm-active' : '' }}">

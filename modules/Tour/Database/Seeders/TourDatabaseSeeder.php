@@ -15,9 +15,9 @@ class TourDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $labelFree   = TourLabel::create(['name' => 'Free Transport', 'slug' => 'free-transport']);
-        $labelLunch  = TourLabel::create(['name' => 'Lunch Included', 'slug' => 'lunch-included']);
-        $labelIsland = TourLabel::create(['name' => 'Island Hopping', 'slug' => 'island-hopping']);
+        $labelFree   = TourLabel::create(['name' => 'Free Transport', 'slug' => 'free-transport', 'icon' => 'mdi-train-car']);
+        $labelLunch  = TourLabel::create(['name' => 'Lunch Included', 'slug' => 'lunch-included', 'icon' => 'mdi-island']);
+        $labelIsland = TourLabel::create(['name' => 'Island Hopping', 'slug' => 'island-hopping', 'icon' => 'mdi-food']);
 
         $tour = Tour::create([
             'title'         => 'Eksplorasi Keajaiban Nusa Penida',
