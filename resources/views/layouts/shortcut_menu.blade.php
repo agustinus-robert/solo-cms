@@ -80,6 +80,13 @@
                 </div>
 
                 <div class="col-md-4">
+                    <a class="dropdown-icon-item" href="{{ route('tour::dashboard') }}">
+                        <i class="bx bx-coffee" style='font-size:30px;'></i>
+                        <span>Tour</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4 offset-md-4">
                     <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun</span>

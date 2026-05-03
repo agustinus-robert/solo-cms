@@ -1,6 +1,6 @@
 @extends('layouts.vertical')
 
-@section('titleTemplate', config('modules.hotel.name'))
+@section('titleTemplate', config('modules.hrms.name'))
 
 @section('bodyclass', 'bg-light')
 
@@ -63,7 +63,7 @@
     <div class="vertical-menu">
         <div data-simplebar class="h-100">
             <div id="sidebar-menu">
-             @include('hotel::layouts.components.sidebar')
+             @include('tour::layouts.components.sidebar')
             </div>
         </div>
     </div>
