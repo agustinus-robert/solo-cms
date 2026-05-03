@@ -18,7 +18,12 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::post('tour/{tour}/photos', 'TourPhotoController@store')->name('photo.store');
         Route::post('tour/{tour}/photos/{photo}/primary', 'TourPhotoController@setPrimary')->name('photo.primary');
         Route::delete('photos/{photo}', 'TourPhotoController@destroy')->name('photo.destroy');
+
+        Route::post('booking-order/store', 'BookingOrderController@store')->name('booking-order.store');
+        Route::get('booking-order/{order_number}', 'BookingOrderController@show')->name('booking-order.show');
     });
+
+
 
     Route::namespace('Master')->group(function () {
         Route::resource('label', 'LabelController');

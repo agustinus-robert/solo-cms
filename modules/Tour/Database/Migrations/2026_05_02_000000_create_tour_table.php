@@ -79,6 +79,16 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes(); // Tambah ini
         });
+
+        Schema::create('tour_reviews', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tour_id')->constrained('tours')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->integer('rating')->default(5);
+            $table->text('comment');
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -92,6 +102,7 @@ return new class extends Migration
         Schema::dropIfExists('tour_package_label');
         Schema::dropIfExists('tour_labels');
         Schema::dropIfExists('tour_packages');
+        Schema::dropIfExists('tour_reviews');
         Schema::dropIfExists('tours');
     }
 };
