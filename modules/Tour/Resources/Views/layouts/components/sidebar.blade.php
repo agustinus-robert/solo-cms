@@ -24,6 +24,13 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('tour::availability.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::availability.index') ? 'active' : '' }}" href="{{ route('tour::availability.index') }}">
+            <i class="nav-main-link-icon mdi mdi-calendar-check"></i>
+            <span class="nav-main-link-name">Availability</span>
+        </a>
+    </li>
+
     {{-- <li class="menu-title" key="t-layanan">Manajemen Ruangan</li>
 
     <li class="{{ Request::routeIs('hotel::room-types.*') ? 'mm-active' : '' }}">

@@ -12,5 +12,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Master')->group(function () {
         Route::resource('label', 'LabelController');
+        Route::resource('availability', 'AvailabilityController');
     });
 });
