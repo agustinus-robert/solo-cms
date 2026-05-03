@@ -9,16 +9,25 @@ use Modules\Tour\Models\TourPackage;
 use Modules\Tour\Models\TourDetail;
 use Modules\Tour\Models\TourAvailability;
 use Modules\Tour\Models\TourPhoto;
+use Modules\Tour\Models\TourLocation; // Import Model Baru
+use Modules\Tour\Models\TourPackageTime; // Import Model Baru
 use Illuminate\Support\Str;
 
 class TourDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. Seed Master Lokasi/Daerah
+        $locSanur = TourLocation::create(['name' => 'Sanur', 'slug' => 'sanur']);
+        $locKuta  = TourLocation::create(['name' => 'Kuta', 'slug' => 'kuta']);
+        $locUbud  = TourLocation::create(['name' => 'Ubud', 'slug' => 'ubud']);
+
+        // Master Labels
         $labelFree   = TourLabel::create(['name' => 'Free Transport', 'slug' => 'free-transport', 'icon' => 'mdi-train-car']);
         $labelLunch  = TourLabel::create(['name' => 'Lunch Included', 'slug' => 'lunch-included', 'icon' => 'mdi-island']);
         $labelIsland = TourLabel::create(['name' => 'Island Hopping', 'slug' => 'island-hopping', 'icon' => 'mdi-food']);
 
+        // Master Tour
         $tour = Tour::create([
             'title'         => 'Eksplorasi Keajaiban Nusa Penida',
             'slug'          => Str::slug('Eksplorasi Keajaiban Nusa Penida'),
@@ -34,17 +43,9 @@ class TourDatabaseSeeder extends Seeder
             ],
         ]);
 
-        TourPhoto::create([
-            'tour_id'    => $tour->id,
-            'image_path' => 'tours/nusa-penida-1.jpg',
-            'is_primary' => true,
-        ]);
-
-        TourPhoto::create([
-            'tour_id'    => $tour->id,
-            'image_path' => 'tours/nusa-penida-2.jpg',
-            'is_primary' => false,
-        ]);
+        // Photos
+        TourPhoto::create(['tour_id' => $tour->id, 'image_path' => 'tours/nusa-penida-1.jpg', 'is_primary' => true]);
+        TourPhoto::create(['tour_id' => $tour->id, 'image_path' => 'tours/nusa-penida-2.jpg', 'is_primary' => false]);
 
         $packages = [
             [
@@ -53,7 +54,10 @@ class TourDatabaseSeeder extends Seeder
                 'details' => [
                     ['label' => 'Syarat & Ketentuan', 'content' => 'Minimal booking 2 orang. Membawa pakaian ganti.'],
                     ['label' => 'Itinerary', 'content' => '08:00 Dermaga Sanur, 09:30 Kelingking Beach, 12:00 Lunch.'],
-                    ['label' => 'How to Use', 'content' => 'Tunjukkan QR Code di loket keberangkatan Sanur.'],
+                ],
+                'times' => [
+                    ['location_id' => $locSanur->id, 'time' => '07:30', 'point' => 'Dermaga Sanur Pelabuhan Baru'],
+                    ['location_id' => $locKuta->id, 'time' => '06:00', 'point' => 'Lobby Hotel (Area Kuta)']
                 ]
             ],
             [
@@ -61,9 +65,10 @@ class TourDatabaseSeeder extends Seeder
                 'price_per_person' => 1250000,
                 'details' => [
                     ['label' => 'Syarat & Ketentuan', 'content' => 'Tidak ada batasan minimal orang.'],
-                    ['label' => 'Detail Bookings', 'content' => 'Konfirmasi instan setelah pembayaran.'],
-                    ['label' => 'Itinerary', 'content' => 'Jadwal fleksibel sesuai permintaan tamu.'],
-                    ['label' => 'Term & Conditions', 'content' => 'Pembatalan H-1 dikenakan potongan 50%.'],
+                ],
+                'times' => [
+                    ['location_id' => $locSanur->id, 'time' => '08:30', 'point' => 'Dermaga Sanur'],
+                    ['location_id' => $locUbud->id, 'time' => '07:00', 'point' => 'Coco Supermarket Ubud']
                 ]
             ]
         ];
@@ -77,7 +82,7 @@ class TourDatabaseSeeder extends Seeder
 
             $newPackage->labels()->attach([$labelFree->id, $labelLunch->id, $labelIsland->id]);
 
-
+            // Seed Detail Package
             foreach ($p['details'] as $index => $detail) {
                 TourDetail::create([
                     'tour_package_id' => $newPackage->id,
@@ -87,18 +92,22 @@ class TourDatabaseSeeder extends Seeder
                 ]);
             }
 
+            // 2. Seed TourPackageTime (Repeater Data)
+            foreach ($p['times'] as $time) {
+                TourPackageTime::create([
+                    'tour_package_id'  => $newPackage->id,
+                    'tour_location_id' => $time['location_id'],
+                    'departure_time'   => $time['time'],
+                    'meeting_point'    => $time['point']
+                ]);
+            }
+
+            // Availability
             TourAvailability::create([
                 'tour_package_id' => $newPackage->id,
                 'available_date'  => now()->addDay()->format('Y-m-d'),
                 'stock'           => 10,
                 'is_available'    => true,
-            ]);
-
-            TourAvailability::create([
-                'tour_package_id' => $newPackage->id,
-                'available_date'  => now()->addDays(2)->format('Y-m-d'),
-                'stock'           => 0,
-                'is_available'    => false,
             ]);
         }
     }

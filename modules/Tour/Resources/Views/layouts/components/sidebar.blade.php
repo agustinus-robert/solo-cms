@@ -22,6 +22,22 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('tour::availability.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::availability.index') ? 'active' : '' }}" href="{{ route('tour::availability.index') }}">
+            <i class="nav-main-link-icon mdi mdi-calendar-check"></i>
+            <span class="nav-main-link-name">Availability</span>
+        </a>
+    </li>
+
+    {{-- <li class="menu-title" key="t-layanan">Data</li>
+
+     <li class="{{ Request::routeIs('tour::booking-order.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::booking.index') ? 'active' : '' }}" href="{{ route('tour::booking.index') }}">
+            <i class="nav-main-link-icon mdi mdi-account-group-outline"></i>
+            <span class="nav-main-link-name">Booking</span>
+        </a>
+    </li> --}}
+
     <li class="menu-title" key="t-layanan">Master</li>
 
     <li class="{{ Request::routeIs('tour::label.*') ? 'mm-active' : '' }}">
@@ -31,10 +47,10 @@
         </a>
     </li>
 
-    <li class="{{ Request::routeIs('tour::availability.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('tour::availability.index') ? 'active' : '' }}" href="{{ route('tour::availability.index') }}">
-            <i class="nav-main-link-icon mdi mdi-calendar-check"></i>
-            <span class="nav-main-link-name">Availability</span>
+    <li class="{{ Request::routeIs('tour::location.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::location.index') ? 'active' : '' }}" href="{{ route('tour::location.index') }}">
+            <i class="nav-main-link-icon mdi mdi-map-marker-radius"></i>
+            <span class="nav-main-link-name">Location</span>
         </a>
     </li>
 

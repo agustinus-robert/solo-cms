@@ -89,6 +89,38 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Schema::create('tour_faqs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tour_id')->constrained('tours')->onDelete('cascade');
+
+            $table->string('question');
+            $table->text('answer');
+            $table->integer('sort_order')->default(0); // Untuk mengatur urutan tampil
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('tour_locations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('tour_package_times', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tour_package_id')->constrained('tour_packages')->onDelete('cascade');
+            $table->foreignId('tour_location_id')->constrained('tour_locations'); // Lokasi daerah
+
+            $table->time('departure_time');
+            $table->string('meeting_point')->nullable(); // Detail lokasi (misal: Lobby Hotel atau Bandara)
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -103,6 +135,8 @@ return new class extends Migration
         Schema::dropIfExists('tour_labels');
         Schema::dropIfExists('tour_packages');
         Schema::dropIfExists('tour_reviews');
+        Schema::dropIfExists('tour_locations');
+        Schema::dropIfExists('tour_package_times');
         Schema::dropIfExists('tours');
     }
 };
