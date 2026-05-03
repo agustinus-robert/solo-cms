@@ -9,6 +9,10 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
     Route::namespace('Transaction')->group(function () {
         Route::resource('booking', 'BookingController');
         Route::resource('package', 'PackageController');
+        Route::get('package-show/{package}', 'PackageDetailController@show')->name('package.detail.show');
+        Route::post('package-detail/{package}', 'PackageDetailController@store')->name('package.detail.store');
+        Route::delete('package-detail-destroy/{package}', 'PackageDetailController@destroy')->name('package.detail.destroy');
+        Route::post('package/detail/update-order', 'PackageDetailController@updateOrder')->name('package.detail.update-order');
     });
 
     Route::namespace('Master')->group(function () {
