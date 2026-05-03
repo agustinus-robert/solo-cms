@@ -15,6 +15,13 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('tour::booking.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::package.index') ? 'active' : '' }}" href="{{ route('tour::package.index') }}">
+            <i class="nav-main-link-icon mdi mdi-package"></i>
+            <span class="nav-main-link-name">Package</span>
+        </a>
+    </li>
+
     <li class="menu-title" key="t-layanan">Master</li>
 
     <li class="{{ Request::routeIs('tour::label.*') ? 'mm-active' : '' }}">

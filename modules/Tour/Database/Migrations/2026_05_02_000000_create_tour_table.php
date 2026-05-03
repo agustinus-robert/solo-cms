@@ -29,7 +29,6 @@ return new class extends Migration
             $table->foreignId('tour_id')->constrained()->onDelete('cascade');
             $table->string('package_name');
             $table->decimal('price_per_person', 15, 2);
-            $table->json('labels')->nullable();
             $table->timestamps();
             $table->softDeletes(); // Tambah ini
         });

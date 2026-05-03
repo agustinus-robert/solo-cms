@@ -36,6 +36,7 @@ class TourPackage extends Model
         return $this->hasMany(TourAvailability::class);
     }
 
+
     public function labels(): BelongsToMany
     {
         return $this->belongsToMany(TourLabel::class, 'tour_package_label');

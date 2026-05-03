@@ -8,6 +8,7 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Transaction')->group(function () {
         Route::resource('booking', 'BookingController');
+        Route::resource('package', 'PackageController');
     });
 
     Route::namespace('Master')->group(function () {
