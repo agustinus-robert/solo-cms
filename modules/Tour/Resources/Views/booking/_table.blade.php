@@ -32,13 +32,13 @@
                 </td>
                 <td class="text-end pe-3">
                     <div class="btn-group shadow-sm" role="group">
-                        <a href="{{ route('tour::booking.edit', $tour->id) }}"
+                        <a href="{{ route('tour::booking.edit', ["booking" => $tour->id]) }}"
                            class="btn btn-sm btn-white border"
                            title="Edit Tour">
                             <i class="mdi mdi-pencil text-warning"></i>
                         </a>
                         <button type="button"
-                                onclick="deleteAction('{{ route('tour::booking.destroy', $tour->id) }}')"
+                                onclick="deleteAction('{{ route('tour::booking.destroy', ['booking' => $tour->id]) }}')"
                                 class="btn btn-sm btn-white border text-danger"
                                 title="Hapus Tour">
                             <i class="mdi mdi-trash-can"></i>

@@ -30,8 +30,9 @@ class BookingController extends Controller
         return view('tour::booking.upsert', compact('tour'));
     }
 
-    public function edit(Tour $tour)
+    public function edit(Tour $booking)
     {
+        $tour = $booking;
         return view('tour::booking.upsert', compact('tour'));
     }
 
@@ -45,19 +46,19 @@ class BookingController extends Controller
         }
     }
 
-    public function update(UpdateRequest $request, Tour $tour)
+    public function update(Tour $booking, UpdateRequest $request)
     {
         try {
-            $this->upsertTour($request->transform(), $tour);
+            $this->upsertTour($request->transform(), $booking);
             return redirect()->route('tour::booking.index')->with('success', 'Tour Berhasil Diperbarui');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }
 
-    public function destroy(Tour $tour)
+    public function destroy(Tour $booking)
     {
-        $this->deleteTour($tour);
+        $this->deleteTour($booking);
         return back()->with('success', 'Data dihapus');
     }
 }

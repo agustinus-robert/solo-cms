@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('base_price', 15, 2)->default(0);
             $table->json('highlights')->nullable();
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
 
         Schema::create('tour_packages', function (Blueprint $table) {
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->decimal('price_per_person', 15, 2);
             $table->json('labels')->nullable();
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
 
         Schema::create('tour_labels', function (Blueprint $table) {
@@ -39,8 +41,11 @@ return new class extends Migration
             $table->string('icon')->nullable();
             $table->string('color')->nullable();
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
 
+        // Tabel pivot tour_package_label biasanya tidak butuh softDeletes
+        // karena fungsinya hanya penghubung (M-to-M).
         Schema::create('tour_package_label', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tour_package_id')->constrained()->onDelete('cascade');
@@ -54,6 +59,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->boolean('is_available')->default(true);
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
 
         Schema::create('tour_details', function (Blueprint $table) {
@@ -63,6 +69,7 @@ return new class extends Migration
             $table->text('content');
             $table->integer('order')->default(0);
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
 
         Schema::create('tour_photos', function (Blueprint $table) {
@@ -71,6 +78,7 @@ return new class extends Migration
             $table->string('image_path');
             $table->boolean('is_primary')->default(false);
             $table->timestamps();
+            $table->softDeletes(); // Tambah ini
         });
     }
 
@@ -79,6 +87,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-
+        Schema::dropIfExists('tour_photos');
+        Schema::dropIfExists('tour_details');
+        Schema::dropIfExists('tour_availabilities');
+        Schema::dropIfExists('tour_package_label');
+        Schema::dropIfExists('tour_labels');
+        Schema::dropIfExists('tour_packages');
+        Schema::dropIfExists('tours');
     }
 };

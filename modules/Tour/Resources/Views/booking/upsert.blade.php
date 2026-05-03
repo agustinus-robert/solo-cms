@@ -7,7 +7,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        <form action="{{ $tour ? route('tour::booking.update', $tour->id) : route('tour::booking.store') }}"
+        <form action="{{ $tour ? route('tour::booking.update', ["booking" => $tour->id]) : route('tour::booking.store') }}"
               method="POST"
               id="upsert-form"
               enctype="multipart/form-data">
@@ -89,7 +89,7 @@
                 <div class="card-footer bg-white py-3 text-end">
                     <a href="{{ route('tour::booking.index') }}" class="btn btn-light border me-2">Batal</a>
                     <button type="submit" class="btn btn-primary px-4">
-                        <i class="mdi mdi-content-save me-1"></i> {{ $tour ? 'Simpan Perubahan' : 'Buat Master Tour' }}
+                        <i class="mdi mdi-content-save me-1"></i> {{ $tour ? 'Simpan Perubahan' : 'Simpan' }}
                     </button>
                 </div>
             </div>

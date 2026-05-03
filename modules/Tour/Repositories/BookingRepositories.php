@@ -29,15 +29,14 @@ trait BookingRepositories
     public function deleteTour(Tour $tour)
     {
         return DB::transaction(function () use ($tour) {
-            // Ini akan menghapus tour, foto, dan package (karena cascade di migrasi)
             return $tour->delete();
         });
     }
 
     public function getTourTable($request)
     {
-        // Load relasi 'packages' jika butuh info jumlah paket di table index
         return Tour::withCount(['packages'])
+            ->where('deleted_at', null)
             ->when($request->search, function($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
                   ->orWhere('location', 'like', '%' . $request->search . '%');

@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TourPackage extends Model
 {
+    use SoftDeletes;
     public $table = "tour_packages";
 
     protected $fillable = ['tour_id', 'package_name', 'price_per_person'];

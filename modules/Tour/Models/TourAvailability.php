@@ -3,9 +3,12 @@
 namespace Modules\Tour\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class TourAvailability extends Model
 {
+    use SoftDeletes;
     protected $table = 'tour_availabilities';
 
     protected $fillable = [
