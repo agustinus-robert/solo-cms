@@ -13,6 +13,11 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::post('package-detail/{package}', 'PackageDetailController@store')->name('package.detail.store');
         Route::delete('package-detail-destroy/{package}', 'PackageDetailController@destroy')->name('package.detail.destroy');
         Route::post('package/detail/update-order', 'PackageDetailController@updateOrder')->name('package.detail.update-order');
+
+        Route::get('tour/{tour}/photos', 'TourPhotoController@show')->name('photo.show');
+        Route::post('tour/{tour}/photos', 'TourPhotoController@store')->name('photo.store');
+        Route::post('tour/{tour}/photos/{photo}/primary', 'TourPhotoController@setPrimary')->name('photo.primary');
+        Route::delete('photos/{photo}', 'TourPhotoController@destroy')->name('photo.destroy');
     });
 
     Route::namespace('Master')->group(function () {

@@ -32,6 +32,11 @@
                 </td>
                 <td class="text-end pe-3">
                     <div class="btn-group shadow-sm" role="group">
+                        <a href="{{ route('tour::photo.show', ["tour" => $tour->id]) }}"
+                           class="btn btn-sm btn-white border"
+                           title="Lihat foto tour">
+                            <i class="mdi mdi-image-area text-info"></i>
+                        </a>
                         <a href="{{ route('tour::booking.edit', ["booking" => $tour->id]) }}"
                            class="btn btn-sm btn-white border"
                            title="Edit Tour">

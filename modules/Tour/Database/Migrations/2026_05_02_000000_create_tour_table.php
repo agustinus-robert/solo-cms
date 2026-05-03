@@ -58,7 +58,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->boolean('is_available')->default(true);
             $table->timestamps();
-            $table->softDeletes(); // Tambah ini
+            $table->softDeletes();
         });
 
         Schema::create('tour_details', function (Blueprint $table) {
