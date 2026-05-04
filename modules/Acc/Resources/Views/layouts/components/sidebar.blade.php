@@ -5,4 +5,13 @@
             <span class="nav-main-link-name">Dasbor</span>
         </a>
     </li>
+
+     <li class="menu-title" key="t-layanan">Master</li>
+
+    <li class="{{ Request::routeIs('acc::coa.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::coa.index') ? 'active' : '' }}" href="{{ route('acc::coa.index') }}">
+            <i class="nav-main-link-icon mdi mdi-ab-testing"></i>
+            <span class="nav-main-link-name">COA</span>
+        </a>
+    </li>
 </ul>
