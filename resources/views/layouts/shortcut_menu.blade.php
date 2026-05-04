@@ -63,7 +63,7 @@
 
                 {{-- Referensi/Core --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'acc::dashboard') ? 'active' : '' }}" href="{{ route('acc::dashboard') }}">
                         <i class="bx bx-calculator" style='font-size:30px;'></i>
                         <span>Akuntansi</span>
                     </a>

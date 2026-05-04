@@ -16,7 +16,7 @@ class Ledger extends Model
         'user_id'
     ];
 
-    public function entries()
+    public function ledgerEntries()
     {
         return $this->hasMany(LedgerEntry::class, 'ledger_id');
     }

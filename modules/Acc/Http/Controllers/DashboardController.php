@@ -1,61 +1,65 @@
 <?php
 
-// namespace Modules\HRMS\Http\Controllers;
+namespace Modules\Acc\Http\Controllers;
 
-// use Illuminate\Http\Request;
-// use Modules\Account\Enums\ReligionEnum;
-// use Modules\Account\Enums\SexEnum;
-// use Modules\HRMS\Models\Employee;
-// use Modules\Reference\Models\Grade;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Modules\Acc\Models\Ledger;
+use Modules\Acc\Models\LedgerEntry;
+use Modules\Acc\Enums\AccountCategory;
+use Illuminate\Support\Facades\DB;
 
-// class DashboardController extends Controller
-// {
-//     /**
-//      * Show the dashboard page.
-//      */
-//     public function index(Request $request)
-//     {
-//         $grades = Grade::all()->keyBy('id');
-//         $gradeMapping = [
-//             'SLTA/SMA/MA/SEDERAJAT' => 1,
-//             'Diploma III' => 2,
-//             'Strata I' => 3,
-//             'Strata II' => 4,
-//             'Strata III' => 5,
-//             'Kosong' => 6,
-//         ];
+class DashboardController extends Controller
+{
+    public function index(Request $request)
+    {
+        // 1. Hitung Total Kas & Bank (Asset) -> Debit - Credit
+        $totalBalance = LedgerEntry::whereHas('coa', function($q) {
+                $q->where('category', AccountCategory::ASSET);
+            })
+            ->select(DB::raw('SUM(debit - credit) as balance'))
+            ->value('balance') ?? 0;
 
-//         $users = Employee::with('user.meta', 'contract.contract', 'position.position.department')->whereHas('contract')->get();
+        // 2. Hitung Piutang (Filter kode akun diawali 12... atau sesuaikan)
+        $totalReceivable = LedgerEntry::whereHas('coa', function($q) {
+                $q->where('code', 'like', '12%');
+            })
+            ->select(DB::raw('SUM(debit - credit) as balance'))
+            ->value('balance') ?? 0;
 
-//       $employee_by_genders = collect($users)->mapToGroups(fn($e) => [
-//             !is_null($e->user?->getMeta('profile_sex'))
-//                 ? (SexEnum::tryFrom((int) $e->user->getMeta('profile_sex'))?->label() ?? 'Kosong')
-//                 : 'Kosong' => $e
-//         ])->map(fn($group) => $group->count())->toArray();
+        // 3. Hitung Hutang (Liability) -> Credit - Debit
+        $totalPayable = LedgerEntry::whereHas('coa', function($q) {
+                $q->where('category', AccountCategory::LIABILITY);
+            })
+            ->select(DB::raw('SUM(credit - debit) as balance'))
+            ->value('balance') ?? 0;
 
-//         $employee_by_religions = collect($users)->mapToGroups(fn($e) => [
-//             !is_null($e->user->getMeta('profile_religion')) ? ReligionEnum::tryFrom($e->user->getMeta('profile_religion'))->label() : 'Kosong' => $e
-//         ])->map(fn($group) => $group->count())->toArray();
+        // 4. Data Statistik Biaya untuk Chart
+        $expense_stats = LedgerEntry::whereHas('coa', function($q) {
+                $q->where('category', AccountCategory::EXPENSE);
+            })
+            ->join('acc_coas', 'acc_ledger_entries.coa_id', '=', 'acc_coas.id')
+            ->select('acc_coas.name', DB::raw('SUM(debit) as total'))
+            ->groupBy('acc_coas.name')
+            ->pluck('total', 'name')
+            ->toArray();
 
-//         $employee_by_educations = collect($users)->mapToGroups(function ($e) use ($grades) {
-//             $eduGrade = $e->user->getMeta('edu_grade');
-//             $gradeName = !is_null($eduGrade) && $grades->has($eduGrade) ? $grades->get($eduGrade)->name : 'Kosong';
-//             return [$gradeName => $e];
-//         })->map->count()->toArray();
+        // 5. Transaksi Terakhir
+        $recentTransactions = Ledger::with(['ledgerEntries.coa'])
+            ->latest()
+            ->take(10)
+            ->get();
 
+        if ($request->ajax()) {
+            return view('acc::dashboard._table', compact('recentTransactions'))->render();
+        }
 
-//         uksort($employee_by_educations, function ($key1, $key2) use ($gradeMapping) {
-//             return $gradeMapping[$key1] <=> $gradeMapping[$key2];
-//         });
-
-//         $employee_by_contracts = collect($users)->mapToGroups(fn($e) => [
-//             $e->contract?->contract->kd ? strtoupper($e->contract?->contract->kd) : 'Kosong' => $e
-//         ])->map(fn($group) => $group->count())->toArray();
-
-//         $employee_by_departements = collect($users)->mapToGroups(fn($e) => [
-//             $e->position?->position->department->name ?: 'Kosong' => $e
-//         ])->map(fn($group) => $group->count())->toArray();
-
-//         return view('hrms::dashboard', compact('employee_by_genders', 'employee_by_contracts', 'employee_by_educations', 'employee_by_religions', 'employee_by_departements'));
-//     }
-// }
+        return view('acc::dashboard.index', compact(
+            'totalBalance',
+            'totalReceivable',
+            'totalPayable',
+            'recentTransactions',
+            'expense_stats'
+        ));
+    }
+}

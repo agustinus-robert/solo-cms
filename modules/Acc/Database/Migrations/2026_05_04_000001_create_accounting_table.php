@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('acc_coa', function (Blueprint $table) {
+        Schema::create('acc_coas', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
@@ -33,7 +33,7 @@ return new class extends Migration
         Schema::create('acc_ledger_entries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ledger_id')->constrained('acc_ledgers')->onDelete('cascade');
-            $table->foreignId('coa_id')->constrained('acc_coa');
+            $table->foreignId('coa_id')->constrained('acc_coas');
             $table->string('department_tag')->nullable();
 
             $table->decimal('debit', 15, 2)->default(0);
@@ -53,16 +53,16 @@ return new class extends Migration
         Schema::create('acc_beginning_balances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('period_id')->constrained('acc_periods');
-            $table->foreignId('coa_id')->constrained('acc_coa');
+            $table->foreignId('coa_id')->constrained('acc_coas');
             $table->decimal('amount', 15, 2)->default(0);
             $table->timestamps();
         });
 
-        Schema::create('acc_mapping', function (Blueprint $table) {
+        Schema::create('acc_mappings', function (Blueprint $table) {
             $table->id();
             $table->string('module');
             $table->string('transaction_type');
-            $table->foreignId('coa_id')->constrained('acc_coa');
+            $table->foreignId('coa_id')->constrained('acc_coas');
             $table->timestamps();
         });
     }

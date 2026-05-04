@@ -8,7 +8,7 @@ use Modules\Acc\Enums\NormalBalance;
 
 class Coa extends Model
 {
-    protected $table = 'acc_coa';
+    protected $table = 'acc_coas';
     protected $fillable = ['code', 'name', 'category', 'normal_balance'];
 
     protected $casts = [
