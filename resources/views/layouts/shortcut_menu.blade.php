@@ -20,12 +20,12 @@
 <style>
     /* Paksa warna biru saat item active */
     .dropdown-icon-item.active {
-        background-color: rgba(59, 130, 246, 0.1); /* Biru sangat muda untuk background */
+        background-color: #6a80ee; /* Biru sangat muda untuk background */
         border-radius: 8px;
     }
     .dropdown-icon-item.active i,
     .dropdown-icon-item.active span {
-        color: #249df3 !important; /* Warna biru utama */
+        color: white !important; /* Warna biru utama */
     }
 </style>
 @endpush
