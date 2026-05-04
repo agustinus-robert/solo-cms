@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             PayrollRuleSeeder::class,
             \Modules\Hotel\Database\Seeders\HotelDatabaseSeeder::class,
             \Modules\Tour\Database\Seeders\TourDatabaseSeeder::class,
+            \Modules\Acc\Database\Seeders\AccDatabaseSeeder::class,
         ]);
     }
 }

@@ -3,7 +3,7 @@
 namespace Modules\Acc\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
+use Modules\Account\Models\User;
 
 class Ledger extends Model
 {

@@ -3,11 +3,18 @@
 namespace Modules\Acc\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Acc\Enums\AccountCategory;
+use Modules\Acc\Enums\NormalBalance;
 
 class Coa extends Model
 {
     protected $table = 'acc_coa';
     protected $fillable = ['code', 'name', 'category', 'normal_balance'];
+
+    protected $casts = [
+        'category' => AccountCategory::class,
+        'normal_balance' => NormalBalance::class,
+    ];
 
     public function ledgerEntries()
     {
