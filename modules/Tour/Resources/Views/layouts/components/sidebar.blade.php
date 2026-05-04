@@ -15,8 +15,8 @@
         </a>
     </li>
 
-    <li class="{{ Request::routeIs('tour::package.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('tour::package.index') ? 'active' : '' }}" href="{{ route('tour::package.index') }}">
+    <li class="{{ (Request::routeIs('tour::package.index') || Request::routeIs('tour::package.edit') || Request::routeIs('tour::package.times')) ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ (Request::routeIs('tour::package.index') || Request::routeIs('tour::package.edit') || Request::routeIs('tour::package.times')) ? 'active' : '' }}" href="{{ route('tour::package.index') }}">
             <i class="nav-main-link-icon mdi mdi-package"></i>
             <span class="nav-main-link-name">Package</span>
         </a>
@@ -28,15 +28,6 @@
             <span class="nav-main-link-name">Availability</span>
         </a>
     </li>
-
-    {{-- <li class="menu-title" key="t-layanan">Data</li>
-
-     <li class="{{ Request::routeIs('tour::booking-order.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('tour::booking.index') ? 'active' : '' }}" href="{{ route('tour::booking.index') }}">
-            <i class="nav-main-link-icon mdi mdi-account-group-outline"></i>
-            <span class="nav-main-link-name">Booking</span>
-        </a>
-    </li> --}}
 
     <li class="menu-title" key="t-layanan">Master</li>
 
@@ -56,64 +47,10 @@
 
     <li class="menu-title" key="t-layanan">Laporan</li>
 
-    <li class="{{ Request::routeIs('tour::package.report.*') ? 'mm-active' : '' }}">
+    <li class="{{ Request::routeIs('tour::package.report') ? 'mm-active' : '' }}">
         <a class="nav-main-link {{ Request::routeIs('tour::package.report') ? 'active' : '' }}" href="{{ route('tour::package.report') }}">
             <i class="nav-main-link-icon mdi mdi-calendar"></i>
             <span class="nav-main-link-name">Jadwal Paket</span>
         </a>
     </li>
-    {{-- <li class="menu-title" key="t-layanan">Manajemen Ruangan</li>
-
-    <li class="{{ Request::routeIs('hotel::room-types.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::room-types.index') ? 'active' : '' }}" href="{{ route('hotel::room-types.index') }}">
-            <i class="nav-main-link-icon mdi mdi-sofa-single-outline"></i>
-            <span class="nav-main-link-name">Tipe Ruangan</span>
-        </a>
-    </li>
-
-    <li class="{{ Request::routeIs('hotel::room.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::room.index') ? 'active' : '' }}" href="{{ route('hotel::room.index') }}">
-            <i class="nav-main-link-icon mdi mdi-bed-king"></i>
-            <span class="nav-main-link-name">Ruangan</span>
-        </a>
-    </li>
-
-    <li class="menu-title" key="t-layanan">Transaksi</li>
-
-    <li class="{{ Request::routeIs('hotel::guest.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::guest.index') ? 'active' : '' }}" href="{{ route('hotel::guest.index') }}">
-            <i class="nav-main-link-icon mdi mdi-account-group-outline"></i>
-            <span class="nav-main-link-name">Guest</span>
-        </a>
-    </li>
-
-    <li class="{{ Request::routeIs('hotel::booking.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::booking.index') ? 'active' : '' }}" href="{{ route('hotel::booking.index') }}">
-            <i class="nav-main-link-icon mdi mdi-book-edit-outline"></i>
-            <span class="nav-main-link-name">Booking</span>
-        </a>
-    </li>
-
-    <li class="menu-title" key="t-layanan">Master</li>
-
-    <li class="{{ Request::routeIs('hotel::amenity.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::amenity.index') ? 'active' : '' }}" href="{{ route('hotel::amenity.index') }}">
-            <i class="nav-main-link-icon mdi mdi-offer"></i>
-            <span class="nav-main-link-name">Fasilitas</span>
-        </a>
-    </li>
-
-    <li class="{{ Request::routeIs('hotel::source.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::source.index') ? 'active' : '' }}" href="{{ route('hotel::source.index') }}">
-            <i class="nav-main-link-icon mdi mdi-link"></i>
-            <span class="nav-main-link-name">Sumber Informasi</span>
-        </a>
-    </li>
-
-    <li class="{{ Request::routeIs('hotel::inventory.*') ? 'mm-active' : '' }}">
-        <a class="nav-main-link {{ Request::routeIs('hotel::inventory.index') ? 'active' : '' }}" href="{{ route('hotel::inventory.index') }}">
-            <i class="nav-main-link-icon mdi mdi-archive"></i>
-            <span class="nav-main-link-name">Inventaris</span>
-        </a>
-    </li> --}}
 </ul>
