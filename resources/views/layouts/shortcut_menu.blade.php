@@ -63,9 +63,9 @@
 
                 {{-- Referensi/Core --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'core::') ? 'active' : '' }}" href="{{ route('core::dashboard') }}">
-                        <i class="bx bxs-cog" style='font-size:30px;'></i>
-                        <span>Referensi</span>
+                    <a class="dropdown-icon-item" href="">
+                        <i class="bx bx-calculator" style='font-size:30px;'></i>
+                        <span>Akuntansi</span>
                     </a>
                 </div>
 
@@ -109,8 +109,14 @@
                     </a>
                 </div>
 
-                {{-- Akun --}}
-                <div class="col-md-4 offset-md-4">
+                <div class="col-md-4 offset-md-2">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'core::') ? 'active' : '' }}" href="{{ route('core::dashboard') }}">
+                        <i class="bx bxs-cog" style='font-size:30px;'></i>
+                        <span>Referensi</span>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
                     <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'account::') ? 'active' : '' }}" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun</span>
