@@ -53,4 +53,11 @@
             <span class="nav-main-link-name">Jadwal Paket</span>
         </a>
     </li>
+
+    <li class="{{ Request::routeIs('tour::tour-review.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::tour-review.index') ? 'active' : '' }}" href="{{ route('tour::tour-review.index') }}">
+            <i class="nav-main-link-icon mdi mdi-comment"></i>
+            <span class="nav-main-link-name">Tour Review</span>
+        </a>
+    </li>
 </ul>

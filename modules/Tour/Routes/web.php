@@ -37,5 +37,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Reporting')->group(function(){
         Route::get('package-report', 'PackageTimeReportController@index')->name('package.report');
+        Route::resource('tour-review', 'TourReviewController');
     });
 });
