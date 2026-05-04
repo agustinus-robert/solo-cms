@@ -6,7 +6,7 @@
         </a>
     </li>
 
-     <li class="menu-title" key="t-layanan">Master</li>
+     <li class="menu-title" key="t-layanan">Setting</li>
 
     <li class="{{ Request::routeIs('acc::coa.*') ? 'mm-active' : '' }}">
         <a class="nav-main-link {{ Request::routeIs('acc::coa.index') ? 'active' : '' }}" href="{{ route('acc::coa.index') }}">
@@ -19,6 +19,13 @@
         <a class="nav-main-link {{ Request::routeIs('acc::period.index') ? 'active' : '' }}" href="{{ route('acc::period.index') }}">
             <i class="nav-main-link-icon mdi mdi-calendar-clock"></i>
             <span class="nav-main-link-name">Periode</span>
+        </a>
+    </li>
+
+    <li class="{{ Request::routeIs('acc::beginning-balance.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::beginning-balance.index') ? 'active' : '' }}" href="{{ route('acc::beginning-balance.index') }}">
+            <i class="nav-main-link-icon mdi mdi-scale-balance"></i>
+            <span class="nav-main-link-name">Biaya Awal</span>
         </a>
     </li>
 </ul>
