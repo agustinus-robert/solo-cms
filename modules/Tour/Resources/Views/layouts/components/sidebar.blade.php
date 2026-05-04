@@ -54,6 +54,14 @@
         </a>
     </li>
 
+    <li class="menu-title" key="t-layanan">Laporan</li>
+
+    <li class="{{ Request::routeIs('tour::package.report.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('tour::package.report') ? 'active' : '' }}" href="{{ route('tour::package.report') }}">
+            <i class="nav-main-link-icon mdi mdi-calendar"></i>
+            <span class="nav-main-link-name">Jadwal Paket</span>
+        </a>
+    </li>
     {{-- <li class="menu-title" key="t-layanan">Manajemen Ruangan</li>
 
     <li class="{{ Request::routeIs('hotel::room-types.*') ? 'mm-active' : '' }}">

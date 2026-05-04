@@ -34,4 +34,8 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::resource('availability', 'AvailabilityController');
         Route::resource('location', 'LocationController');
     });
+
+    Route::namespace('Reporting')->group(function(){
+        Route::get('package-report', 'PackageTimeReportController@index')->name('package.report');
+    });
 });
