@@ -61,19 +61,19 @@
                     </a>
                 </div>
 
-                {{-- Referensi/Core --}}
-                <div class="col-md-4">
-                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'acc::dashboard') ? 'active' : '' }}" href="{{ route('acc::dashboard') }}">
-                        <i class="bx bx-calculator" style='font-size:30px;'></i>
-                        <span>Akuntansi</span>
-                    </a>
-                </div>
-
                 {{-- Kepegawaian/HRMS --}}
                 <div class="col-md-4">
                     <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'hrms::') ? 'active' : '' }}" href="{{ route('hrms::dashboard') }}">
                         <i class="bx bx-briefcase" style='font-size:30px;'></i>
                         <span>Kepegawaian</span>
+                    </a>
+                </div>
+
+                {{-- Akuntansi --}}
+                <div class="col-md-4">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'acc::dashboard') ? 'active' : '' }}" href="{{ route('acc::dashboard') }}">
+                        <i class="bx bx-calculator" style='font-size:30px;'></i>
+                        <span>Akuntansi</span>
                     </a>
                 </div>
 
