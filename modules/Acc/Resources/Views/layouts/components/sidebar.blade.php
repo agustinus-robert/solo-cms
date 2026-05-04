@@ -14,4 +14,11 @@
             <span class="nav-main-link-name">COA</span>
         </a>
     </li>
+
+    <li class="{{ Request::routeIs('acc::period.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::period.index') ? 'active' : '' }}" href="{{ route('acc::period.index') }}">
+            <i class="nav-main-link-icon mdi mdi-calendar-clock"></i>
+            <span class="nav-main-link-name">Periode</span>
+        </a>
+    </li>
 </ul>

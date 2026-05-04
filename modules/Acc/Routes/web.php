@@ -8,5 +8,6 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
     Route::namespace('Master')->group(function() {
         Route::resource('coa', 'CoaController');
+        Route::resource('period', 'PeriodController');
     });
 });
