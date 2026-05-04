@@ -16,6 +16,20 @@
 
 @include('portal::layouts.components.notifications')
 
+@push('styles')
+<style>
+    /* Paksa warna biru saat item active */
+    .dropdown-icon-item.active {
+        background-color: rgba(59, 130, 246, 0.1); /* Biru sangat muda untuk background */
+        border-radius: 8px;
+    }
+    .dropdown-icon-item.active i,
+    .dropdown-icon-item.active span {
+        color: #249df3 !important; /* Warna biru utama */
+    }
+</style>
+@endpush
+
 <div class="dropdown d-none d-lg-inline-block ms-1">
     <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="bx bx-customize"></i>
@@ -23,77 +37,86 @@
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
         <div class="px-lg-2">
             <div class="row g-0">
+                {{-- Dashboard --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('portal::dashboard-msdm.index') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'portal::dashboard-msdm') ? 'active' : '' }}" href="{{ route('portal::dashboard-msdm.index') }}">
                         <i class="bx bxs-dashboard" style='font-size:30px;'></i>
                         <span>Dashboard</span>
                     </a>
                 </div>
 
+                {{-- CMS --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('cms::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'cms::') ? 'active' : '' }}" href="{{ route('cms::dashboard') }}">
                         <i class="bx bxs-book-content" style='font-size:30px;'></i>
                         <span>CMS</span>
                     </a>
                 </div>
 
+                {{-- Outlet --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('portal::outlet.manage-outlet.index') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'portal::outlet') ? 'active' : '' }}" href="{{ route('portal::outlet.manage-outlet.index') }}">
                         <i class="bx bx-store" style='font-size:30px;'></i>
                         <span>Outlet</span>
                     </a>
                 </div>
 
+                {{-- Referensi/Core --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('core::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'core::') ? 'active' : '' }}" href="{{ route('core::dashboard') }}">
                         <i class="bx bxs-cog" style='font-size:30px;'></i>
                         <span>Referensi</span>
                     </a>
                 </div>
 
+                {{-- Kepegawaian/HRMS --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('hrms::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'hrms::') ? 'active' : '' }}" href="{{ route('hrms::dashboard') }}">
                         <i class="bx bx-briefcase" style='font-size:30px;'></i>
                         <span>Kepegawaian</span>
                     </a>
                 </div>
 
+                {{-- Keuangan/Finance --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('finance::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'finance::') ? 'active' : '' }}" href="{{ route('finance::dashboard') }}">
                         <i class="bx bx-money" style='font-size:30px;'></i>
                         <span>Keuangan</span>
                     </a>
                 </div>
 
+                {{-- Supplier/POZ --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('poz::supplier.dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'poz::') ? 'active' : '' }}" href="{{ route('poz::supplier.dashboard') }}">
                         <i class="bx bxs-business" style='font-size:30px;'></i>
                         <span>Supplier</span>
                     </a>
                 </div>
 
+                {{-- Perhotelan/Hotel --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('hotel::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'hotel::') ? 'active' : '' }}" href="{{ route('hotel::dashboard') }}">
                         <i class="bx bx-restaurant" style='font-size:30px;'></i>
                         <span>Perhotelan</span>
                     </a>
                 </div>
 
+                {{-- Tour --}}
                 <div class="col-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('tour::dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'tour::') ? 'active' : '' }}" href="{{ route('tour::dashboard') }}">
                         <i class="bx bx-coffee" style='font-size:30px;'></i>
                         <span>Tour</span>
                     </a>
                 </div>
 
+                {{-- Akun --}}
                 <div class="col-md-4 offset-md-4">
-                    <a class="dropdown-icon-item" href="{{ route('account::account.dashboard') }}">
+                    <a class="dropdown-icon-item {{ str_contains(Route::currentRouteName(), 'account::') ? 'active' : '' }}" href="{{ route('account::account.dashboard') }}">
                         <i class="bx bxs-user-circle" style='font-size:30px;'></i>
                         <span>Akun</span>
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
