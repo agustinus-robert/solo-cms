@@ -41,4 +41,12 @@ class TourPackage extends Model
     {
         return $this->belongsToMany(TourLabel::class, 'tour_package_label');
     }
+
+    /**
+     * Relasi ke waktu
+     */
+    public function times(): HasMany
+    {
+        return $this->hasMany(TourPackageTime::class);
+    }
 }

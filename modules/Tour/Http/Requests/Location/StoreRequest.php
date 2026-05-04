@@ -11,7 +11,7 @@ class StoreRequest extends FormRequest
     {
         $id = $this->route('id');
         return [
-            'name' => 'required|string|max:255|unique:tour_locations,name,' . $id,
+            'name' => 'required|string|max:255',
         ];
     }
 

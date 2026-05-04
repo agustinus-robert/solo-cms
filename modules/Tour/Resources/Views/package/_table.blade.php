@@ -41,6 +41,9 @@
                 </td>
                 <td class="text-end pe-3">
                     <div class="btn-group shadow-sm">
+                        <a href="{{ route('tour::package.times', $package->id) }}" class="btn btn-sm btn-white border text-primary">
+                            <i class="mdi mdi-timer-outline"></i>
+                        </a>
                         <a href="{{ route('tour::package.detail.show', ['package' => $package->id]) }}" class="btn btn-sm btn-white border" title="Edit Paket">
                             <i class="mdi mdi-eye text-info"></i>
                         </a>

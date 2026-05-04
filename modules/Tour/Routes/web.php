@@ -21,6 +21,10 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
 
         Route::post('booking-order/store', 'BookingOrderController@store')->name('booking-order.store');
         Route::get('booking-order/{order_number}', 'BookingOrderController@show')->name('booking-order.show');
+
+        Route::get('package-times/{package}', 'PackageTimeController@show')->name('package.times');
+        Route::post('package-times/{package}', 'PackageTimeController@store')->name('package.times.store');
+        Route::delete('package-times/{package}', 'PackageTimeController@destroy')->name('package.times.destroy');
     });
 
 
