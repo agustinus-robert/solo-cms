@@ -15,6 +15,16 @@
         </a>
     </li>
 
+    <li class="menu-title" key="t-layanan">Report</li>
+
+    <li class="{{ Request::routeIs('acc::trial-balance.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::trial-balance') ? 'active' : '' }}" href="{{ route('acc::trial-balance') }}">
+            <i class="nav-main-link-icon mdi mdi-chart-gantt"></i>
+            <span class="nav-main-link-name">Nerace Saldo</span>
+        </a>
+    </li>
+
+
     <li class="menu-title" key="t-layanan">Setting</li>
 
     <li class="{{ Request::routeIs('acc::coa.*') ? 'mm-active' : '' }}">

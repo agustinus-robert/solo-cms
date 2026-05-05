@@ -10,6 +10,10 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::resource('ledger', 'LedgerController');
     });
 
+    Route::namespace('Reporting')->group(function(){
+        Route::get('trial-balance', 'TrialBalanceController@index')->name('trial-balance');
+    });
+
     Route::namespace('Master')->group(function() {
         Route::resource('coa', 'CoaController');
         Route::resource('period', 'PeriodController');
