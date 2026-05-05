@@ -24,6 +24,12 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('acc::profit-loss.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::profit-loss') ? 'active' : '' }}" href="{{ route('acc::profit-loss') }}">
+            <i class="nav-main-link-icon mdi mdi-chart-areaspline-variant"></i>
+            <span class="nav-main-link-name">Untung Rugi</span>
+        </a>
+    </li>
 
     <li class="menu-title" key="t-layanan">Setting</li>
 
