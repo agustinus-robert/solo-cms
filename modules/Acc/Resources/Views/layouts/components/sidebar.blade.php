@@ -31,6 +31,13 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('acc::balance-sheet.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::balance-sheet') ? 'active' : '' }}" href="{{ route('acc::balance-sheet') }}">
+            <i class="nav-main-link-icon mdi mdi-chart-bar"></i>
+            <span class="nav-main-link-name">Neraca</span>
+        </a>
+    </li>
+
     <li class="menu-title" key="t-layanan">Setting</li>
 
     <li class="{{ Request::routeIs('acc::coa.*') ? 'mm-active' : '' }}">
