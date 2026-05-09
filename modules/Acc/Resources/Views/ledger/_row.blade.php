@@ -4,7 +4,7 @@
             <option value="">-- Pilih Akun --</option>
             @foreach($coas as $coa)
                 <option value="{{ $coa->id }}" {{ isset($entry) && $entry->coa_id == $coa->id ? 'selected' : '' }}>
-                    {{ $coa->code }} - {{ $coa->name }} ({{ strtoupper($coa->normal_balance->value) }})
+                    {{ $coa->code }} - {{ $coa->name }}
                 </option>
             @endforeach
         </select>
