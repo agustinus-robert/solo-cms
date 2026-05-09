@@ -10,7 +10,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'transaction_date' => 'required|date',
-            'reference_number' => 'required|string|unique:acc_ledgers,reference_number,' . ($this->route('ledger')?->id),
+            'reference_number' => 'required|string|unique:acc_ledgers,reference_number,' . ($this->route('ledger') ? $this->route('ledger')->id : 'NULL'),
             'description'      => 'nullable|string',
             'entries'          => 'required|array|min:2',
             'entries.*.coa_id' => 'required|exists:acc_coas,id',

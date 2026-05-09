@@ -22,22 +22,24 @@ trait LedgerRepository
     public function upsert(array $data, $id = null)
     {
         return DB::transaction(function () use ($data, $id) {
-            // 1. Simpan Header
-            $ledger = Ledger::updateOrCreate(
-                ['id' => $id],
-                [
-                    'transaction_date' => $data['transaction_date'],
-                    'reference_number' => $data['reference_number'],
-                    'description'      => $data['description'],
-                    'source_module'    => $data['source_module'] ?? 'manual',
-                    'user_id'          => auth()->id(),
-                ]
-            );
+            $payload = [
+                'transaction_date' => $data['transaction_date'],
+                'reference_number' => $data['reference_number'],
+                'description'      => $data['description'],
+                'source_module'    => $data['source_module'] ?? 'manual',
+                'user_id'          => auth()->id(),
+            ];
 
-            // 2. Simpan Detail (Hapus yang lama jika update, lalu insert baru)
+            if (!empty($id) && is_numeric($id)) {
+                $ledger = Ledger::findOrFail($id);
+                $ledger->update($payload);
+            } else {
+                $ledger = Ledger::create($payload);
+            }
+
             if (isset($data['entries'])) {
-                $ledger->entries()->delete();
-                $ledger->entries()->createMany($data['entries']);
+                $ledger->ledgerEntries()->delete();
+                $ledger->ledgerEntries()->createMany($data['entries']);
             }
 
             return $ledger;

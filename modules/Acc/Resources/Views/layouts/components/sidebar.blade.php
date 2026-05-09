@@ -17,6 +17,13 @@
 
     <li class="menu-title" key="t-layanan">Report</li>
 
+    <li class="{{ Request::routeIs('acc::report.ledger.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::report.ledger') ? 'active' : '' }}" href="{{ route('acc::report.ledger') }}">
+            <i class="nav-main-link-icon mdi mdi-book-open"></i>
+            <span class="nav-main-link-name">Buku Besar</span>
+        </a>
+    </li>
+
     <li class="{{ Request::routeIs('acc::trial-balance.*') ? 'mm-active' : '' }}">
         <a class="nav-main-link {{ Request::routeIs('acc::trial-balance') ? 'active' : '' }}" href="{{ route('acc::trial-balance') }}">
             <i class="nav-main-link-icon mdi mdi-chart-gantt"></i>
