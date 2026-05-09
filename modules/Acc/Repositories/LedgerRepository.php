@@ -12,11 +12,17 @@ trait LedgerRepository
         return Ledger::query()
             ->with(['ledgerEntries.coa', 'user'])
             ->when(isset($params['search']), function ($q) use ($params) {
-                $q->where('reference_number', 'ilike', "%{$params['search']}%")
-                  ->orWhere('description', 'ilike', "%{$params['search']}%");
+                $q->where(function($sub) use ($params) {
+                    $sub->where('reference_number', 'ilike', "%{$params['search']}%")
+                        ->orWhere('description', 'ilike', "%{$params['search']}%");
+                });
+            })
+            ->when(!empty($params['type']), function ($q) use ($params) {
+                $q->where('type', $params['type']);
             })
             ->orderBy('transaction_date', 'desc')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
     }
 
     public function upsert(array $data, $id = null)
@@ -28,6 +34,7 @@ trait LedgerRepository
                 'description'      => $data['description'],
                 'source_module'    => $data['source_module'] ?? 'manual',
                 'user_id'          => auth()->id(),
+                'type'             => $data['type'] ?? 'general',
             ];
 
             if (!empty($id) && is_numeric($id)) {

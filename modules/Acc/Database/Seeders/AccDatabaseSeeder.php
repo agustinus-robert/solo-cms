@@ -9,8 +9,9 @@ use Modules\Acc\Models\AccMapping;
 use Modules\Acc\Models\BeginningBalance;
 use Modules\Acc\Models\Ledger;
 use Modules\Acc\Models\LedgerEntry;
-use Modules\Acc\Enums\AccountCategory; // Import Enum Kategori
-use Modules\Acc\Enums\NormalBalance;   // Import Enum Saldo Normal
+use Modules\Acc\Enums\AccountCategory;
+use Modules\Acc\Enums\NormalBalance;
+use Modules\Acc\Enums\LedgerType;
 use Illuminate\Support\Facades\DB;
 
 class AccDatabaseSeeder extends Seeder
@@ -72,7 +73,6 @@ class AccDatabaseSeeder extends Seeder
         ];
 
         foreach ($coaData as $item) {
-            // Karena sudah di-cast di Model Coa, Laravel akan otomatis menyimpan value string dari Enum ini
             Coa::updateOrCreate(['code' => $item['code']], $item);
         }
     }
@@ -97,7 +97,6 @@ class AccDatabaseSeeder extends Seeder
 
     private function seedMapping()
     {
-        // Pastikan ambil ID-nya dengan aman
         $kas = Coa::where('code', '1101')->first()?->id;
         $pendHotel = Coa::where('code', '4101')->first()?->id;
         $pendTour = Coa::where('code', '4201')->first()?->id;
@@ -145,7 +144,8 @@ class AccDatabaseSeeder extends Seeder
             'reference_number' => 'INV-HOT-001',
             'description' => 'Booking Room 101 - Robert',
             'source_module' => 'hotel',
-            'user_id' => 2
+            'user_id' => 2,
+            'type' => LedgerType::GENERAL // Tambahkan LedgerType
         ]);
         LedgerEntry::create(['ledger_id' => $l1->id, 'coa_id' => $kas, 'department_tag' => 'hotel', 'debit' => 750000, 'credit' => 0]);
         LedgerEntry::create(['ledger_id' => $l1->id, 'coa_id' => $pendHotel, 'department_tag' => 'hotel', 'debit' => 0, 'credit' => 750000]);
@@ -156,7 +156,8 @@ class AccDatabaseSeeder extends Seeder
             'reference_number' => 'INV-TOUR-001',
             'description' => 'Paket Tour Borobudur',
             'source_module' => 'tour',
-            'user_id' => 2
+            'user_id' => 2,
+            'type' => LedgerType::GENERAL // Tambahkan LedgerType
         ]);
         LedgerEntry::create(['ledger_id' => $l2->id, 'coa_id' => $kas, 'department_tag' => 'tour', 'debit' => 1200000, 'credit' => 0]);
         LedgerEntry::create(['ledger_id' => $l2->id, 'coa_id' => $pendTour, 'department_tag' => 'tour', 'debit' => 0, 'credit' => 1200000]);
@@ -167,11 +168,25 @@ class AccDatabaseSeeder extends Seeder
             'reference_number' => 'INV-POS-001',
             'description' => 'Penjualan Cafe',
             'source_module' => 'pos',
-            'user_id' => 2
+            'user_id' => 2,
+            'type' => LedgerType::GENERAL // Tambahkan LedgerType
         ]);
         LedgerEntry::create(['ledger_id' => $l3->id, 'coa_id' => $kas, 'department_tag' => 'pos', 'debit' => 150000, 'credit' => 0]);
         LedgerEntry::create(['ledger_id' => $l3->id, 'coa_id' => $pendPOS, 'department_tag' => 'pos', 'debit' => 0, 'credit' => 150000]);
         LedgerEntry::create(['ledger_id' => $l3->id, 'coa_id' => $hpp, 'department_tag' => 'pos', 'debit' => 60000, 'credit' => 0]);
         LedgerEntry::create(['ledger_id' => $l3->id, 'coa_id' => $stok, 'department_tag' => 'pos', 'debit' => 0, 'credit' => 60000]);
+
+        // Contoh Seeding untuk Jurnal Penyesuaian (Adjustment)
+        $l4 = Ledger::create([
+            'transaction_date' => '2026-05-31',
+            'reference_number' => 'ADJ-001',
+            'description' => 'Penyesuaian Beban Listrik Mei',
+            'source_module' => 'manual',
+            'user_id' => 2,
+            'type' => LedgerType::ADJUSTMENT // Menggunakan tipe ADJUSTMENT
+        ]);
+        $listrik = Coa::where('code', '5202')->first()?->id;
+        LedgerEntry::create(['ledger_id' => $l4->id, 'coa_id' => $listrik, 'debit' => 4600000, 'credit' => 0]);
+        LedgerEntry::create(['ledger_id' => $l4->id, 'coa_id' => $kas, 'debit' => 0, 'credit' => 4600000]);
     }
 }

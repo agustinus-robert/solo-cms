@@ -4,6 +4,7 @@ namespace Modules\Acc\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Account\Models\User;
+use Modules\Acc\Enums\LedgerType;
 
 class Ledger extends Model
 {
@@ -13,7 +14,12 @@ class Ledger extends Model
         'reference_number',
         'description',
         'source_module',
-        'user_id'
+        'user_id',
+        'type'
+    ];
+
+    protected $casts = [
+        'type' => LedgerType::class,
     ];
 
     public function ledgerEntries()

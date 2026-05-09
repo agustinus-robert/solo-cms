@@ -16,6 +16,7 @@ class StoreRequest extends FormRequest
             'entries.*.coa_id' => 'required|exists:acc_coas,id',
             'entries.*.debit'  => 'required|numeric|min:0',
             'entries.*.credit' => 'required|numeric|min:0',
+            'type' => ['required', \Illuminate\Validation\Rule::enum(\Modules\Acc\Enums\LedgerType::class)],
         ];
     }
 
@@ -38,6 +39,7 @@ class StoreRequest extends FormRequest
             'reference_number' => $this->reference_number,
             'description'      => $this->description,
             'source_module'    => 'manual',
+            'type'             => $this->type,
             'entries'          => collect($this->entries)->map(function($e) {
                 return [
                     'coa_id' => $e['coa_id'],

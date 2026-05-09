@@ -16,6 +16,19 @@
                     <label class="form-label fw-bold">Tanggal Transaksi</label>
                     <input type="date" name="transaction_date" class="form-control" value="{{ old('transaction_date', $ledger->transaction_date ?? date('Y-m-d')) }}" required>
                 </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Tipe Jurnal</label>
+                    <select name="type" class="form-select" required>
+                        @foreach(\Modules\Acc\Enums\LedgerType::cases() as $type)
+                            <option value="{{ $type->value }}"
+                                {{ old('type', $ledger->type->value ?? 'general') == $type->value ? 'selected' : '' }}>
+                                {{ $type->label() }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-md-3">
                     <label class="form-label fw-bold">No. Referensi</label>
                     <input type="text" name="reference_number" class="form-control" value="{{ old('reference_number', $ledger->reference_number ?? '') }}" placeholder="Contoh: JV-001" required>
@@ -39,7 +52,7 @@
                     </thead>
                     <tbody id="entryBody">
                         @if($ledger)
-                            @foreach($ledger->entries as $index => $entry)
+                            @foreach($ledger->ledgerEntries as $index => $entry)
                                 @include('acc::ledger._row', ['index' => $index, 'entry' => $entry])
                             @endforeach
                         @else
@@ -76,7 +89,7 @@
 </div>
 
 <script>
-    let rowIndex = {{ $ledger ? $ledger->entries->count() : 2 }};
+    let rowIndex = {{ $ledger ? $ledger->ledgerEntries->count() : 2 }};
 
     function addRow() {
         const template = ` @include('acc::ledger._row', ['index' => 'REPLACE_INDEX']) `;

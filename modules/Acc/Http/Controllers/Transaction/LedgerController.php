@@ -35,7 +35,8 @@ class LedgerController extends Controller
 
     public function edit(Ledger $ledger)
     {
-        $ledger->load('entries.coa');
+        $ledger->load('ledgerEntries.coa');
+
         $coas = Coa::orderBy('code', 'asc')->get();
         return view('acc::ledger.upsert', compact('ledger', 'coas'));
     }

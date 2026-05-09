@@ -10,11 +10,29 @@
     </div>
     <div class="card-body">
         <form action="{{ route('acc::ledger.index') }}" method="GET" class="row g-2 mb-4">
-            <div class="col-md-3">
-                <input type="text" name="search" class="form-control" placeholder="No. Ref / Deskripsi..." value="{{ request('search') }}">
+            <!-- Filter Search -->
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="mdi mdi-magnify"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="No. Ref / Deskripsi..." value="{{ request('search') }}">
+                </div>
             </div>
+
+            <!-- Filter Tipe Jurnal -->
+            <div class="col-md-3">
+                <select name="type" class="form-select">
+                    <option value="">-- Semua Tipe --</option>
+                    @foreach(\Modules\Acc\Enums\LedgerType::cases() as $type)
+                        <option value="{{ $type->value }}" {{ request('type') == $type->value ? 'selected' : '' }}>
+                            {{ $type->label() }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="col-md-2">
-                <button class="btn btn-light border" type="submit">Filter</button>
+                <button class="btn btn-primary" type="submit">Filter</button>
+                <a href="{{ route('acc::ledger.index') }}" class="btn btn-light border">Reset</a>
             </div>
         </form>
 
