@@ -24,6 +24,13 @@
         </a>
     </li>
 
+    <li class="{{ Request::routeIs('acc::work-sheet.*') ? 'mm-active' : '' }}">
+        <a class="nav-main-link {{ Request::routeIs('acc::work-sheet') ? 'active' : '' }}" href="{{ route('acc::work-sheet') }}">
+            <i class="nav-main-link-icon mdi mdi-chart-timeline"></i>
+            <span class="nav-main-link-name">Nerace Lajur</span>
+        </a>
+    </li>
+
     <li class="{{ Request::routeIs('acc::trial-balance.*') ? 'mm-active' : '' }}">
         <a class="nav-main-link {{ Request::routeIs('acc::trial-balance') ? 'active' : '' }}" href="{{ route('acc::trial-balance') }}">
             <i class="nav-main-link-icon mdi mdi-chart-gantt"></i>

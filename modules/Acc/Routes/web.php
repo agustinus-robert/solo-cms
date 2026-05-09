@@ -15,6 +15,7 @@ Route::middleware(['auth', AccessMiddleware::class])->group(function () {
         Route::get('profit-loss', 'ProfitLossController@index')->name('profit-loss');
         Route::get('balance-sheet', 'BalanceSheetController@index')->name('balance-sheet');
         Route::get('ledger-report', 'LedgerReportController@index')->name('report.ledger');
+        Route::get('worksheet-report', 'WorksheetController@index')->name('work-sheet');
     });
 
     Route::namespace('Master')->group(function() {
